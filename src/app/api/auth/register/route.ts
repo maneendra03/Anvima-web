@@ -23,8 +23,14 @@ export async function POST(request: NextRequest) {
     const verificationToken = generateVerificationToken()
     const hashedToken = hashToken(verificationToken)
 
-    // Skip email verification in development mode
-    const skipEmailVerification = process.env.NODE_ENV === 'development' || process.env.SKIP_EMAIL_VERIFICATION === 'true'
+    // Skip email verification if not configured or explicitly disabled
+    const emailConfigured = process.env.EMAIL_SERVER_HOST && 
+                           process.env.EMAIL_SERVER_USER && 
+                           process.env.EMAIL_SERVER_PASSWORD &&
+                           process.env.EMAIL_SERVER_PASSWORD !== 'your-app-password'
+    const skipEmailVerification = process.env.NODE_ENV === 'development' || 
+                                  process.env.SKIP_EMAIL_VERIFICATION === 'true' ||
+                                  !emailConfigured
 
     // Create user
     const user = await User.create({
