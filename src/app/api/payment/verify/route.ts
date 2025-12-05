@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyRazorpaySignature } from '@/lib/razorpay'
+import { verifyRazorpaySignature, isPaymentEnabled } from '@/lib/razorpay'
 import { requireAuth, isAuthenticated } from '@/lib/auth/middleware'
 import dbConnect from '@/lib/mongodb'
 import Order from '@/models/Order'
@@ -7,6 +7,14 @@ import Order from '@/models/Order'
 // Verify Razorpay Payment
 export async function POST(request: NextRequest) {
   try {
+    // Check if Razorpay is configured
+    if (!isPaymentEnabled()) {
+      return NextResponse.json(
+        { success: false, message: 'Payment gateway not configured' },
+        { status: 503 }
+      )
+    }
+
     // Verify authentication
     const authResult = await requireAuth()
     if (!isAuthenticated(authResult)) {

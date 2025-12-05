@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import dbConnect from '@/lib/mongodb'
 import Order from '@/models/Order'
+import { isPaymentEnabled } from '@/lib/razorpay'
 
 // Verify Razorpay Webhook Signature
 function verifyWebhookSignature(body: string, signature: string): boolean {
+  if (!process.env.RAZORPAY_WEBHOOK_SECRET) {
+    return false
+  }
   const expectedSignature = crypto
-    .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET!)
+    .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
     .update(body)
     .digest('hex')
   
@@ -15,6 +19,14 @@ function verifyWebhookSignature(body: string, signature: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if Razorpay is configured
+    if (!isPaymentEnabled()) {
+      return NextResponse.json(
+        { success: false, message: 'Payment gateway not configured' },
+        { status: 503 }
+      )
+    }
+
     const body = await request.text()
     const signature = request.headers.get('x-razorpay-signature')
 

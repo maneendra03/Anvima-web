@@ -1,11 +1,21 @@
 import Razorpay from 'razorpay'
 import crypto from 'crypto'
 
-// Server-side Razorpay instance
-export const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-})
+// Server-side Razorpay instance - only initialize if keys are available
+const isRazorpayConfigured = process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET && 
+  process.env.RAZORPAY_KEY_ID !== 'rzp_test_your_key_id'
+
+export const razorpay = isRazorpayConfigured 
+  ? new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID!,
+      key_secret: process.env.RAZORPAY_KEY_SECRET!,
+    })
+  : null
+
+// Check if Razorpay is configured
+export function isPaymentEnabled(): boolean {
+  return !!isRazorpayConfigured && razorpay !== null
+}
 
 // Format amount for Razorpay (convert to paise - smallest currency unit)
 export function formatAmountForRazorpay(amount: number): number {

@@ -242,23 +242,23 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="min-h-screen bg-cream-50 flex items-center justify-center px-4 py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
-      >
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <Suspense fallback={
-            <div className="flex items-center justify-center py-8">
-              <div className="w-8 h-8 border-2 border-forest-500/30 border-t-forest-500 rounded-full animate-spin" />
-            </div>
-          }>
+    <Suspense fallback={
+      <div className="min-h-screen bg-cream-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-forest-500/30 border-t-forest-500 rounded-full animate-spin" />
+      </div>
+    }>
+      <div className="min-h-screen bg-cream-50 flex items-center justify-center px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md"
+        >
+          <div className="bg-white rounded-2xl shadow-lg p-8">
             <ResetPasswordForm />
-          </Suspense>
-        </div>
-      </motion.div>
-    </div>
+          </div>
+        </motion.div>
+      </div>
+    </Suspense>
   )
 }
