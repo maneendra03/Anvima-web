@@ -1,0 +1,310 @@
+import nodemailer from 'nodemailer'
+
+// Support both naming conventions for environment variables
+const smtpHost = process.env.SMTP_HOST || process.env.EMAIL_SERVER_HOST || 'smtp.gmail.com'
+const smtpPort = parseInt(process.env.SMTP_PORT || process.env.EMAIL_SERVER_PORT || '587')
+const smtpUser = process.env.SMTP_USER || process.env.EMAIL_SERVER_USER
+const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_SERVER_PASSWORD
+const smtpSecure = (process.env.SMTP_SECURE === 'true') || smtpPort === 465
+
+const transporter = nodemailer.createTransport({
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpSecure,
+  auth: {
+    user: smtpUser,
+    pass: smtpPass,
+  },
+})
+
+const FROM_EMAIL = process.env.FROM_EMAIL || process.env.EMAIL_FROM?.match(/<(.+)>/)?.[1] || smtpUser || 'noreply@anvimacreations.com'
+const FROM_NAME = process.env.FROM_NAME || process.env.EMAIL_FROM?.match(/^([^<]+)/)?.[1]?.trim() || 'Anvima Creations'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'
+
+interface EmailOptions {
+  to: string
+  subject: string
+  html: string
+}
+
+async function sendEmail({ to, subject, html }: EmailOptions): Promise<void> {
+  try {
+    await transporter.sendMail({
+      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
+      to,
+      subject,
+      html,
+    })
+    console.log(`✅ Email sent to ${to}`)
+  } catch (error) {
+    console.error('❌ Email sending failed:', error)
+    throw new Error('Failed to send email')
+  }
+}
+
+export async function sendVerificationEmail(
+  email: string,
+  name: string,
+  token: string
+): Promise<void> {
+  const verificationUrl = `${APP_URL}/verify-email?token=${token}`
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: 'Inter', Arial, sans-serif; background-color: #FAF7F2; margin: 0; padding: 20px;">
+      <div style="max-width: 600px; margin: 0 auto; background-color: #FDFCFA; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div style="background: linear-gradient(135deg, #FFAA8A 0%, #FF8FA6 100%); padding: 40px 20px; text-align: center;">
+          <h1 style="color: #FDFCFA; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 28px;">Anvima Creations</h1>
+        </div>
+        <div style="padding: 40px 30px;">
+          <h2 style="color: #3D3D3D; margin-bottom: 20px; font-size: 24px;">Welcome to Anvima, ${name}! 🎉</h2>
+          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+            Thank you for creating an account with us. To complete your registration and start exploring our beautiful collection of customized gifts, please verify your email address.
+          </p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verificationUrl}" 
+               style="display: inline-block; background-color: #2D5A47; color: #FDFCFA; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+              Verify Email Address
+            </a>
+          </div>
+          <p style="color: #999; font-size: 14px; line-height: 1.6;">
+            If the button doesn't work, copy and paste this link into your browser:<br>
+            <a href="${verificationUrl}" style="color: #2D5A47;">${verificationUrl}</a>
+          </p>
+          <p style="color: #999; font-size: 14px; margin-top: 30px;">
+            This link will expire in 24 hours. If you didn't create an account, please ignore this email.
+          </p>
+        </div>
+        <div style="background-color: #F5F0E8; padding: 20px; text-align: center;">
+          <p style="color: #999; font-size: 12px; margin: 0;">
+            © ${new Date().getFullYear()} Anvima Creations. Made with ❤️ in India
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  await sendEmail({
+    to: email,
+    subject: 'Verify your email - Anvima Creations',
+    html,
+  })
+}
+
+export async function sendPasswordResetEmail(
+  email: string,
+  name: string,
+  token: string
+): Promise<void> {
+  const resetUrl = `${APP_URL}/reset-password?token=${token}`
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: 'Inter', Arial, sans-serif; background-color: #FAF7F2; margin: 0; padding: 20px;">
+      <div style="max-width: 600px; margin: 0 auto; background-color: #FDFCFA; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div style="background: linear-gradient(135deg, #FFAA8A 0%, #FF8FA6 100%); padding: 40px 20px; text-align: center;">
+          <h1 style="color: #FDFCFA; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 28px;">Anvima Creations</h1>
+        </div>
+        <div style="padding: 40px 30px;">
+          <h2 style="color: #3D3D3D; margin-bottom: 20px; font-size: 24px;">Password Reset Request</h2>
+          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+            Hi ${name},<br><br>
+            We received a request to reset your password. Click the button below to create a new password.
+          </p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetUrl}" 
+               style="display: inline-block; background-color: #2D5A47; color: #FDFCFA; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+              Reset Password
+            </a>
+          </div>
+          <p style="color: #999; font-size: 14px; line-height: 1.6;">
+            If the button doesn't work, copy and paste this link into your browser:<br>
+            <a href="${resetUrl}" style="color: #2D5A47;">${resetUrl}</a>
+          </p>
+          <p style="color: #999; font-size: 14px; margin-top: 30px;">
+            This link will expire in 1 hour. If you didn't request a password reset, please ignore this email or contact support if you have concerns.
+          </p>
+        </div>
+        <div style="background-color: #F5F0E8; padding: 20px; text-align: center;">
+          <p style="color: #999; font-size: 12px; margin: 0;">
+            © ${new Date().getFullYear()} Anvima Creations. Made with ❤️ in India
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  await sendEmail({
+    to: email,
+    subject: 'Reset your password - Anvima Creations',
+    html,
+  })
+}
+
+export async function sendWelcomeEmail(
+  email: string,
+  name: string
+): Promise<void> {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: 'Inter', Arial, sans-serif; background-color: #FAF7F2; margin: 0; padding: 20px;">
+      <div style="max-width: 600px; margin: 0 auto; background-color: #FDFCFA; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div style="background: linear-gradient(135deg, #FFAA8A 0%, #FF8FA6 100%); padding: 40px 20px; text-align: center;">
+          <h1 style="color: #FDFCFA; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 28px;">Anvima Creations</h1>
+        </div>
+        <div style="padding: 40px 30px;">
+          <h2 style="color: #3D3D3D; margin-bottom: 20px; font-size: 24px;">Welcome aboard, ${name}! 🎊</h2>
+          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+            Your email has been verified and your account is now active. We're thrilled to have you join the Anvima family!
+          </p>
+          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+            At Anvima Creations, we believe every gift tells a story. Browse our collection of beautifully crafted, personalized gifts perfect for any occasion.
+          </p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${APP_URL}/shop" 
+               style="display: inline-block; background-color: #2D5A47; color: #FDFCFA; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+              Start Shopping
+            </a>
+          </div>
+          <div style="background-color: #F5F0E8; border-radius: 8px; padding: 20px; margin-top: 30px;">
+            <h3 style="color: #3D3D3D; margin-top: 0; font-size: 16px;">Here's what you can do:</h3>
+            <ul style="color: #666; line-height: 1.8; padding-left: 20px;">
+              <li>Browse our exclusive collection</li>
+              <li>Customize products with your photos & text</li>
+              <li>Track your orders in real-time</li>
+              <li>Save favorites to your wishlist</li>
+            </ul>
+          </div>
+        </div>
+        <div style="background-color: #F5F0E8; padding: 20px; text-align: center;">
+          <p style="color: #999; font-size: 12px; margin: 0;">
+            © ${new Date().getFullYear()} Anvima Creations. Made with ❤️ in India
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  await sendEmail({
+    to: email,
+    subject: 'Welcome to Anvima Creations! 🎉',
+    html,
+  })
+}
+
+export async function sendOrderConfirmationEmail(
+  email: string,
+  name: string,
+  orderNumber: string,
+  orderDetails: {
+    items: { name: string; quantity: number; price: number }[]
+    subtotal: number
+    shipping: number
+    total: number
+    address: string
+  }
+): Promise<void> {
+  const itemsHtml = orderDetails.items
+    .map(
+      (item) => `
+      <tr>
+        <td style="padding: 12px; border-bottom: 1px solid #eee;">${item.name}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">₹${item.price.toLocaleString('en-IN')}</td>
+      </tr>
+    `
+    )
+    .join('')
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: 'Inter', Arial, sans-serif; background-color: #FAF7F2; margin: 0; padding: 20px;">
+      <div style="max-width: 600px; margin: 0 auto; background-color: #FDFCFA; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div style="background: linear-gradient(135deg, #FFAA8A 0%, #FF8FA6 100%); padding: 40px 20px; text-align: center;">
+          <h1 style="color: #FDFCFA; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 28px;">Anvima Creations</h1>
+        </div>
+        <div style="padding: 40px 30px;">
+          <h2 style="color: #3D3D3D; margin-bottom: 20px; font-size: 24px;">Order Confirmed! 🎁</h2>
+          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
+            Hi ${name},<br><br>
+            Thank you for your order! We're excited to create something special for you.
+          </p>
+          <div style="background-color: #F5F0E8; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <p style="margin: 0; color: #3D3D3D;"><strong>Order Number:</strong> ${orderNumber}</p>
+          </div>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <thead>
+              <tr style="background-color: #F5F0E8;">
+                <th style="padding: 12px; text-align: left; color: #3D3D3D;">Item</th>
+                <th style="padding: 12px; text-align: center; color: #3D3D3D;">Qty</th>
+                <th style="padding: 12px; text-align: right; color: #3D3D3D;">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+          </table>
+          <div style="border-top: 2px solid #F5F0E8; padding-top: 15px;">
+            <p style="display: flex; justify-content: space-between; margin: 5px 0; color: #666;">
+              <span>Subtotal:</span>
+              <span>₹${orderDetails.subtotal.toLocaleString('en-IN')}</span>
+            </p>
+            <p style="display: flex; justify-content: space-between; margin: 5px 0; color: #666;">
+              <span>Shipping:</span>
+              <span>${orderDetails.shipping === 0 ? 'FREE' : `₹${orderDetails.shipping.toLocaleString('en-IN')}`}</span>
+            </p>
+            <p style="display: flex; justify-content: space-between; margin: 15px 0; color: #3D3D3D; font-size: 18px; font-weight: bold;">
+              <span>Total:</span>
+              <span>₹${orderDetails.total.toLocaleString('en-IN')}</span>
+            </p>
+          </div>
+          <div style="background-color: #F5F0E8; border-radius: 8px; padding: 20px; margin-top: 20px;">
+            <h3 style="color: #3D3D3D; margin-top: 0; font-size: 16px;">Shipping Address:</h3>
+            <p style="color: #666; margin: 0; white-space: pre-line;">${orderDetails.address}</p>
+          </div>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${APP_URL}/account/orders" 
+               style="display: inline-block; background-color: #2D5A47; color: #FDFCFA; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+              Track Order
+            </a>
+          </div>
+        </div>
+        <div style="background-color: #F5F0E8; padding: 20px; text-align: center;">
+          <p style="color: #999; font-size: 12px; margin: 0;">
+            © ${new Date().getFullYear()} Anvima Creations. Made with ❤️ in India
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  await sendEmail({
+    to: email,
+    subject: `Order Confirmed - ${orderNumber} | Anvima Creations`,
+    html,
+  })
+}

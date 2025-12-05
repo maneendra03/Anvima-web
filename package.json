@@ -1,0 +1,54 @@
+{
+  "name": "anvima-web",
+  "version": "1.0.0",
+  "description": "Anvima - Customized Gifts E-commerce",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "seed": "npx tsx scripts/seed.ts"
+  },
+  "keywords": [
+    "gifts",
+    "customized",
+    "ecommerce"
+  ],
+  "author": "Anvima Creations",
+  "license": "ISC",
+  "dependencies": {
+    "@auth/mongodb-adapter": "^3.11.1",
+    "@tailwindcss/postcss": "^4.1.17",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.22",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.8.0",
+    "framer-motion": "^12.23.25",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^0.555.0",
+    "mongoose": "^9.0.0",
+    "next": "^16.0.7",
+    "next-auth": "^4.24.13",
+    "nodemailer": "^7.0.11",
+    "postcss": "^8.5.6",
+    "razorpay": "^2.9.6",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "react-hot-toast": "^2.6.0",
+    "tailwindcss": "^3.4.18",
+    "typescript": "^5.9.3",
+    "zod": "^4.1.13",
+    "zustand": "^5.0.9"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.3",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/nodemailer": "^7.0.4",
+    "eslint-config-next": "^16.0.7",
+    "tsx": "^4.21.0"
+  }
+}

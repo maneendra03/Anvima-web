@@ -1,0 +1,173 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --peach-primary: #FFAA8A;
+  --blush-primary: #FF8FA6;
+  --cream-primary: #FAF7F2;
+  --forest-primary: #2D5A47;
+  --charcoal-primary: #3D3D3D;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #FDFCFA;
+  color: #3D3D3D;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF7F2;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4C4AC;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #BFA98D;
+}
+
+/* Selection */
+::selection {
+  background-color: #FFAA8A;
+  color: #1F1F1F;
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: 2px solid #2D5A47;
+  outline-offset: 2px;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Image hover effects */
+.image-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.image-hover:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Button hover effects */
+.btn-primary {
+  @apply bg-forest-500 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 hover:bg-forest-600 hover:shadow-lg active:scale-95;
+}
+
+.btn-secondary {
+  @apply bg-transparent border-2 border-forest-500 text-forest-500 px-6 py-3 rounded-full font-medium transition-all duration-300 hover:bg-forest-500 hover:text-white;
+}
+
+.btn-peach {
+  @apply bg-peach-400 text-charcoal-700 px-6 py-3 rounded-full font-medium transition-all duration-300 hover:bg-peach-500 hover:shadow-lg active:scale-95;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md;
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Gradient backgrounds */
+.gradient-peach {
+  background: linear-gradient(135deg, #FFF8F5 0%, #FFEDE5 100%);
+}
+
+.gradient-hero {
+  background: linear-gradient(180deg, #FDFCFA 0%, #FAF7F2 50%, #FFF8F5 100%);
+}
+
+/* Animation delays for staggered effects */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* WhatsApp button pulse */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+  }
+}
+
+.whatsapp-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Product image container */
+.product-image-container {
+  @apply relative overflow-hidden rounded-xl;
+}
+
+.product-image-container::after {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition-opacity duration-300;
+}
+
+.product-image-container:hover::after {
+  @apply opacity-100;
+}
+
+/* Form input styles */
+.input-field {
+  @apply w-full px-4 py-3 rounded-xl border border-cream-300 bg-white focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20 transition-all duration-200 outline-none;
+}
+
+.textarea-field {
+  @apply w-full px-4 py-3 rounded-xl border border-cream-300 bg-white focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20 transition-all duration-200 outline-none resize-none;
+}
+
+/* Badge */
+.badge {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.badge-peach {
+  @apply bg-peach-100 text-peach-600;
+}
+
+.badge-forest {
+  @apply bg-forest-500/10 text-forest-600;
+}
