@@ -168,58 +168,6 @@ open http://localhost:3000
 
 ---
 
-## ⚙️ Environment Configuration
-
-Create a `.env.local` file in the root directory:
-
-```bash
-# ===========================================
-# DATABASE
-# ===========================================
-# Local MongoDB
-MONGODB_URI=mongodb://localhost:27017/anvima
-
-# MongoDB Atlas (Production)
-# MONGODB_URI=mongodb+srv://<username>:<password>@cluster.xxxxx.mongodb.net/anvima
-
-# ===========================================
-# AUTHENTICATION
-# ===========================================
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-super-secret-key-min-32-characters
-
-# JWT Secret for API authentication
-JWT_SECRET=your-jwt-secret-key-min-32-characters
-
-# ===========================================
-# EMAIL (Nodemailer with Gmail)
-# ===========================================
-EMAIL_SERVER_HOST=smtp.gmail.com
-EMAIL_SERVER_PORT=587
-EMAIL_SERVER_USER=your-email@gmail.com
-EMAIL_SERVER_PASSWORD=your-app-password    # Use Gmail App Password
-EMAIL_FROM=Anvima <noreply@anvima.com>
-
-# ===========================================
-# CLOUDINARY (Image Uploads)
-# ===========================================
-CLOUDINARY_CLOUD_NAME=your-cloud-name
-CLOUDINARY_API_KEY=your-api-key
-CLOUDINARY_API_SECRET=your-api-secret
-
-# ===========================================
-# RAZORPAY (Payments)
-# ===========================================
-RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
-RAZORPAY_KEY_SECRET=your-razorpay-secret
-
-# ===========================================
-# ADMIN (Initial Setup)
-# ===========================================
-ADMIN_EMAIL=admin@anvima.com
-ADMIN_PASSWORD=admin123456
-```
-
 ### Environment Variables Explained
 
 | Variable | Required | Description |
