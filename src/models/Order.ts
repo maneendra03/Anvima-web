@@ -236,9 +236,8 @@ OrderSchema.pre('save', function () {
   }
 })
 
-// Indexes
+// Indexes (orderNumber index is created by unique: true)
 OrderSchema.index({ user: 1, createdAt: -1 })
-OrderSchema.index({ orderNumber: 1 })
 OrderSchema.index({ status: 1 })
 OrderSchema.index({ createdAt: -1 })
 

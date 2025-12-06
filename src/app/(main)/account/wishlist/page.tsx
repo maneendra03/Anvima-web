@@ -72,6 +72,7 @@ export default function WishlistPage() {
     addToCart({
       id: item.product._id,
       productId: item.product._id,
+      slug: item.product.slug,
       name: item.product.name,
       price: item.product.price,
       image: item.product.images.find((img) => img.isPrimary)?.url || item.product.images[0]?.url || '',

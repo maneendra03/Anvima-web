@@ -4,6 +4,7 @@ import './globals.css'
 import LayoutWrapper from '@/components/layout/LayoutWrapper'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXTAUTH_URL || 'http://localhost:3000'),
   title: 'Anvima | Customized Gifts & Personalized Creations',
   description: 'Create beautiful customized frames, printed Polaroids, curated hampers, and bespoke gifts. Handcrafted with love for your special moments. Shop now at Anvima Creations.',
   keywords: 'customized gifts, personalized frames, photo gifts, Polaroid prints, hampers, custom orders, gift shop, handmade gifts',
