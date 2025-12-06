@@ -171,7 +171,7 @@ function SearchContent() {
       name: product.name,
       price: product.price,
       quantity: 1,
-      image: product.images?.[0] || '/placeholder.jpg',
+      image: product.images?.[0] || '/placeholder.svg',
     })
     toast.success('Added to cart!')
   }
@@ -358,7 +358,7 @@ function SearchContent() {
             <Link href={`/product/${product.slug}`} className="sm:w-48 md:w-56 flex-shrink-0">
               <div className="relative aspect-square sm:h-full">
                 <Image
-                  src={product.images?.[0] || '/placeholder.jpg'}
+                  src={product.images?.[0] || '/placeholder.svg'}
                   alt={product.name}
                   fill
                   className="object-cover"
@@ -452,7 +452,7 @@ function SearchContent() {
       >
         <Link href={`/product/${product.slug}`} className="block relative aspect-square overflow-hidden">
           <Image
-            src={product.images?.[0] || '/placeholder.jpg'}
+            src={product.images?.[0] || '/placeholder.svg'}
             alt={product.name}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"

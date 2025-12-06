@@ -61,14 +61,14 @@ export default function Header() {
           : 'bg-transparent'
       }`}
     >
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 md:h-20">
+      <nav className="max-w-7xl mx-auto px-2.5 sm:px-4 lg:px-8">
+        <div className="flex items-center justify-between h-12 sm:h-14 md:h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-2xl md:text-3xl font-serif font-bold text-forest-600"
+              className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif font-bold text-forest-600"
             >
               Anvima
             </motion.div>
@@ -94,16 +94,18 @@ export default function Header() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
+            {/* Search - visible on all screen sizes */}
             <button 
               onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="p-2 hover:bg-cream-100 rounded-full transition-colors hidden md:block"
+              className="p-2 hover:bg-cream-100 rounded-full transition-colors"
             >
               <Search className="w-5 h-5 text-charcoal-600" />
             </button>
+            {/* Wishlist - visible on all screen sizes */}
             <Link 
               href="/account/wishlist"
-              className="p-2 hover:bg-cream-100 rounded-full transition-colors hidden md:block"
+              className="p-2 hover:bg-cream-100 rounded-full transition-colors"
             >
               <Heart className="w-5 h-5 text-charcoal-600" />
             </Link>
@@ -231,6 +233,30 @@ export default function Header() {
             className="md:hidden bg-white border-t border-cream-200"
           >
             <div className="px-4 py-4 space-y-2">
+              {/* Mobile Search Button */}
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false)
+                  setIsSearchOpen(true)
+                }}
+                className="flex items-center gap-3 w-full px-4 py-3 text-charcoal-600 hover:bg-cream-50 hover:text-forest-500 rounded-lg transition-colors"
+              >
+                <Search className="w-5 h-5" />
+                Search Products
+              </button>
+              
+              {/* Mobile Wishlist Link */}
+              <Link
+                href="/account/wishlist"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-charcoal-600 hover:bg-cream-50 hover:text-forest-500 rounded-lg transition-colors"
+              >
+                <Heart className="w-5 h-5" />
+                Wishlist
+              </Link>
+              
+              <div className="border-t border-cream-100 pt-2 mt-2"></div>
+              
               {navigation.map((item) => (
                 <Link
                   key={item.name}

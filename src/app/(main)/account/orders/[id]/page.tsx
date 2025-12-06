@@ -141,6 +141,9 @@ export default function OrderDetailPage({ params }: Props) {
   const { id } = use(params)
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [cancelReason, setCancelReason] = useState('')
+  const [cancelling, setCancelling] = useState(false)
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -167,6 +170,58 @@ export default function OrderDetailPage({ params }: Props) {
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text)
     toast.success(`${label} copied!`)
+  }
+
+  const canCancelOrder = () => {
+    if (!order) return false
+    return ['pending', 'confirmed'].includes(order.status)
+  }
+
+  const handleCancelOrder = async () => {
+    if (!order) return
+    
+    setCancelling(true)
+    try {
+      const response = await fetch(`/api/user/orders/${order._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'cancel',
+          reason: cancelReason || 'Cancelled by customer'
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('Order cancelled successfully')
+        // Update local state
+        setOrder({
+          ...order,
+          status: 'cancelled',
+          paymentStatus: order.paymentStatus === 'paid' ? 'refunded' : order.paymentStatus,
+          timeline: [
+            ...order.timeline,
+            {
+              status: 'cancelled',
+              message: cancelReason || 'Cancelled by customer',
+              timestamp: new Date().toISOString()
+            }
+          ]
+        })
+        setShowCancelModal(false)
+        setCancelReason('')
+      } else {
+        toast.error(data.message || 'Failed to cancel order')
+      }
+    } catch (error) {
+      console.error('Error cancelling order:', error)
+      toast.error('Failed to cancel order')
+    } finally {
+      setCancelling(false)
+    }
   }
 
   const formatDate = (dateString: string) => {
@@ -255,8 +310,36 @@ export default function OrderDetailPage({ params }: Props) {
             <StatusIcon className="w-4 h-4" />
             {statusInfo.label}
           </span>
+          {canCancelOrder() && (
+            <button
+              onClick={() => setShowCancelModal(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 transition-colors"
+            >
+              <XCircle className="w-4 h-4" />
+              Cancel Order
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Cancel Order Info Banner */}
+      {canCancelOrder() && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-amber-50 border border-amber-200 rounded-lg p-4"
+        >
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-amber-800">You can still cancel this order</p>
+              <p className="text-sm text-amber-700 mt-1">
+                Orders can be cancelled before they are processed. Once the order is being processed or shipped, it cannot be cancelled.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Progress Tracker */}
       {order.status !== 'cancelled' && order.status !== 'refunded' && (
@@ -426,7 +509,7 @@ export default function OrderDetailPage({ params }: Props) {
               <div key={index} className="p-4 flex gap-4">
                 <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                   <Image
-                    src={item.image || '/placeholder.jpg'}
+                    src={item.image || '/placeholder.svg'}
                     alt={item.name}
                     fill
                     className="object-cover"
@@ -628,6 +711,81 @@ export default function OrderDetailPage({ params }: Props) {
           </div>
         </div>
       </motion.div>
+
+      {/* Cancel Order Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <XCircle className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Cancel Order</h3>
+                <p className="text-sm text-gray-500">Order #{order.orderNumber}</p>
+              </div>
+            </div>
+            
+            <p className="text-gray-600 mb-4">
+              Are you sure you want to cancel this order? This action cannot be undone.
+              {order.paymentStatus === 'paid' && (
+                <span className="block mt-2 text-sm text-amber-600">
+                  Your payment will be refunded within 5-7 business days.
+                </span>
+              )}
+            </p>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Reason for cancellation (optional)
+              </label>
+              <select
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              >
+                <option value="">Select a reason</option>
+                <option value="Changed my mind">Changed my mind</option>
+                <option value="Found a better price">Found a better price</option>
+                <option value="Ordered by mistake">Ordered by mistake</option>
+                <option value="Delivery time too long">Delivery time too long</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowCancelModal(false)
+                  setCancelReason('')
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                disabled={cancelling}
+              >
+                Keep Order
+              </button>
+              <button
+                onClick={handleCancelOrder}
+                disabled={cancelling}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {cancelling ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Cancelling...
+                  </>
+                ) : (
+                  'Cancel Order'
+                )}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   )
 }

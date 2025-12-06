@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard,
   Package,
@@ -18,10 +18,23 @@ import {
   ChevronRight,
   Bell,
   Store,
-  Tag
+  Tag,
+  AlertTriangle,
+  Clock,
+  CheckCircle
 } from 'lucide-react'
 import { useAuthStore } from '@/store/auth'
 import { useCartStore } from '@/store/cartStore'
+
+interface Notification {
+  id: string
+  type: 'order' | 'stock' | 'user' | 'system'
+  title: string
+  message: string
+  time: string
+  read: boolean
+  link?: string
+}
 
 const adminNavItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -44,11 +57,123 @@ export default function AdminLayout({
   const clearCart = useCartStore((state) => state.clearCart)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [loadingNotifications, setLoadingNotifications] = useState(false)
+
+  const fetchNotifications = useCallback(async () => {
+    setLoadingNotifications(true)
+    try {
+      // Fetch recent orders for notifications
+      const ordersRes = await fetch('/api/admin/orders?limit=5&sort=-createdAt')
+      const ordersData = await ordersRes.json()
+      
+      // Fetch low stock products
+      const productsRes = await fetch('/api/admin/products?stock=low&limit=3')
+      const productsData = await productsRes.json()
+      
+      const newNotifications: Notification[] = []
+      
+      // Add recent order notifications
+      if (ordersData.success && ordersData.data?.orders) {
+        ordersData.data.orders.slice(0, 3).forEach((order: { _id: string; orderNumber: string; status: string; createdAt: string; total: number }) => {
+          const isRecent = new Date(order.createdAt).getTime() > Date.now() - 24 * 60 * 60 * 1000
+          if (isRecent) {
+            newNotifications.push({
+              id: `order-${order._id}`,
+              type: 'order',
+              title: 'New Order',
+              message: `Order #${order.orderNumber} - ₹${order.total?.toLocaleString('en-IN')}`,
+              time: formatTimeAgo(order.createdAt),
+              read: order.status !== 'pending',
+              link: `/admin/orders/${order._id}`
+            })
+          }
+        })
+      }
+      
+      // Add low stock notifications
+      if (productsData.success && productsData.data?.products) {
+        productsData.data.products.forEach((product: { _id: string; name: string; stock: number }) => {
+          if (product.stock <= 10) {
+            newNotifications.push({
+              id: `stock-${product._id}`,
+              type: 'stock',
+              title: 'Low Stock Alert',
+              message: `${product.name} - Only ${product.stock} left`,
+              time: 'Now',
+              read: false,
+              link: `/admin/products/${product._id}/edit`
+            })
+          }
+        })
+      }
+      
+      // Add a welcome notification if no notifications
+      if (newNotifications.length === 0) {
+        newNotifications.push({
+          id: 'welcome',
+          type: 'system',
+          title: 'All caught up!',
+          message: 'No new notifications at the moment',
+          time: 'Now',
+          read: true
+        })
+      }
+      
+      setNotifications(newNotifications)
+    } catch (error) {
+      console.error('Error fetching notifications:', error)
+    } finally {
+      setLoadingNotifications(false)
+    }
+  }, [])
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+    
+    if (seconds < 60) return 'Just now'
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
+    return `${Math.floor(seconds / 86400)}d ago`
+  }
+
+  const unreadCount = notifications.filter(n => !n.read).length
+
+  const markAsRead = (id: string) => {
+    setNotifications(prev => 
+      prev.map(n => n.id === id ? { ...n, read: true } : n)
+    )
+  }
+
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+  }
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'order': return <ShoppingBag className="w-4 h-4 text-blue-500" />
+      case 'stock': return <AlertTriangle className="w-4 h-4 text-amber-500" />
+      case 'user': return <Users className="w-4 h-4 text-green-500" />
+      default: return <Bell className="w-4 h-4 text-gray-500" />
+    }
+  }
 
   useEffect(() => {
     setMounted(true)
     fetchUser()
   }, [fetchUser])
+
+  useEffect(() => {
+    if (mounted && isAuthenticated && user?.role === 'admin') {
+      fetchNotifications()
+      // Refresh notifications every 2 minutes
+      const interval = setInterval(fetchNotifications, 120000)
+      return () => clearInterval(interval)
+    }
+  }, [mounted, isAuthenticated, user, fetchNotifications])
 
   useEffect(() => {
     if (mounted && !isLoading) {
@@ -59,6 +184,18 @@ export default function AdminLayout({
       }
     }
   }, [mounted, isAuthenticated, isLoading, user, router])
+
+  // Close notification dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (showNotifications && !target.closest('[data-notifications]')) {
+        setShowNotifications(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showNotifications])
 
   const handleLogout = async () => {
     // Clear cart first (this also clears localStorage via persist)
@@ -219,10 +356,105 @@ export default function AdminLayout({
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <button className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors">
-                <Bell className="h-5 w-5 text-gray-600" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
+              {/* Notification Bell */}
+              <div className="relative" data-notifications>
+                <button 
+                  onClick={() => {
+                    setShowNotifications(!showNotifications)
+                    if (!showNotifications) fetchNotifications()
+                  }}
+                  className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-colors"
+                >
+                  <Bell className="h-5 w-5 text-gray-600" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1 right-1 w-5 h-5 bg-red-500 rounded-full text-white text-xs flex items-center justify-center font-medium">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Notification Dropdown */}
+                <AnimatePresence>
+                  {showNotifications && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                    >
+                      <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+                        <h3 className="font-semibold text-gray-900">Notifications</h3>
+                        {unreadCount > 0 && (
+                          <button
+                            onClick={markAllAsRead}
+                            className="text-xs text-forest-600 hover:text-forest-700 font-medium"
+                          >
+                            Mark all read
+                          </button>
+                        )}
+                      </div>
+                      
+                      <div className="max-h-96 overflow-y-auto">
+                        {loadingNotifications ? (
+                          <div className="p-4 text-center">
+                            <div className="w-6 h-6 border-2 border-gray-200 border-t-forest-500 rounded-full animate-spin mx-auto" />
+                          </div>
+                        ) : notifications.length === 0 ? (
+                          <div className="p-8 text-center text-gray-500">
+                            <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                            <p className="text-sm">No notifications</p>
+                          </div>
+                        ) : (
+                          notifications.map((notification) => (
+                            <Link
+                              key={notification.id}
+                              href={notification.link || '#'}
+                              onClick={() => {
+                                markAsRead(notification.id)
+                                setShowNotifications(false)
+                              }}
+                              className={`block p-4 hover:bg-gray-50 transition-colors border-b border-gray-50 ${
+                                !notification.read ? 'bg-blue-50/50' : ''
+                              }`}
+                            >
+                              <div className="flex gap-3">
+                                <div className="flex-shrink-0 mt-0.5">
+                                  {getNotificationIcon(notification.type)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className={`text-sm font-medium ${!notification.read ? 'text-gray-900' : 'text-gray-600'}`}>
+                                    {notification.title}
+                                  </p>
+                                  <p className="text-sm text-gray-500 truncate">
+                                    {notification.message}
+                                  </p>
+                                  <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {notification.time}
+                                  </p>
+                                </div>
+                                {!notification.read && (
+                                  <div className="flex-shrink-0">
+                                    <span className="w-2 h-2 bg-blue-500 rounded-full block" />
+                                  </div>
+                                )}
+                              </div>
+                            </Link>
+                          ))
+                        )}
+                      </div>
+                      
+                      <Link
+                        href="/admin/orders"
+                        onClick={() => setShowNotifications(false)}
+                        className="block p-3 text-center text-sm text-forest-600 hover:bg-gray-50 font-medium border-t border-gray-100"
+                      >
+                        View All Orders →
+                      </Link>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
               <div className="hidden md:flex items-center gap-2 pl-3 border-l border-gray-200">
                 <div className="h-9 w-9 bg-gradient-to-br from-forest-400 to-forest-600 rounded-full flex items-center justify-center text-white font-medium shadow-lg shadow-forest-500/20">
                   {user?.name?.charAt(0).toUpperCase()}
