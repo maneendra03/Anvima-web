@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Package, ChevronRight, Clock, CheckCircle, Truck, XCircle, Search } from 'lucide-react'
+import { Package, ChevronRight, Clock, CheckCircle, Truck, XCircle, Search, AlertCircle } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 interface Order {
   id: string
@@ -33,6 +34,9 @@ export default function OrdersPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null)
+  const [showCancelModal, setShowCancelModal] = useState<string | null>(null)
+  const [cancelReason, setCancelReason] = useState('')
 
   useEffect(() => {
     fetchOrders()
@@ -50,6 +54,47 @@ export default function OrdersPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleCancelOrder = async (orderId: string) => {
+    setCancellingOrderId(orderId)
+    try {
+      const response = await fetch(`/api/user/orders/${orderId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'cancel',
+          reason: cancelReason || 'Cancelled by customer'
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('Order cancelled successfully')
+        // Update local state
+        setOrders(orders.map(order => 
+          order.id === orderId 
+            ? { ...order, status: 'cancelled' as const }
+            : order
+        ))
+        setShowCancelModal(null)
+        setCancelReason('')
+      } else {
+        toast.error(data.message || 'Failed to cancel order')
+      }
+    } catch (error) {
+      console.error('Error cancelling order:', error)
+      toast.error('Failed to cancel order')
+    } finally {
+      setCancellingOrderId(null)
+    }
+  }
+
+  const canCancelOrder = (status: string) => {
+    return ['pending', 'confirmed'].includes(status)
   }
 
   const filteredOrders = orders.filter((order) => {
@@ -204,6 +249,14 @@ export default function OrdersPage() {
                       >
                         View Details
                       </Link>
+                      {canCancelOrder(order.status) && (
+                        <button
+                          onClick={() => setShowCancelModal(order.id)}
+                          className="flex-1 sm:flex-none px-4 py-2 border border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      )}
                       {order.status === 'delivered' && (
                         <button className="flex-1 sm:flex-none px-4 py-2 border border-forest-600 text-forest-600 rounded-lg font-medium hover:bg-forest-50 transition-colors">
                           Write Review
@@ -215,6 +268,78 @@ export default function OrdersPage() {
               </motion.div>
             )
           })}
+        </div>
+      )}
+
+      {/* Cancel Order Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <XCircle className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Cancel Order</h3>
+                <p className="text-sm text-gray-500">
+                  Order #{orders.find(o => o.id === showCancelModal)?.orderNumber}
+                </p>
+              </div>
+            </div>
+            
+            <p className="text-gray-600 mb-4">
+              Are you sure you want to cancel this order? This action cannot be undone.
+            </p>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Reason for cancellation (optional)
+              </label>
+              <select
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              >
+                <option value="">Select a reason</option>
+                <option value="Changed my mind">Changed my mind</option>
+                <option value="Found a better price">Found a better price</option>
+                <option value="Ordered by mistake">Ordered by mistake</option>
+                <option value="Delivery time too long">Delivery time too long</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowCancelModal(null)
+                  setCancelReason('')
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                disabled={cancellingOrderId === showCancelModal}
+              >
+                Keep Order
+              </button>
+              <button
+                onClick={() => handleCancelOrder(showCancelModal)}
+                disabled={cancellingOrderId === showCancelModal}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {cancellingOrderId === showCancelModal ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Cancelling...
+                  </>
+                ) : (
+                  'Cancel Order'
+                )}
+              </button>
+            </div>
+          </motion.div>
         </div>
       )}
     </div>

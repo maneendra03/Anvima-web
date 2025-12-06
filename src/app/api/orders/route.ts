@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import mongoose from 'mongoose'
 import dbConnect from '@/lib/mongodb'
 import Order, { IOrder } from '@/models/Order'
 import Product from '@/models/Product'
@@ -9,6 +10,12 @@ function generateOrderNumber(): string {
   const timestamp = Date.now().toString(36).toUpperCase()
   const random = Math.random().toString(36).substring(2, 6).toUpperCase()
   return `ANV-${timestamp}-${random}`
+}
+
+// Helper to check if string is valid MongoDB ObjectId
+function isValidObjectId(id: string): boolean {
+  return mongoose.Types.ObjectId.isValid(id) && 
+         new mongoose.Types.ObjectId(id).toString() === id
 }
 
 // GET - Get user's orders
@@ -50,6 +57,10 @@ export async function POST(request: NextRequest) {
     await dbConnect()
 
     const body = await request.json()
+    
+    // Debug: Log the entire request body
+    console.log('Order API received body:', JSON.stringify(body, null, 2))
+    
     const {
       items,
       shippingAddress,
@@ -57,6 +68,9 @@ export async function POST(request: NextRequest) {
       couponCode,
       notes,
     } = body
+
+    // Debug: Log items specifically
+    console.log('Items received:', items)
 
     // Validate items
     if (!items || items.length === 0) {
@@ -79,10 +93,49 @@ export async function POST(request: NextRequest) {
     let subtotal = 0
 
     for (const item of items) {
-      const product = await Product.findById(item.productId)
+      // Debug logging
+      console.log('Processing item:', { productId: item.productId, slug: item.slug })
+      
+      // Try to find product by ObjectId first, then by slug
+      let product = null
+      
+      if (item.productId && isValidObjectId(item.productId)) {
+        product = await Product.findById(item.productId)
+        console.log('Found by ObjectId:', !!product)
+      }
+      
+      // If not found by ID, try by slug (for mock data compatibility)
+      if (!product && item.slug) {
+        console.log('Searching for product by slug:', item.slug)
+        product = await Product.findOne({ slug: item.slug })
+        console.log('Found by item.slug:', !!product, 'slug:', item.slug)
+        
+        // If still not found, try without any filters
+        if (!product) {
+          const allProducts = await Product.find({}).select('slug name')
+          console.log('All products in DB:', allProducts.map(p => p.slug))
+        }
+      }
+      
+      // Also try productId as slug
+      if (!product && item.productId) {
+        product = await Product.findOne({ slug: item.productId })
+        console.log('Found by productId as slug:', !!product)
+      }
+      
       if (!product) {
+        console.log('Product NOT FOUND for:', { productId: item.productId, slug: item.slug })
+        // Return detailed error message for debugging
         return NextResponse.json(
-          { success: false, message: `Product not found: ${item.productId}` },
+          { 
+            success: false, 
+            message: `Product not found: ${item.slug || item.productId}`,
+            debug: {
+              receivedProductId: item.productId,
+              receivedSlug: item.slug,
+              fullItem: item
+            }
+          },
           { status: 400 }
         )
       }
@@ -162,12 +215,14 @@ export async function POST(request: NextRequest) {
       ],
     }) as IOrder
 
-    // If COD, mark as confirmed
-    if (paymentMethod === 'cod') {
+    // If COD or Pay Later, mark as confirmed
+    if (paymentMethod === 'cod' || paymentMethod === 'pay_later') {
       order.status = 'confirmed'
       order.timeline.push({
         status: 'confirmed',
-        message: 'Order confirmed (Cash on Delivery)',
+        message: paymentMethod === 'cod' 
+          ? 'Order confirmed (Cash on Delivery)' 
+          : 'Order confirmed (Pay Later)',
         timestamp: new Date(),
       })
       await order.save()

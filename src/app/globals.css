@@ -24,14 +24,71 @@ body {
   overflow-x: hidden;
 }
 
+/* Mobile-first balanced compact sizing */
+html {
+  font-size: 14px; /* Balanced base font on mobile */
+}
+
+@media (min-width: 480px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 640px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
+}
+
 body {
   font-family: 'Inter', system-ui, sans-serif;
   background-color: #FDFCFA;
   color: #3D3D3D;
+  line-height: 1.5; /* Better readability */
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Playfair Display', Georgia, serif;
+  line-height: 1.25;
+}
+
+/* Mobile compact heading sizes - balanced */
+h1 {
+  @apply text-2xl sm:text-3xl lg:text-4xl;
+}
+
+h2 {
+  @apply text-xl sm:text-2xl lg:text-3xl;
+}
+
+h3 {
+  @apply text-lg sm:text-xl lg:text-2xl;
+}
+
+/* Balanced spacing utilities for mobile */
+@layer utilities {
+  .section-padding {
+    @apply py-6 sm:py-10 lg:py-14;
+  }
+  
+  .container-padding {
+    @apply px-4 sm:px-5 lg:px-6;
+  }
+  
+  .card-padding {
+    @apply p-3 sm:p-4 lg:p-6;
+  }
+  
+  .compact-gap {
+    @apply gap-3 sm:gap-4 lg:gap-6;
+  }
 }
 
 /* Custom Scrollbar */
@@ -79,22 +136,22 @@ html {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
 }
 
-/* Button hover effects */
+/* Button hover effects - balanced sizing */
 .btn-primary {
-  @apply bg-forest-500 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 hover:bg-forest-600 hover:shadow-lg active:scale-95;
+  @apply bg-forest-500 text-white px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-300 hover:bg-forest-600 hover:shadow-lg active:scale-95;
 }
 
 .btn-secondary {
-  @apply bg-transparent border-2 border-forest-500 text-forest-500 px-6 py-3 rounded-full font-medium transition-all duration-300 hover:bg-forest-500 hover:text-white;
+  @apply bg-transparent border-2 border-forest-500 text-forest-500 px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-300 hover:bg-forest-500 hover:text-white;
 }
 
 .btn-peach {
-  @apply bg-peach-400 text-charcoal-700 px-6 py-3 rounded-full font-medium transition-all duration-300 hover:bg-peach-500 hover:shadow-lg active:scale-95;
+  @apply bg-peach-400 text-charcoal-700 px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-300 hover:bg-peach-500 hover:shadow-lg active:scale-95;
 }
 
-/* Card styles */
+/* Card styles - more compact */
 .card {
-  @apply bg-white rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md;
+  @apply bg-white rounded-lg sm:rounded-xl lg:rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md;
 }
 
 /* Glass effect */
@@ -150,18 +207,18 @@ html {
   @apply opacity-100;
 }
 
-/* Form input styles */
+/* Form input styles - balanced sizing */
 .input-field {
-  @apply w-full px-4 py-3 rounded-xl border border-cream-300 bg-white focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20 transition-all duration-200 outline-none;
+  @apply w-full px-3 py-2 sm:px-4 sm:py-2.5 lg:px-4 lg:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border border-cream-300 bg-white focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20 transition-all duration-200 outline-none;
 }
 
 .textarea-field {
-  @apply w-full px-4 py-3 rounded-xl border border-cream-300 bg-white focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20 transition-all duration-200 outline-none resize-none;
+  @apply w-full px-3 py-2 sm:px-4 sm:py-2.5 lg:px-4 lg:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border border-cream-300 bg-white focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20 transition-all duration-200 outline-none resize-none;
 }
 
-/* Badge */
+/* Badge - balanced sizing */
 .badge {
-  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  @apply inline-flex items-center px-2.5 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium;
 }
 
 .badge-peach {

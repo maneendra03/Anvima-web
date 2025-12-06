@@ -14,11 +14,39 @@ import {
   Loader2,
   AlertCircle
 } from 'lucide-react'
-import { useCartStore } from '@/store/cartStore'
+import { useCartStore, CartItem } from '@/store/cartStore'
 import { useAuthStore } from '@/store/auth'
 import RazorpayCheckout from '@/components/checkout/CheckoutForm'
 import CouponInput from '@/components/checkout/CouponInput'
 import toast from 'react-hot-toast'
+import { products } from '@/data'
+
+// Helper to get slug from mock data by product ID or name
+function getProductSlug(item: CartItem): string | undefined {
+  // If item already has slug, use it
+  if (item.slug) return item.slug
+  
+  // Try to find by productId in mock data (supports "1", "2", etc.)
+  const productById = products.find(p => p.id === item.productId || p.id === item.id)
+  if (productById) {
+    console.log('Found product by ID:', productById.slug)
+    return productById.slug
+  }
+  
+  // Try to find by name (case-insensitive)
+  if (item.name) {
+    const productByName = products.find(p => 
+      p.name.toLowerCase() === item.name.toLowerCase()
+    )
+    if (productByName) {
+      console.log('Found product by name:', productByName.slug)
+      return productByName.slug
+    }
+  }
+  
+  console.log('Could not find slug for item:', item)
+  return undefined
+}
 
 type PaymentMethod = 'razorpay' | 'cod' | 'pay_later'
 
@@ -121,36 +149,50 @@ export default function CheckoutPage() {
     setError(null)
 
     try {
-      // Prepare order items
-      const orderItems = items.map(item => ({
-        productId: item.productId || item.id,
-        quantity: item.quantity,
-        price: item.price,
-        variant: item.customization?.size ? { name: 'Size', option: item.customization.size } : undefined,
-        customization: item.customization ? { 
-          text: item.customization.text,
-          images: item.customization.imageUrl ? [item.customization.imageUrl] : undefined,
-          notes: item.customization.engraving,
-        } : undefined,
-      }))
+      // Debug: Log cart items
+      console.log('Cart items:', items)
+      
+      // Prepare order items - include slug for product lookup (handles old cart items without slug)
+      const orderItems = items.map(item => {
+        const slug = getProductSlug(item)
+        console.log('Item:', item.name, 'productId:', item.productId, 'found slug:', slug)
+        return {
+          productId: item.productId || item.id,
+          slug: slug, // Get slug from item or lookup in mock data
+          quantity: item.quantity,
+          price: item.price,
+          variant: item.customization?.size ? { name: 'Size', option: item.customization.size } : undefined,
+          customization: item.customization ? { 
+            text: item.customization.text,
+            images: item.customization.imageUrl ? [item.customization.imageUrl] : undefined,
+            notes: item.customization.engraving,
+          } : undefined,
+        }
+      })
+
+      // Build request body
+      const requestBody = {
+        items: orderItems,
+        shippingAddress: {
+          name: `${formData.firstName} ${formData.lastName}`,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+          landmark: formData.landmark,
+        },
+        paymentMethod,
+      }
+      
+      // Debug: Log the full request body being sent
+      console.log('Sending order request:', JSON.stringify(requestBody, null, 2))
 
       // Create order
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: orderItems,
-          shippingAddress: {
-            name: `${formData.firstName} ${formData.lastName}`,
-            phone: formData.phone,
-            address: formData.address,
-            city: formData.city,
-            state: formData.state,
-            pincode: formData.pincode,
-            landmark: formData.landmark,
-          },
-          paymentMethod,
-        }),
+        body: JSON.stringify(requestBody),
       })
 
       const data = await response.json()

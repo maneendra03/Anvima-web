@@ -107,6 +107,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     addItem({
       id: `${product.id}-${Date.now()}`,
       productId: product.id,
+      slug: product.slug, // Include slug for order API compatibility
       name: product.name,
       price: calculatePrice(),
       quantity,

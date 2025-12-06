@@ -67,6 +67,7 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
     addItem({
       id: `${product.id}-${Date.now()}`,
       productId: product.id,
+      slug: product.slug, // Include slug for order API compatibility
       name: product.name,
       price: calculatePrice(),
       quantity,
