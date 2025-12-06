@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 export interface User {
   id: string
@@ -16,10 +16,12 @@ interface AuthState {
   user: User | null
   isLoading: boolean
   isAuthenticated: boolean
+  _hasHydrated: boolean
   
   // Actions
   setUser: (user: User | null) => void
   setLoading: (loading: boolean) => void
+  setHasHydrated: (state: boolean) => void
   login: (email: string, password: string) => Promise<{ success: boolean; message: string; user?: User }>
   register: (data: { name: string; email: string; password: string; phone?: string }) => Promise<{ success: boolean; message: string }>
   logout: () => Promise<void>
@@ -33,10 +35,13 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isLoading: false,
       isAuthenticated: false,
+      _hasHydrated: false,
 
       setUser: (user) => set({ user, isAuthenticated: !!user }),
       
       setLoading: (isLoading) => set({ isLoading }),
+      
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
 
       login: async (email, password) => {
         set({ isLoading: true })
@@ -133,7 +138,16 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true)
+      },
     }
   )
 )
+
+// Hook to wait for hydration
+export const useAuthHydration = () => {
+  return useAuthStore((state) => state._hasHydrated)
+}

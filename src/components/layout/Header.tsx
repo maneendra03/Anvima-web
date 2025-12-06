@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ShoppingBag, Search, Heart, User, LogOut, Package, Settings } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
-import { useAuthStore } from '@/store/auth'
+import { useAuthStore, useAuthHydration } from '@/store/auth'
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -23,9 +23,13 @@ export default function Header() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [isMobile, setIsMobile] = useState(false)
+  
+  // Wait for hydration before showing auth-dependent UI
+  const hasHydrated = useAuthHydration()
   const cartItems = useCartStore((state) => state.items)
   const clearCart = useCartStore((state) => state.clearCart)
-  const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0)
+  const cartCount = useMemo(() => cartItems.reduce((acc, item) => acc + item.quantity, 0), [cartItems])
   const { user, isAuthenticated, logout } = useAuthStore()
 
   const handleLogout = async () => {
@@ -33,7 +37,7 @@ export default function Header() {
     await logout()
     setIsUserMenuOpen(false)
     setIsMobileMenuOpen(false)
-    router.push('/login')
+    router.replace('/login')
   }
 
   const handleSearch = (e: React.FormEvent) => {
@@ -46,10 +50,18 @@ export default function Header() {
   }
 
   useEffect(() => {
+    // Check if mobile on mount and resize
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
     }
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
@@ -126,7 +138,7 @@ export default function Header() {
             </Link>
 
             {/* User Menu */}
-            {isAuthenticated && user ? (
+            {hasHydrated && isAuthenticated && user ? (
               <div className="relative hidden md:block">
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -150,9 +162,10 @@ export default function Header() {
                 <AnimatePresence>
                   {isUserMenuOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: 10 }}
+                      initial={isMobile ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
+                      exit={isMobile ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                      transition={{ duration: 0.15 }}
                       className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-cream-200 py-2 z-50"
                     >
                       <div className="px-4 py-3 border-b border-cream-100">
@@ -198,7 +211,7 @@ export default function Header() {
                   )}
                 </AnimatePresence>
               </div>
-            ) : (
+            ) : hasHydrated ? (
               <Link
                 href="/login"
                 className="hidden md:flex items-center gap-2 px-4 py-2 bg-forest-600 text-white rounded-lg hover:bg-forest-700 transition-colors font-medium"
@@ -206,6 +219,8 @@ export default function Header() {
                 <User className="w-4 h-4" />
                 Sign In
               </Link>
+            ) : (
+              <div className="hidden md:block w-20 h-9 bg-cream-100 rounded-lg animate-pulse" />
             )}
 
             {/* Mobile menu button */}
@@ -227,9 +242,10 @@ export default function Header() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
             className="md:hidden bg-white border-t border-cream-200"
           >
             <div className="px-4 py-4 space-y-2">
@@ -270,7 +286,9 @@ export default function Header() {
               
               {/* Mobile Auth Section */}
               <div className="border-t border-cream-100 pt-4 mt-4">
-                {isAuthenticated && user ? (
+                {!hasHydrated ? (
+                  <div className="px-4 py-3 bg-cream-50 rounded-lg animate-pulse h-20" />
+                ) : isAuthenticated && user ? (
                   <>
                     <div className="px-4 py-3 bg-cream-50 rounded-lg mb-2">
                       <p className="font-medium text-charcoal-800">{user.name}</p>
@@ -338,9 +356,10 @@ export default function Header() {
       <AnimatePresence>
         {isSearchOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
             className="absolute top-full left-0 right-0 bg-white shadow-lg border-t border-gray-100"
           >
             <div className="max-w-2xl mx-auto px-4 py-4">

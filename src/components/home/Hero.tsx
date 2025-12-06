@@ -1,10 +1,27 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowRight, Sparkles } from 'lucide-react'
 
 export default function Hero() {
+  const [isMobile, setIsMobile] = useState(false)
+  
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Disable animations on mobile for better performance
+  const animationProps = isMobile ? {} : {
+    initial: { opacity: 0, y: 30 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.6 }
+  }
+
   return (
     <section className="relative min-h-[75vh] sm:min-h-[85vh] lg:min-h-screen flex items-center gradient-hero overflow-hidden">
       {/* Background decoration */}
@@ -18,20 +35,15 @@ export default function Hero() {
         <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
           {/* Text Content */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            {...animationProps}
             className="text-center lg:text-left"
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
+            <div
               className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-4 sm:py-1.5 bg-peach-100 rounded-full text-peach-600 text-xs sm:text-sm font-medium mb-3 sm:mb-4 lg:mb-5"
             >
               <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
               Handcrafted with Love
-            </motion.div>
+            </div>
 
             <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-serif font-bold text-charcoal-700 leading-tight mb-3 sm:mb-4 lg:mb-6">
               Create Memories{' '}
@@ -61,31 +73,24 @@ export default function Hero() {
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
               <Link href="/shop">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
+                <button
+                  className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto hover:scale-[1.02] active:scale-[0.98] transition-transform"
                 >
                   Customize Your Gift
                   <ArrowRight className="w-4 h-4" />
-                </motion.button>
+                </button>
               </Link>
               <Link href="/custom-orders">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="btn-secondary w-full sm:w-auto"
+                <button
+                  className="btn-secondary w-full sm:w-auto hover:scale-[1.02] active:scale-[0.98] transition-transform"
                 >
                   Request Custom Order
-                </motion.button>
+                </button>
               </Link>
             </div>
 
             {/* Trust badges */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
+            <div
               className="mt-6 sm:mt-8 lg:mt-10 flex flex-wrap items-center gap-4 sm:gap-6 lg:gap-8 justify-center lg:justify-start text-xs sm:text-sm text-charcoal-500"
             >
               <div className="flex items-center gap-2">
@@ -96,27 +101,21 @@ export default function Hero() {
                 <span className="w-2 h-2 bg-peach-400 rounded-full" />
                 4.9★ Rating
               </div>
-            </motion.div>
+            </div>
           </motion.div>
 
-          {/* Image Grid */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+          {/* Image Grid - Desktop only */}
+          <div
             className="relative hidden lg:block"
           >
             <div className="grid grid-cols-2 gap-3">
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                className="space-y-4"
-              >
+              <div className="space-y-4">
                 <div className="rounded-2xl overflow-hidden shadow-lg aspect-[3/4] bg-cream-200">
                   <img
                     src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=400&h=500&fit=crop"
                     alt="Custom frame"
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </div>
                 <div className="rounded-2xl overflow-hidden shadow-lg aspect-square bg-cream-200">
@@ -124,19 +123,17 @@ export default function Hero() {
                     src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&h=400&fit=crop"
                     alt="Gift hamper"
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </div>
-              </motion.div>
-              <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                className="space-y-4 pt-8"
-              >
+              </div>
+              <div className="space-y-4 pt-8">
                 <div className="rounded-2xl overflow-hidden shadow-lg aspect-square bg-cream-200">
                   <img
                     src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=400&fit=crop"
                     alt="Polaroid prints"
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </div>
                 <div className="rounded-2xl overflow-hidden shadow-lg aspect-[3/4] bg-cream-200">
@@ -144,40 +141,28 @@ export default function Hero() {
                     src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400&h=500&fit=crop"
                     alt="Photo collage"
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </div>
-              </motion.div>
+              </div>
             </div>
 
             {/* Floating badge */}
-            <motion.div
-              animate={{ rotate: [0, 5, -5, 0] }}
-              transition={{ duration: 3, repeat: Infinity }}
-              className="absolute -left-8 top-1/2 bg-white rounded-xl shadow-lg p-4"
-            >
+            <div className="absolute -left-8 top-1/2 bg-white rounded-xl shadow-lg p-4">
               <p className="text-sm font-medium text-charcoal-700">
                 ✨ 100% Customizable
               </p>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="w-6 h-10 border-2 border-charcoal-300 rounded-full flex justify-center pt-2"
-        >
+      {/* Scroll indicator - hidden on mobile */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:block">
+        <div className="w-6 h-10 border-2 border-charcoal-300 rounded-full flex justify-center pt-2 animate-bounce">
           <div className="w-1.5 h-1.5 bg-charcoal-400 rounded-full" />
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </section>
   )
 }

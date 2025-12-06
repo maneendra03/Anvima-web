@@ -196,16 +196,11 @@ export default function ShopPage() {
                   : 'grid-cols-1'
               }`}
             >
-              {filteredProducts.map((product, index) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
+              {filteredProducts.map((product) => (
+                <div key={product.id}>
                   <Link href={`/product/${product.slug}`}>
                     <div
-                      className={`group bg-white rounded-lg sm:rounded-xl lg:rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all ${
+                      className={`group bg-white rounded-lg sm:rounded-xl lg:rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${
                         viewMode === 'list' ? 'flex' : ''
                       }`}
                     >
@@ -245,25 +240,21 @@ export default function ShopPage() {
 
                         {/* Quick actions */}
                         <div className="absolute bottom-1.5 sm:bottom-2 lg:bottom-3 right-1.5 sm:right-2 lg:right-3 flex gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                          <button
                             onClick={(e) => {
                               e.preventDefault()
                               setQuickViewProduct(product)
                             }}
-                            className="p-1.5 sm:p-2 lg:p-3 bg-white rounded-full shadow-lg"
+                            className="p-1.5 sm:p-2 lg:p-3 bg-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-transform"
                             title="Quick View"
                           >
                             <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-charcoal-600" />
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="p-1.5 sm:p-2 lg:p-3 bg-white rounded-full shadow-lg"
+                          </button>
+                          <button
+                            className="p-1.5 sm:p-2 lg:p-3 bg-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-transform"
                           >
                             <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-forest-500" />
-                          </motion.button>
+                          </button>
                         </div>
                       </div>
 
@@ -310,7 +301,7 @@ export default function ShopPage() {
                       </div>
                     </div>
                   </Link>
-                </motion.div>
+                </div>
               ))}
             </div>
 

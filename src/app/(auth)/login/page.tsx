@@ -55,15 +55,17 @@ function LoginForm() {
     
     if (result.success) {
       toast.success('Welcome back!')
+      // Force refresh to update the auth state across the app
+      router.refresh()
       // Check for redirect URL first (e.g., from checkout)
       if (redirectUrl) {
-        router.push(redirectUrl)
+        router.replace(redirectUrl)
       } else if (result.user?.role === 'admin') {
         // Redirect admin users to admin portal
-        router.push('/admin')
+        router.replace('/admin')
       } else {
         // Redirect regular users to home page
-        router.push('/')
+        router.replace('/')
       }
     } else {
       toast.error(result.message)
