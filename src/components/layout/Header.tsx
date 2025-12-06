@@ -70,11 +70,11 @@ export default function Header() {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
           ? 'bg-white/95 backdrop-blur-md shadow-sm'
-          : 'bg-transparent'
+          : 'bg-white/80 backdrop-blur-sm'
       }`}
     >
-      <nav className="max-w-7xl mx-auto px-2.5 sm:px-4 lg:px-8">
-        <div className="flex items-center justify-between h-12 sm:h-14 md:h-16 lg:h-20">
+      <nav className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16 md:h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <motion.div

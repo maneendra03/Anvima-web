@@ -53,7 +53,7 @@ export default function ShopPage() {
   }, [selectedCategory, priceRange, sortBy])
 
   return (
-    <div className="min-h-screen bg-cream-50 pt-16 sm:pt-20">
+    <div className="min-h-screen bg-cream-50 pt-14 sm:pt-16 lg:pt-20">
       {/* Header */}
       <div className="bg-gradient-to-b from-peach-50 to-cream-50 py-6 sm:py-10 lg:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -24,6 +24,13 @@ body {
   overflow-x: hidden;
 }
 
+/* Prevent zoom on input focus in iOS */
+@media screen and (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
 /* Mobile-first balanced compact sizing */
 html {
   font-size: 14px; /* Balanced base font on mobile */

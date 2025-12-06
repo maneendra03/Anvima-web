@@ -220,9 +220,9 @@ function SearchContent() {
   const FilterSidebar = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div className={`${isMobile ? '' : 'sticky top-24'} space-y-4`}>
       {/* Category Filter */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-          <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Category</h3>
+      <div className="bg-white rounded-lg border border-cream-200 overflow-hidden">
+        <div className="px-4 py-3 bg-cream-50 border-b border-cream-200">
+          <h3 className="font-semibold text-charcoal-900 text-sm uppercase tracking-wide">Category</h3>
         </div>
         <div className="p-3 space-y-1">
           {categories.map((cat) => (
@@ -232,7 +232,7 @@ function SearchContent() {
               className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between ${
                 selectedCategory === cat.slug
                   ? 'bg-orange-50 text-orange-700 font-medium'
-                  : 'text-gray-700 hover:bg-gray-50'
+                  : 'text-charcoal-700 hover:bg-cream-50'
               }`}
             >
               <span>{cat.name}</span>
@@ -243,9 +243,9 @@ function SearchContent() {
       </div>
 
       {/* Price Filter */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-          <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Price</h3>
+      <div className="bg-white rounded-lg border border-cream-200 overflow-hidden">
+        <div className="px-4 py-3 bg-cream-50 border-b border-cream-200">
+          <h3 className="font-semibold text-charcoal-900 text-sm uppercase tracking-wide">Price</h3>
         </div>
         <div className="p-3 space-y-1">
           <button
@@ -253,7 +253,7 @@ function SearchContent() {
             className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between ${
               !selectedPriceRange
                 ? 'bg-orange-50 text-orange-700 font-medium'
-                : 'text-gray-700 hover:bg-gray-50'
+                : 'text-charcoal-700 hover:bg-cream-50'
             }`}
           >
             <span>All Prices</span>
@@ -266,7 +266,7 @@ function SearchContent() {
               className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between ${
                 selectedPriceRange?.min === range.min && selectedPriceRange?.max === range.max
                   ? 'bg-orange-50 text-orange-700 font-medium'
-                  : 'text-gray-700 hover:bg-gray-50'
+                  : 'text-charcoal-700 hover:bg-cream-50'
               }`}
             >
               <span>{range.label}</span>
@@ -279,9 +279,9 @@ function SearchContent() {
       </div>
 
       {/* Availability Filter */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-          <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Availability</h3>
+      <div className="bg-white rounded-lg border border-cream-200 overflow-hidden">
+        <div className="px-4 py-3 bg-cream-50 border-b border-cream-200">
+          <h3 className="font-semibold text-charcoal-900 text-sm uppercase tracking-wide">Availability</h3>
         </div>
         <div className="p-3 space-y-3">
           <label className="flex items-center gap-3 cursor-pointer">
@@ -289,38 +289,38 @@ function SearchContent() {
               type="checkbox"
               checked={inStockOnly}
               onChange={(e) => setInStockOnly(e.target.checked)}
-              className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+              className="w-4 h-4 text-forest-600 border-cream-200 rounded focus:ring-forest-500"
             />
-            <span className="text-sm text-gray-700">In Stock Only</span>
+            <span className="text-sm text-charcoal-700">In Stock Only</span>
           </label>
           <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="checkbox"
               checked={discountedOnly}
               onChange={(e) => setDiscountedOnly(e.target.checked)}
-              className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+              className="w-4 h-4 text-forest-600 border-cream-200 rounded focus:ring-forest-500"
             />
-            <span className="text-sm text-gray-700">On Sale</span>
+            <span className="text-sm text-charcoal-700">On Sale</span>
           </label>
         </div>
       </div>
 
       {/* Customer Ratings */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-          <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Customer Rating</h3>
+      <div className="bg-white rounded-lg border border-cream-200 overflow-hidden">
+        <div className="px-4 py-3 bg-cream-50 border-b border-cream-200">
+          <h3 className="font-semibold text-charcoal-900 text-sm uppercase tracking-wide">Customer Rating</h3>
         </div>
         <div className="p-3 space-y-2">
           {[4, 3, 2, 1].map((rating) => (
             <button
               key={rating}
-              className="w-full text-left px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+              className="w-full text-left px-3 py-2 rounded-md text-sm text-charcoal-700 hover:bg-cream-50 flex items-center gap-2"
             >
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-4 h-4 ${i < rating ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`}
+                    className={`w-4 h-4 ${i < rating ? 'fill-amber-400 text-amber-400' : 'text-charcoal-300'}`}
                   />
                 ))}
               </div>
@@ -333,7 +333,7 @@ function SearchContent() {
       {hasActiveFilters && (
         <button
           onClick={clearAllFilters}
-          className="w-full py-2.5 text-sm font-medium text-orange-600 hover:text-orange-700 border border-orange-200 rounded-lg hover:bg-orange-50 transition-colors"
+          className="w-full py-2.5 text-sm font-medium text-forest-600 hover:text-orange-700 border border-forest-200 rounded-lg hover:bg-forest-50 transition-colors"
         >
           Clear All Filters
         </button>
@@ -352,7 +352,7 @@ function SearchContent() {
           layout
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+          className="bg-white rounded-lg border border-cream-200 overflow-hidden hover:shadow-lg transition-shadow"
         >
           <div className="flex flex-col sm:flex-row">
             <Link href={`/product/${product.slug}`} className="sm:w-48 md:w-56 flex-shrink-0">
@@ -377,14 +377,14 @@ function SearchContent() {
             </Link>
             <div className="flex-1 p-4 flex flex-col">
               <div className="flex-1">
-                <p className="text-xs text-gray-500 mb-1">{getCategoryName(product.category)}</p>
+                <p className="text-xs text-charcoal-500 mb-1">{getCategoryName(product.category)}</p>
                 <Link href={`/product/${product.slug}`}>
-                  <h3 className="font-medium text-gray-900 hover:text-orange-600 line-clamp-2 mb-2">
+                  <h3 className="font-medium text-charcoal-900 hover:text-forest-600 line-clamp-2 mb-2">
                     {product.name}
                   </h3>
                 </Link>
                 {product.shortDescription && (
-                  <p className="text-sm text-gray-600 line-clamp-2 mb-3">{product.shortDescription}</p>
+                  <p className="text-sm text-charcoal-600 line-clamp-2 mb-3">{product.shortDescription}</p>
                 )}
                 <div className="flex items-center gap-2 mb-3">
                   {product.rating && (
@@ -393,21 +393,21 @@ function SearchContent() {
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`w-4 h-4 ${i < Math.floor(product.rating || 0) ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`}
+                            className={`w-4 h-4 ${i < Math.floor(product.rating || 0) ? 'fill-amber-400 text-amber-400' : 'text-charcoal-300'}`}
                           />
                         ))}
                       </div>
-                      <span className="text-sm text-gray-600">({product.reviewCount || 0})</span>
+                      <span className="text-sm text-charcoal-600">({product.reviewCount || 0})</span>
                     </div>
                   )}
                 </div>
                 <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-xl font-bold text-gray-900">{formatCurrency(product.price)}</span>
+                  <span className="text-xl font-bold text-charcoal-900">{formatCurrency(product.price)}</span>
                   {originalPrice && originalPrice > product.price && (
-                    <span className="text-sm text-gray-500 line-through">{formatCurrency(originalPrice)}</span>
+                    <span className="text-sm text-charcoal-500 line-through">{formatCurrency(originalPrice)}</span>
                   )}
                 </div>
-                <div className="flex items-center gap-4 text-xs text-gray-600">
+                <div className="flex items-center gap-4 text-xs text-charcoal-600">
                   <span className="flex items-center gap-1">
                     <Truck className="w-4 h-4" />
                     Free Delivery
@@ -421,7 +421,7 @@ function SearchContent() {
               <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
                 <button
                   onClick={() => handleAddToCart(product)}
-                  className="flex-1 py-2.5 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 py-2.5 bg-forest-500 text-white font-medium rounded-lg hover:bg-forest-600 transition-colors flex items-center justify-center gap-2"
                 >
                   <ShoppingCart className="w-4 h-4" />
                   Add to Cart
@@ -431,7 +431,7 @@ function SearchContent() {
                   className={`p-2.5 border rounded-lg transition-colors ${
                     isWishlisted
                       ? 'border-red-200 bg-red-50 text-red-500'
-                      : 'border-gray-200 hover:bg-gray-50 text-gray-600'
+                      : 'border-cream-200 hover:bg-cream-50 text-charcoal-600'
                   }`}
                 >
                   <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
@@ -448,7 +448,7 @@ function SearchContent() {
         layout
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-lg border border-gray-200 overflow-hidden group hover:shadow-lg transition-all"
+        className="bg-white rounded-lg border border-cream-200 overflow-hidden group hover:shadow-lg transition-all"
       >
         <Link href={`/product/${product.slug}`} className="block relative aspect-square overflow-hidden">
           <Image
@@ -484,7 +484,7 @@ function SearchContent() {
             className={`absolute top-2 right-2 p-2 rounded-full transition-all ${
               isWishlisted
                 ? 'bg-red-50 text-red-500'
-                : 'bg-white/80 text-gray-600 opacity-0 group-hover:opacity-100'
+                : 'bg-white/80 text-charcoal-600 opacity-0 group-hover:opacity-100'
             }`}
           >
             <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
@@ -496,7 +496,7 @@ function SearchContent() {
                 e.preventDefault()
                 handleAddToCart(product)
               }}
-              className="w-full py-2 bg-white text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+              className="w-full py-2 bg-white text-charcoal-900 font-medium rounded-lg hover:bg-cream-50 transition-colors flex items-center justify-center gap-2"
             >
               <ShoppingCart className="w-4 h-4" />
               Add to Cart
@@ -504,9 +504,9 @@ function SearchContent() {
           </div>
         </Link>
         <div className="p-4">
-          <p className="text-xs text-gray-500 mb-1">{getCategoryName(product.category)}</p>
+          <p className="text-xs text-charcoal-500 mb-1">{getCategoryName(product.category)}</p>
           <Link href={`/product/${product.slug}`}>
-            <h3 className="font-medium text-gray-900 hover:text-orange-600 line-clamp-2 mb-2 min-h-[2.5rem]">
+            <h3 className="font-medium text-charcoal-900 hover:text-forest-600 line-clamp-2 mb-2 min-h-[2.5rem]">
               {product.name}
             </h3>
           </Link>
@@ -516,21 +516,21 @@ function SearchContent() {
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-3.5 h-3.5 ${i < Math.floor(product.rating || 0) ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`}
+                    className={`w-3.5 h-3.5 ${i < Math.floor(product.rating || 0) ? 'fill-amber-400 text-amber-400' : 'text-charcoal-300'}`}
                   />
                 ))}
               </div>
-              <span className="text-xs text-gray-600">({product.reviewCount || 0})</span>
+              <span className="text-xs text-charcoal-600">({product.reviewCount || 0})</span>
             </div>
           )}
           <div className="flex items-baseline gap-2">
-            <span className="text-lg font-bold text-gray-900">{formatCurrency(product.price)}</span>
+            <span className="text-lg font-bold text-charcoal-900">{formatCurrency(product.price)}</span>
             {originalPrice && originalPrice > product.price && (
-              <span className="text-sm text-gray-500 line-through">{formatCurrency(originalPrice)}</span>
+              <span className="text-sm text-charcoal-500 line-through">{formatCurrency(originalPrice)}</span>
             )}
           </div>
           {product.customizable && (
-            <span className="inline-block mt-2 text-xs text-orange-600 font-medium">
+            <span className="inline-block mt-2 text-xs text-forest-600 font-medium">
               ✨ Customizable
             </span>
           )}
@@ -540,9 +540,9 @@ function SearchContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-cream-50 pt-14 sm:pt-16 lg:pt-20">
       {/* Search Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
+      <div className="bg-white border-b border-cream-200 shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4 py-3">
           <form onSubmit={handleSearch} className="max-w-3xl mx-auto">
             <div className="flex gap-2">
@@ -552,13 +552,13 @@ function SearchContent() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search for customized gifts, frames, hampers..."
-                  className="w-full pl-4 pr-10 py-3 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:ring-0 text-base"
+                  className="w-full pl-4 pr-10 py-3 border-2 border-cream-200 rounded-lg focus:border-forest-500 focus:ring-0 text-base bg-cream-50"
                 />
                 {searchTerm && (
                   <button
                     type="button"
                     onClick={() => setSearchTerm('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-charcoal-400 hover:text-charcoal-600"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -566,7 +566,7 @@ function SearchContent() {
               </div>
               <button
                 type="submit"
-                className="px-6 py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-2"
+                className="px-6 py-3 bg-forest-500 text-white font-medium rounded-lg hover:bg-forest-600 transition-colors flex items-center gap-2"
               >
                 <Search className="w-5 h-5" />
                 <span className="hidden sm:inline">Search</span>
@@ -577,16 +577,16 @@ function SearchContent() {
       </div>
 
       {/* Breadcrumb */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-cream-200">
         <div className="max-w-[1400px] mx-auto px-4 py-2">
           <nav className="flex items-center gap-2 text-sm">
-            <Link href="/" className="text-gray-500 hover:text-orange-600">Home</Link>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-900">Search Results</span>
+            <Link href="/" className="text-charcoal-500 hover:text-forest-600">Home</Link>
+            <ChevronRight className="w-4 h-4 text-charcoal-400" />
+            <span className="text-charcoal-900">Search Results</span>
             {query && (
               <>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-500">&quot;{query}&quot;</span>
+                <ChevronRight className="w-4 h-4 text-charcoal-400" />
+                <span className="text-charcoal-500">&quot;{query}&quot;</span>
               </>
             )}
           </nav>
@@ -596,12 +596,12 @@ function SearchContent() {
       <div className="max-w-[1400px] mx-auto px-4 py-6">
         {!query ? (
           /* Empty State - No Query */
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+          <div className="bg-white rounded-xl shadow-sm border border-cream-200 p-12 text-center">
             <div className="w-24 h-24 mx-auto mb-6 bg-orange-100 rounded-full flex items-center justify-center">
-              <Search className="w-12 h-12 text-orange-500" />
+              <Search className="w-12 h-12 text-forest-500" />
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Search Our Collection</h2>
-            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+            <h2 className="text-2xl font-semibold text-charcoal-900 mb-2">Search Our Collection</h2>
+            <p className="text-charcoal-600 mb-8 max-w-md mx-auto">
               Find the perfect customized gift. Search for frames, polaroids, hampers, and more!
             </p>
             <div className="flex flex-wrap justify-center gap-2">
@@ -609,7 +609,7 @@ function SearchContent() {
                 <button
                   key={suggestion}
                   onClick={() => router.push(`/search?q=${encodeURIComponent(suggestion)}`)}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-orange-100 hover:text-orange-700 transition-colors"
+                  className="px-4 py-2 bg-cream-50 text-charcoal-700 rounded-full hover:bg-forest-100 hover:text-orange-700 transition-colors"
                 >
                   {suggestion}
                 </button>
@@ -620,7 +620,7 @@ function SearchContent() {
           /* Loading State */
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="w-full lg:w-64 flex-shrink-0">
-              <div className="bg-white rounded-lg border border-gray-200 p-4 animate-pulse">
+              <div className="bg-white rounded-lg border border-cream-200 p-4 animate-pulse">
                 <div className="h-6 bg-gray-200 rounded mb-4" />
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="h-10 bg-gray-200 rounded mb-2" />
@@ -628,12 +628,12 @@ function SearchContent() {
               </div>
             </div>
             <div className="flex-1">
-              <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4 animate-pulse">
+              <div className="bg-white rounded-lg border border-cream-200 p-4 mb-4 animate-pulse">
                 <div className="h-6 bg-gray-200 rounded w-1/4" />
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {[...Array(8)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-lg border border-gray-200 overflow-hidden animate-pulse">
+                  <div key={i} className="bg-white rounded-lg border border-cream-200 overflow-hidden animate-pulse">
                     <div className="aspect-square bg-gray-200" />
                     <div className="p-4">
                       <div className="h-4 bg-gray-200 rounded mb-2" />
@@ -647,18 +647,18 @@ function SearchContent() {
           </div>
         ) : products.length === 0 ? (
           /* No Results State */
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-              <Package className="w-12 h-12 text-gray-400" />
+          <div className="bg-white rounded-xl shadow-sm border border-cream-200 p-12 text-center">
+            <div className="w-24 h-24 mx-auto mb-6 bg-cream-50 rounded-full flex items-center justify-center">
+              <Package className="w-12 h-12 text-charcoal-400" />
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">No Results Found</h2>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            <h2 className="text-2xl font-semibold text-charcoal-900 mb-2">No Results Found</h2>
+            <p className="text-charcoal-600 mb-6 max-w-md mx-auto">
               We couldn&apos;t find any products matching &quot;{query}&quot;. Try different keywords or browse our categories.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href="/shop"
-                className="px-6 py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
+                className="px-6 py-3 bg-forest-500 text-white font-medium rounded-lg hover:bg-forest-600 transition-colors"
               >
                 Browse All Products
               </Link>
@@ -667,7 +667,7 @@ function SearchContent() {
                   setSearchTerm('')
                   router.push('/search')
                 }}
-                className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                className="px-6 py-3 border border-cream-200 text-charcoal-700 font-medium rounded-lg hover:bg-cream-50 transition-colors flex items-center justify-center gap-2"
               >
                 <RotateCcw className="w-4 h-4" />
                 New Search
@@ -685,10 +685,10 @@ function SearchContent() {
             {/* Main Content */}
             <div className="flex-1 min-w-0">
               {/* Results Header */}
-              <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+              <div className="bg-white rounded-lg border border-cream-200 p-4 mb-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <p className="text-gray-900">
+                    <p className="text-charcoal-900">
                       <span className="font-semibold">{totalResults.toLocaleString()}</span> results for{' '}
                       <span className="font-semibold">&quot;{query}&quot;</span>
                     </p>
@@ -697,26 +697,26 @@ function SearchContent() {
                     {/* Mobile Filter Button */}
                     <button
                       onClick={() => setShowMobileFilters(true)}
-                      className="lg:hidden px-4 py-2 border border-gray-300 rounded-lg flex items-center gap-2 hover:bg-gray-50"
+                      className="lg:hidden px-4 py-2 border border-cream-200 rounded-lg flex items-center gap-2 hover:bg-cream-50"
                     >
                       <Filter className="w-4 h-4" />
                       Filters
                       {hasActiveFilters && (
-                        <span className="w-2 h-2 bg-orange-500 rounded-full" />
+                        <span className="w-2 h-2 bg-forest-500 rounded-full" />
                       )}
                     </button>
                     
                     {/* View Toggle */}
-                    <div className="hidden sm:flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                    <div className="hidden sm:flex items-center border border-cream-200 rounded-lg overflow-hidden">
                       <button
                         onClick={() => setViewMode('grid')}
-                        className={`p-2 ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'}`}
+                        className={`p-2 ${viewMode === 'grid' ? 'bg-cream-50 text-charcoal-900' : 'text-charcoal-500 hover:bg-cream-50'}`}
                       >
                         <Grid3X3 className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => setViewMode('list')}
-                        className={`p-2 ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:bg-gray-50'}`}
+                        className={`p-2 ${viewMode === 'list' ? 'bg-cream-50 text-charcoal-900' : 'text-charcoal-500 hover:bg-cream-50'}`}
                       >
                         <LayoutList className="w-5 h-5" />
                       </button>
@@ -726,9 +726,9 @@ function SearchContent() {
                     <div className="relative">
                       <button
                         onClick={() => setShowSortDropdown(!showSortDropdown)}
-                        className="px-4 py-2 border border-gray-300 rounded-lg flex items-center gap-2 hover:bg-gray-50 min-w-[180px] justify-between"
+                        className="px-4 py-2 border border-cream-200 rounded-lg flex items-center gap-2 hover:bg-cream-50 min-w-[180px] justify-between"
                       >
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm text-charcoal-700">
                           {sortOptions.find(o => o.value === sortBy)?.label}
                         </span>
                         <ChevronDown className={`w-4 h-4 transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} />
@@ -739,7 +739,7 @@ function SearchContent() {
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            className="absolute right-0 top-full mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden"
+                            className="absolute right-0 top-full mt-1 w-full bg-white border border-cream-200 rounded-lg shadow-lg z-20 overflow-hidden"
                           >
                             {sortOptions.map((option) => (
                               <button
@@ -748,8 +748,8 @@ function SearchContent() {
                                   setSortBy(option.value)
                                   setShowSortDropdown(false)
                                 }}
-                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between ${
-                                  sortBy === option.value ? 'bg-orange-50 text-orange-700' : 'text-gray-700'
+                                className={`w-full text-left px-4 py-2 text-sm hover:bg-cream-50 flex items-center justify-between ${
+                                  sortBy === option.value ? 'bg-orange-50 text-orange-700' : 'text-charcoal-700'
                                 }`}
                               >
                                 {option.label}
@@ -765,8 +765,8 @@ function SearchContent() {
 
                 {/* Active Filters */}
                 {hasActiveFilters && (
-                  <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-gray-200">
-                    <span className="text-sm text-gray-500">Active filters:</span>
+                  <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-cream-200">
+                    <span className="text-sm text-charcoal-500">Active filters:</span>
                     {selectedCategory !== 'all' && (
                       <span className="inline-flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-700 text-sm rounded-full">
                         {categories.find(c => c.slug === selectedCategory)?.name}
@@ -801,7 +801,7 @@ function SearchContent() {
                     )}
                     <button
                       onClick={clearAllFilters}
-                      className="text-sm text-gray-500 hover:text-orange-600 underline"
+                      className="text-sm text-charcoal-500 hover:text-forest-600 underline"
                     >
                       Clear all
                     </button>
@@ -827,7 +827,7 @@ function SearchContent() {
                     <button
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 border border-cream-200 rounded-lg text-charcoal-700 hover:bg-cream-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Previous
                     </button>
@@ -848,8 +848,8 @@ function SearchContent() {
                           onClick={() => setCurrentPage(pageNum)}
                           className={`w-10 h-10 rounded-lg ${
                             currentPage === pageNum
-                              ? 'bg-orange-500 text-white'
-                              : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                              ? 'bg-forest-500 text-white'
+                              : 'border border-cream-200 text-charcoal-700 hover:bg-cream-50'
                           }`}
                         >
                           {pageNum}
@@ -859,7 +859,7 @@ function SearchContent() {
                     <button
                       onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
-                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 border border-cream-200 rounded-lg text-charcoal-700 hover:bg-cream-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Next
                     </button>
@@ -889,11 +889,11 @@ function SearchContent() {
               transition={{ type: 'tween', duration: 0.3 }}
               className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white z-50 lg:hidden overflow-y-auto"
             >
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+              <div className="sticky top-0 bg-white border-b border-cream-200 px-4 py-3 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-charcoal-900">Filters</h2>
                 <button
                   onClick={() => setShowMobileFilters(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg"
+                  className="p-2 hover:bg-cream-50 rounded-lg"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -901,10 +901,10 @@ function SearchContent() {
               <div className="p-4">
                 <FilterSidebar isMobile />
               </div>
-              <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
+              <div className="sticky bottom-0 bg-white border-t border-cream-200 p-4">
                 <button
                   onClick={() => setShowMobileFilters(false)}
-                  className="w-full py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
+                  className="w-full py-3 bg-forest-500 text-white font-medium rounded-lg hover:bg-forest-600 transition-colors"
                 >
                   Apply Filters
                 </button>
@@ -919,10 +919,10 @@ function SearchContent() {
 
 function SearchLoading() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="min-h-screen bg-cream-50 flex items-center justify-center">
       <div className="text-center">
-        <Loader2 className="w-12 h-12 text-orange-500 animate-spin mx-auto mb-4" />
-        <p className="text-gray-600">Loading search...</p>
+        <Loader2 className="w-12 h-12 text-forest-500 animate-spin mx-auto mb-4" />
+        <p className="text-charcoal-600">Loading search...</p>
       </div>
     </div>
   )

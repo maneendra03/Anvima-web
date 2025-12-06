@@ -23,7 +23,7 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative min-h-[75vh] sm:min-h-[85vh] lg:min-h-screen flex items-center gradient-hero overflow-hidden">
+    <section className="relative min-h-[85vh] sm:min-h-[90vh] lg:min-h-screen flex items-center gradient-hero overflow-hidden pt-14 sm:pt-16 lg:pt-20">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-40 sm:w-56 lg:w-72 h-40 sm:h-56 lg:h-72 bg-peach-200/30 rounded-full blur-3xl" />

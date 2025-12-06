@@ -154,10 +154,11 @@ function LoginForm() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 transition-colors ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 transition-colors text-base ${
                     errors.email ? 'border-red-500' : 'border-charcoal-200'
                   }`}
                   placeholder="you@example.com"
+                  autoComplete="email"
                 />
               </div>
               {errors.email && (
@@ -178,10 +179,11 @@ function LoginForm() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 transition-colors ${
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 transition-colors text-base ${
                     errors.password ? 'border-red-500' : 'border-charcoal-200'
                   }`}
                   placeholder="••••••••"
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
