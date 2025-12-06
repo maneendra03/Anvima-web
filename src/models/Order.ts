@@ -62,7 +62,7 @@ export interface IOrder extends Document {
   tax: number
   total: number
   status: OrderStatus
-  paymentMethod: 'cod' | 'razorpay' | 'upi' | 'card' | 'netbanking' | 'wallet'
+  paymentMethod: 'cod' | 'razorpay' | 'upi' | 'card' | 'netbanking' | 'wallet' | 'stripe' | 'pay_later'
   paymentStatus: PaymentStatus
   paymentDetails?: {
     razorpayOrderId?: string
@@ -176,7 +176,7 @@ const OrderSchema = new Schema<IOrder>(
     },
     paymentMethod: {
       type: String,
-      enum: ['cod', 'razorpay', 'stripe', 'upi'],
+      enum: ['cod', 'razorpay', 'stripe', 'upi', 'pay_later', 'card', 'netbanking', 'wallet'],
       required: true,
     },
     paymentStatus: {

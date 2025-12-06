@@ -65,6 +65,7 @@ export default function RelatedProducts({
     addItem({
       id: `${product.id}-${Date.now()}`,
       productId: product.id,
+      slug: product.slug, // Include slug for order API compatibility
       name: product.name,
       price: product.price,
       quantity: 1,

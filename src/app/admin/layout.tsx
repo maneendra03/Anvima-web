@@ -17,7 +17,8 @@ import {
   Gift,
   ChevronRight,
   Bell,
-  Store
+  Store,
+  Tag
 } from 'lucide-react'
 import { useAuthStore } from '@/store/auth'
 import { useCartStore } from '@/store/cartStore'
@@ -27,6 +28,7 @@ const adminNavItems = [
   { href: '/admin/products', label: 'Products', icon: Package },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
   { href: '/admin/categories', label: 'Categories', icon: FolderOpen },
+  { href: '/admin/coupons', label: 'Coupons', icon: Tag },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ]

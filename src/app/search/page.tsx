@@ -167,6 +167,7 @@ function SearchContent() {
     addItem({
       id: `${product._id || product.id}-${Date.now()}`,
       productId: product._id || product.id || '',
+      slug: product.slug, // Include slug for order API compatibility
       name: product.name,
       price: product.price,
       quantity: 1,

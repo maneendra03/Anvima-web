@@ -76,15 +76,13 @@
 - ✅ **Related Products** - Shows related products on product pages
 - ✅ **Product Quick View** - Modal preview on shop page
 - ✅ **Size/Variant Guide** - Size charts modal for products with size options
+- ✅ **Admin Coupon Management** - Full CRUD for coupons with stats dashboard
+- ✅ **Order Tracking Page** - Timeline view with progress tracker
+- ✅ **Email Notifications** - Order confirmation, shipping, delivery, status updates
 
 ---
 
 ## ⚠️ TODO
-
-### High Priority
-- ❌ Admin Coupon Management UI
-- ❌ Order Tracking Page with Timeline
-- ❌ Email Notifications (Order confirmation, shipping updates)
 
 ### Medium Priority
 - ❌ Wishlist Sharing (Share wishlist via link)

@@ -15,10 +15,16 @@ export async function GET(
 
     const product = await Product.findOne({ slug })
     if (!product) {
-      return NextResponse.json(
-        { success: false, message: 'Product not found' },
-        { status: 404 }
-      )
+      // Return empty reviews instead of 404 for better UX
+      return NextResponse.json({
+        success: true,
+        data: {
+          reviews: [],
+          averageRating: 0,
+          distribution: [0, 0, 0, 0, 0],
+          total: 0,
+        },
+      })
     }
 
     const reviews = await Review.find({ product: product._id, isApproved: true })
