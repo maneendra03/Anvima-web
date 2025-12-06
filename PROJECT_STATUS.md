@@ -26,6 +26,7 @@
 | Contact | ✅ | `/contact` |
 | FAQ | ✅ | `/faq` |
 | Custom Orders | ✅ | `/custom-orders` |
+| Search Results | ✅ | `/search` |
 
 ### 🔐 Authentication
 
@@ -66,26 +67,58 @@
 - ✅ User, Product, Order, Category
 - ✅ Review, Coupon, CustomOrder, Settings
 
+### 🆕 Newly Added Features
+
+- ✅ **Global Search** - Search bar in header with results page
+- ✅ **Product Reviews UI** - Display & write reviews on product pages
+- ✅ **Coupon System** - Apply coupons at checkout with validation
+- ✅ **Recently Viewed Products** - Tracks and displays recently viewed items
+- ✅ **Related Products** - Shows related products on product pages
+- ✅ **Product Quick View** - Modal preview on shop page
+- ✅ **Size/Variant Guide** - Size charts modal for products with size options
+
 ---
 
 ## ⚠️ TODO
 
 ### High Priority
-- ❌ Global Search
-- ❌ Product Reviews UI
-- ❌ Coupon System at Checkout
-- ❌ Admin Coupon Management
+- ❌ Admin Coupon Management UI
+- ❌ Order Tracking Page with Timeline
+- ❌ Email Notifications (Order confirmation, shipping updates)
 
 ### Medium Priority
-- ❌ Email Notifications
+- ❌ Wishlist Sharing (Share wishlist via link)
+- ❌ Compare Products (Side-by-side comparison)
+- ❌ Review Moderation (Admin)
+- ❌ Product Recommendations ("You may also like")
 - ❌ Category Images
-- ❌ Review Moderation
 
 ### Low Priority
 - ❌ WhatsApp Integration
 - ❌ Analytics
 - ❌ PWA Support
 - ❌ Social Login
+
+---
+
+## 📦 New Components Added
+
+| Component | Location | Description |
+|-----------|----------|-------------|
+| CouponInput | `/components/checkout/` | Coupon input with validation |
+| ProductReviews | `/components/product/` | Reviews display & submission |
+| RelatedProducts | `/components/product/` | Related products carousel |
+| RecentlyViewed | `/components/product/` | Recently viewed products |
+| QuickViewModal | `/components/product/` | Product quick view modal |
+| SizeGuide | `/components/product/` | Size/variant guide modal |
+
+---
+
+## 🗄️ New Store
+
+| Store | Location | Description |
+|-------|----------|-------------|
+| recentlyViewed | `/store/recentlyViewed.ts` | Tracks recently viewed products |
 
 ---
 

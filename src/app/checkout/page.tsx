@@ -17,9 +17,18 @@ import {
 import { useCartStore } from '@/store/cartStore'
 import { useAuthStore } from '@/store/auth'
 import RazorpayCheckout from '@/components/checkout/CheckoutForm'
+import CouponInput from '@/components/checkout/CouponInput'
 import toast from 'react-hot-toast'
 
 type PaymentMethod = 'razorpay' | 'cod' | 'pay_later'
+
+interface AppliedCoupon {
+  code: string
+  discountType: 'percentage' | 'fixed'
+  discountValue: number
+  discountAmount: number
+  description?: string
+}
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -37,6 +46,7 @@ export default function CheckoutPage() {
     razorpayKeyId: string | null
   } | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null)
 
   const [formData, setFormData] = useState({
     email: user?.email || '',
@@ -228,9 +238,11 @@ export default function CheckoutPage() {
 
   // Calculate totals
   const subtotal = getTotalPrice()
+  const couponDiscount = appliedCoupon?.discountAmount || 0
   const shipping = subtotal >= 999 ? 0 : 99
-  const tax = Math.round(subtotal * 0.18)
-  const total = subtotal + shipping + tax
+  const taxableAmount = subtotal - couponDiscount
+  const tax = Math.round(taxableAmount * 0.18)
+  const total = subtotal - couponDiscount + shipping + tax
 
   // Order Success Screen
   if (orderPlaced) {
@@ -677,6 +689,12 @@ export default function CheckoutPage() {
                   <span>Subtotal</span>
                   <span>₹{subtotal.toLocaleString('en-IN')}</span>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Coupon ({appliedCoupon.code})</span>
+                    <span>-₹{couponDiscount.toLocaleString('en-IN')}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-charcoal-600">
                   <span>Shipping</span>
                   <span className={shipping === 0 ? 'text-green-600 font-medium' : ''}>
@@ -692,6 +710,13 @@ export default function CheckoutPage() {
                   <span>₹{total.toLocaleString('en-IN')}</span>
                 </div>
               </div>
+
+              {/* Coupon Input */}
+              <CouponInput
+                cartTotal={subtotal}
+                onCouponApplied={setAppliedCoupon}
+                appliedCoupon={appliedCoupon}
+              />
 
               {/* Trust Badges */}
               <div className="mt-6 pt-6 border-t border-charcoal-100">

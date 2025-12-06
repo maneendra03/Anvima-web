@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, use } from 'react'
+import { useState, use, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import {
@@ -19,6 +19,11 @@ import {
 } from 'lucide-react'
 import { products } from '@/data'
 import { useCartStore } from '@/store/cartStore'
+import { useRecentlyViewedStore } from '@/store/recentlyViewed'
+import ProductReviews from '@/components/product/ProductReviews'
+import RelatedProducts from '@/components/product/RelatedProducts'
+import RecentlyViewed from '@/components/product/RecentlyViewed'
+import SizeGuide, { SizeGuideButton } from '@/components/product/SizeGuide'
 
 export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
@@ -35,8 +40,24 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const [customText, setCustomText] = useState('')
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [hasEngraving, setHasEngraving] = useState(false)
+  const [showSizeGuide, setShowSizeGuide] = useState(false)
   
   const addItem = useCartStore((state) => state.addItem)
+  const addToRecentlyViewed = useRecentlyViewedStore((state) => state.addItem)
+
+  // Track recently viewed product
+  useEffect(() => {
+    if (product) {
+      addToRecentlyViewed({
+        id: product.id,
+        slug: product.slug,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        image: product.images[0],
+      })
+    }
+  }, [product, addToRecentlyViewed])
 
   if (!product) {
     return (
@@ -255,9 +276,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 {/* Size Selection */}
                 {product.customizationOptions?.sizes && (
                   <div>
-                    <label className="block text-sm font-medium text-charcoal-700 mb-2">
-                      Size
-                    </label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-charcoal-700">
+                        Size
+                      </label>
+                      <SizeGuideButton onClick={() => setShowSizeGuide(true)} />
+                    </div>
                     <div className="flex flex-wrap gap-3">
                       {product.customizationOptions.sizes.map((size) => (
                         <button
@@ -470,7 +494,36 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </div>
           </div>
         </div>
+
+        {/* Product Reviews Section */}
+        <div className="mt-16">
+          <ProductReviews productId={product.id} productSlug={product.slug} />
+        </div>
       </div>
+
+      {/* Related Products */}
+      <RelatedProducts
+        currentProductId={product.id}
+        category={product.category}
+        tags={product.tags}
+      />
+
+      {/* Recently Viewed */}
+      <RecentlyViewed excludeId={product.id} />
+
+      {/* Size Guide Modal */}
+      {product.customizationOptions?.sizes && (
+        <SizeGuide
+          sizes={product.customizationOptions.sizes}
+          productType={
+            product.category === 'frames' ? 'frame' :
+            product.category === 'polaroids' ? 'polaroid' :
+            product.category === 'hampers' ? 'gift' : 'general'
+          }
+          isOpen={showSizeGuide}
+          onClose={() => setShowSizeGuide(false)}
+        />
+      )}
     </div>
   )
 }

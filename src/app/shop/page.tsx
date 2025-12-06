@@ -3,8 +3,10 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Filter, Grid, List, Star, ShoppingBag, X, SlidersHorizontal } from 'lucide-react'
+import { Filter, Grid, List, Star, ShoppingBag, X, SlidersHorizontal, Eye } from 'lucide-react'
 import { products, categories } from '@/data'
+import { Product } from '@/types'
+import QuickViewModal from '@/components/product/QuickViewModal'
 
 type SortOption = 'featured' | 'price-low' | 'price-high' | 'rating' | 'newest'
 
@@ -14,6 +16,7 @@ export default function ShopPage() {
   const [sortBy, setSortBy] = useState<SortOption>('featured')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [showFilters, setShowFilters] = useState(false)
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null)
 
   const filteredProducts = useMemo(() => {
     let filtered = [...products]
@@ -240,14 +243,28 @@ export default function ShopPage() {
                           )}
                         </div>
 
-                        {/* Quick add */}
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="absolute bottom-3 right-3 p-3 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <ShoppingBag className="w-5 h-5 text-forest-500" />
-                        </motion.button>
+                        {/* Quick actions */}
+                        <div className="absolute bottom-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setQuickViewProduct(product)
+                            }}
+                            className="p-3 bg-white rounded-full shadow-lg"
+                            title="Quick View"
+                          >
+                            <Eye className="w-5 h-5 text-charcoal-600" />
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="p-3 bg-white rounded-full shadow-lg"
+                          >
+                            <ShoppingBag className="w-5 h-5 text-forest-500" />
+                          </motion.button>
+                        </div>
                       </div>
 
                       {/* Content */}
@@ -399,6 +416,13 @@ export default function ShopPage() {
           </motion.div>
         </motion.div>
       )}
+
+      {/* Quick View Modal */}
+      <QuickViewModal
+        product={quickViewProduct}
+        isOpen={!!quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+      />
     </div>
   )
 }

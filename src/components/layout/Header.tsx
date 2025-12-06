@@ -21,20 +21,28 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const cartItems = useCartStore((state) => state.items)
   const clearCart = useCartStore((state) => state.clearCart)
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0)
   const { user, isAuthenticated, logout } = useAuthStore()
 
   const handleLogout = async () => {
-    // Clear cart first (this also clears localStorage via persist)
     clearCart()
-    // Then logout
     await logout()
     setIsUserMenuOpen(false)
     setIsMobileMenuOpen(false)
-    // Navigate to login
     router.push('/login')
+  }
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+      setIsSearchOpen(false)
+      setSearchQuery('')
+    }
   }
 
   useEffect(() => {
@@ -87,12 +95,18 @@ export default function Header() {
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            <button className="p-2 hover:bg-cream-100 rounded-full transition-colors hidden md:block">
+            <button 
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="p-2 hover:bg-cream-100 rounded-full transition-colors hidden md:block"
+            >
               <Search className="w-5 h-5 text-charcoal-600" />
             </button>
-            <button className="p-2 hover:bg-cream-100 rounded-full transition-colors hidden md:block">
+            <Link 
+              href="/account/wishlist"
+              className="p-2 hover:bg-cream-100 rounded-full transition-colors hidden md:block"
+            >
               <Heart className="w-5 h-5 text-charcoal-600" />
-            </button>
+            </Link>
             <Link
               href="/cart"
               className="p-2 hover:bg-cream-100 rounded-full transition-colors relative"
@@ -289,6 +303,42 @@ export default function Header() {
                   </div>
                 )}
               </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Search Overlay */}
+      <AnimatePresence>
+        {isSearchOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-full left-0 right-0 bg-white shadow-lg border-t border-gray-100"
+          >
+            <div className="max-w-2xl mx-auto px-4 py-4">
+              <form onSubmit={handleSearch} className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search for products..."
+                  className="w-full pl-12 pr-12 py-3 border border-gray-200 rounded-full focus:ring-2 focus:ring-forest/20 focus:border-forest transition-all"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSearchOpen(false)
+                    setSearchQuery('')
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </form>
             </div>
           </motion.div>
         )}
