@@ -23,29 +23,29 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative min-h-[85vh] sm:min-h-[90vh] lg:min-h-screen flex items-center gradient-hero overflow-hidden pt-14 sm:pt-16 lg:pt-20">
+    <section className="relative min-h-[100svh] flex items-center gradient-hero overflow-hidden pt-16 sm:pt-18 lg:pt-20">
       {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-40 sm:w-56 lg:w-72 h-40 sm:h-56 lg:h-72 bg-peach-200/30 rounded-full blur-3xl" />
         <div className="absolute bottom-20 right-10 w-52 sm:w-72 lg:w-96 h-52 sm:h-72 lg:h-96 bg-blush-200/20 rounded-full blur-3xl" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250px] sm:w-[450px] lg:w-[600px] h-[250px] sm:h-[450px] lg:h-[600px] bg-cream-200/20 rounded-full blur-3xl" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 lg:py-20 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-16 relative z-10 w-full">
+        <div className="grid lg:grid-cols-2 gap-4 sm:gap-8 lg:gap-12 items-center">
           {/* Text Content */}
           <motion.div
             {...animationProps}
             className="text-center lg:text-left"
           >
             <div
-              className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-4 sm:py-1.5 bg-peach-100 rounded-full text-peach-600 text-xs sm:text-sm font-medium mb-3 sm:mb-4 lg:mb-5"
+              className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-4 sm:py-1.5 bg-peach-100 rounded-full text-peach-600 text-xs sm:text-sm font-medium mb-2 sm:mb-4 lg:mb-5"
             >
               <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
               Handcrafted with Love
             </div>
 
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-serif font-bold text-charcoal-700 leading-tight mb-3 sm:mb-4 lg:mb-6">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-serif font-bold text-charcoal-700 leading-tight mb-2 sm:mb-4 lg:mb-6">
               Create Memories{' '}
               <span className="text-forest-500 relative">
                 That Last
@@ -65,13 +65,13 @@ export default function Hero() {
               Forever
             </h1>
 
-            <p className="text-sm sm:text-base lg:text-lg text-charcoal-500 mb-4 sm:mb-6 lg:mb-8 max-w-lg mx-auto lg:mx-0">
+            <p className="text-sm sm:text-base lg:text-lg text-charcoal-500 mb-3 sm:mb-6 lg:mb-8 max-w-lg mx-auto lg:mx-0">
               Transform your precious moments into beautiful customized gifts.
               From personalized frames to curated hampers — every piece is crafted
               just for you.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-4 justify-center lg:justify-start">
               <Link href="/shop">
                 <button
                   className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto hover:scale-[1.02] active:scale-[0.98] transition-transform"
@@ -91,7 +91,7 @@ export default function Hero() {
 
             {/* Trust badges */}
             <div
-              className="mt-6 sm:mt-8 lg:mt-10 flex flex-wrap items-center gap-4 sm:gap-6 lg:gap-8 justify-center lg:justify-start text-xs sm:text-sm text-charcoal-500"
+              className="mt-4 sm:mt-8 lg:mt-10 flex flex-wrap items-center gap-3 sm:gap-6 lg:gap-8 justify-center lg:justify-start text-xs sm:text-sm text-charcoal-500"
             >
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-green-500 rounded-full" />
