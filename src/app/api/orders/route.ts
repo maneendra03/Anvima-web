@@ -3,7 +3,9 @@ import mongoose from 'mongoose'
 import dbConnect from '@/lib/mongodb'
 import Order, { IOrder } from '@/models/Order'
 import Product from '@/models/Product'
+import User from '@/models/User'
 import { requireAuth, isAuthenticated } from '@/lib/auth/middleware'
+import { sendOrderConfirmationEmail } from '@/lib/email'
 
 // Generate unique order number
 function generateOrderNumber(): string {
@@ -230,6 +232,35 @@ export async function POST(request: NextRequest) {
 
     // For online payment (Razorpay), order stays pending until payment is verified
     // Razorpay order will be created separately via /api/payment/create-order
+
+    // Send order confirmation email
+    try {
+      const user = await User.findById(authResult.userId).select('email name')
+      if (user && user.email) {
+        const addressString = `${shippingAddress.name}\n${shippingAddress.address}\n${shippingAddress.city}, ${shippingAddress.state} ${shippingAddress.pincode}\n${shippingAddress.phone}`
+        
+        await sendOrderConfirmationEmail(
+          user.email,
+          user.name,
+          order.orderNumber,
+          {
+            items: orderItems.map(item => ({
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price * item.quantity,
+            })),
+            subtotal,
+            shipping: shippingCost,
+            total: order.total,
+            address: addressString,
+          }
+        )
+        console.log('✅ Order confirmation email sent to:', user.email)
+      }
+    } catch (emailError) {
+      // Don't fail the order if email fails
+      console.error('Failed to send order confirmation email:', emailError)
+    }
 
     return NextResponse.json({
       success: true,

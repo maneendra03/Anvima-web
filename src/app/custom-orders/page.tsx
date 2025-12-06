@@ -2,7 +2,15 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Upload, Calendar, Send, Sparkles, Check, MessageCircle } from 'lucide-react'
+import { Upload, Calendar, Send, Sparkles, Check, MessageCircle, X, Loader2, Image as ImageIcon } from 'lucide-react'
+import toast from 'react-hot-toast'
+
+interface UploadedImage {
+  url: string
+  publicId: string
+  isUploading?: boolean
+  previewUrl?: string
+}
 
 export default function CustomOrdersPage() {
   const [formData, setFormData] = useState({
@@ -13,7 +21,8 @@ export default function CustomOrdersPage() {
     budget: '',
     targetDate: '',
   })
-  const [images, setImages] = useState<string[]>([])
+  const [images, setImages] = useState<UploadedImage[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
 
   const handleInputChange = (
@@ -22,28 +31,129 @@ export default function CustomOrdersPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
-    if (files) {
-      Array.from(files).forEach((file) => {
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          setImages((prev) => [...prev, reader.result as string])
-        }
-        reader.readAsDataURL(file)
-      })
+    if (!files || files.length === 0) return
+
+    // Limit to 5 images
+    if (images.length + files.length > 5) {
+      toast.error('Maximum 5 images allowed')
+      return
     }
+
+    for (const file of Array.from(files)) {
+      // Validate file size (10MB max)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(`${file.name} is too large. Max size: 10MB`)
+        continue
+      }
+
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file)
+      const tempId = `temp-${Date.now()}-${Math.random()}`
+      
+      // Add placeholder with loading state
+      setImages(prev => [...prev, { 
+        url: '', 
+        publicId: tempId, 
+        isUploading: true, 
+        previewUrl 
+      }])
+
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const res = await fetch('/api/upload/custom-order', {
+          method: 'POST',
+          body: formData
+        })
+
+        const data = await res.json()
+        
+        if (data.success) {
+          // Replace temp with actual uploaded data
+          setImages(prev => prev.map(img => 
+            img.publicId === tempId 
+              ? { url: data.url, publicId: data.publicId, isUploading: false }
+              : img
+          ))
+          toast.success('Image uploaded!')
+        } else {
+          // Remove failed upload
+          setImages(prev => prev.filter(img => img.publicId !== tempId))
+          toast.error(data.error || 'Upload failed')
+        }
+      } catch (error) {
+        setImages(prev => prev.filter(img => img.publicId !== tempId))
+        toast.error('Failed to upload image')
+      }
+    }
+    
+    // Reset input
+    e.target.value = ''
   }
 
-  const removeImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index))
+  const removeImage = async (index: number) => {
+    const image = images[index]
+    
+    // Remove from UI immediately
+    setImages(prev => prev.filter((_, i) => i !== index))
+    
+    // If it was uploaded to Cloudinary, delete it
+    if (image.publicId && !image.publicId.startsWith('temp-')) {
+      try {
+        await fetch('/api/upload/custom-order', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ publicId: image.publicId })
+        })
+      } catch (error) {
+        console.error('Failed to delete image from cloud')
+      }
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsSubmitted(true)
+    
+    // Validate
+    if (!formData.name || !formData.email || !formData.phone || !formData.description) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    // Check if any images are still uploading
+    if (images.some(img => img.isUploading)) {
+      toast.error('Please wait for images to finish uploading')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const res = await fetch('/api/custom-orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          images: images.map(img => ({ url: img.url, publicId: img.publicId }))
+        })
+      })
+
+      const data = await res.json()
+      
+      if (data.success) {
+        setIsSubmitted(true)
+        toast.success('Request submitted successfully!')
+      } else {
+        toast.error(data.error || 'Failed to submit request')
+      }
+    } catch (error) {
+      toast.error('Something went wrong. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (isSubmitted) {
@@ -211,23 +321,33 @@ export default function CustomOrdersPage() {
                   {images.length > 0 && (
                     <div className="flex flex-wrap gap-4 mt-4">
                       {images.map((img, index) => (
-                        <div key={index} className="relative">
-                          <img
-                            src={img}
-                            alt={`Reference ${index + 1}`}
-                            className="w-20 h-20 object-cover rounded-lg"
-                          />
+                        <div key={img.publicId} className="relative group">
+                          {img.isUploading ? (
+                            <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
+                              <Loader2 className="w-6 h-6 text-forest-500 animate-spin" />
+                            </div>
+                          ) : (
+                            <img
+                              src={img.previewUrl || img.url}
+                              alt={`Reference ${index + 1}`}
+                              className="w-20 h-20 object-cover rounded-lg"
+                            />
+                          )}
                           <button
                             type="button"
                             onClick={() => removeImage(index)}
-                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-sm"
+                            disabled={img.isUploading}
+                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-sm flex items-center justify-center hover:bg-red-600 disabled:opacity-50"
                           >
-                            ×
+                            <X className="w-4 h-4" />
                           </button>
                         </div>
                       ))}
                     </div>
                   )}
+                  <p className="text-xs text-charcoal-400 mt-2">
+                    {images.length}/5 images uploaded
+                  </p>
                 </div>
 
                 {/* Budget & Date */}
@@ -269,12 +389,22 @@ export default function CustomOrdersPage() {
 
                 <motion.button
                   type="submit"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full btn-primary flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+                  whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+                  className="w-full btn-primary flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <Send className="w-5 h-5" />
-                  Submit Request
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5" />
+                      Submit Request
+                    </>
+                  )}
                 </motion.button>
               </div>
             </motion.form>
