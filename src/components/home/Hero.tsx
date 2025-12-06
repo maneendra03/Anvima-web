@@ -1,26 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowRight, Sparkles } from 'lucide-react'
 
 export default function Hero() {
-  const [isMobile, setIsMobile] = useState(false)
+  const [mounted, setMounted] = useState(false)
   
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768)
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    setMounted(true)
   }, [])
-
-  // Disable animations on mobile for better performance
-  const animationProps = isMobile ? {} : {
-    initial: { opacity: 0, y: 30 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6 }
-  }
 
   return (
     <section className="relative min-h-[100svh] flex items-center gradient-hero overflow-hidden pt-16 sm:pt-18 lg:pt-20">
@@ -34,9 +23,8 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-16 relative z-10 w-full">
         <div className="grid lg:grid-cols-2 gap-4 sm:gap-8 lg:gap-12 items-center">
           {/* Text Content */}
-          <motion.div
-            {...animationProps}
-            className="text-center lg:text-left"
+          <div
+            className={`text-center lg:text-left transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-100'}`}
           >
             <div
               className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-4 sm:py-1.5 bg-peach-100 rounded-full text-peach-600 text-xs sm:text-sm font-medium mb-2 sm:mb-4 lg:mb-5"
@@ -102,7 +90,7 @@ export default function Hero() {
                 4.9★ Rating
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Image Grid - Desktop only */}
           <div
