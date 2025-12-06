@@ -19,6 +19,10 @@ A modern, full-stack e-commerce website for Anvima Creations — a business spec
 - [Authentication Flow](#-authentication-flow)
 - [Payment Integration](#-payment-integration)
 - [Email Configuration](#-email-configuration)
+- [Inventory Management](#-inventory-management)
+- [Sales Analytics Dashboard](#-sales-analytics-dashboard)
+- [Custom Orders with Image Upload](#️-custom-orders-with-image-upload)
+- [Design System](#-design-system)
 - [Deployment](#-deployment)
 - [Troubleshooting](#-troubleshooting)
 
@@ -30,12 +34,13 @@ A modern, full-stack e-commerce website for Anvima Creations — a business spec
 - **Browse Products**: View all products with filtering by category, price, and tags
 - **Product Customization**: Text input, image upload with preview, size/color selection
 - **Real-time Price Updates**: Prices update dynamically as options are selected
-- **User Authentication**: Register, login, password reset
+- **User Authentication**: Register, login, password reset with email verification
 - **Shopping Cart**: Persistent cart with customization details preserved
 - **Wishlist**: Save favorite products for later
 - **Order Tracking**: View order history and status updates
 - **Multiple Payment Options**: Razorpay integration (Cards, UPI, Net Banking)
-- **Custom Orders**: Form for bespoke requests with image uploads
+- **Custom Orders**: Form for bespoke requests with multi-image uploads (Cloudinary)
+- **Email Notifications**: Order confirmation, shipping updates, delivery notifications
 - **WhatsApp Integration**: Floating button for instant customer support
 - **Mobile-First Design**: Fully responsive across all devices
 
@@ -45,7 +50,9 @@ A modern, full-stack e-commerce website for Anvima Creations — a business spec
 - **Category Management**: Organize products into categories
 - **Order Management**: View, update status, and manage all orders
 - **User Management**: View and manage customer accounts
-- **Analytics**: Sales trends, popular products, customer insights
+- **Inventory Management**: Stock tracking, low stock alerts, bulk updates
+- **Sales Analytics**: Revenue trends, top products, order statistics, category insights
+- **Coupon Management**: Create and manage discount codes
 
 ---
 
@@ -558,9 +565,29 @@ anvima-web/
 | GET/POST | `/api/admin/categories` | List/Create categories |
 | GET/PUT/DELETE | `/api/admin/categories/[id]` | Category CRUD |
 | GET | `/api/admin/orders` | List all orders |
-| GET/PUT | `/api/admin/orders/[id]` | Order details/update |
+| GET/PUT | `/api/admin/orders/[id]` | Order details/update (with email notifications) |
 | GET | `/api/admin/users` | List all users |
 | GET/PUT | `/api/admin/users/[id]` | User details/update |
+| GET | `/api/admin/analytics` | Sales analytics data |
+| GET/PATCH | `/api/admin/inventory` | Inventory overview/bulk update |
+| PATCH | `/api/admin/inventory/[id]` | Update single product stock |
+| GET/POST | `/api/admin/coupons` | List/Create coupons |
+| GET/PUT/DELETE | `/api/admin/coupons/[id]` | Coupon CRUD |
+
+### Custom Order Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/custom-orders` | Submit custom order request |
+| GET | `/api/custom-orders` | Get custom orders (admin) |
+| POST | `/api/upload/custom-order` | Upload image to Cloudinary |
+| DELETE | `/api/upload/custom-order` | Delete uploaded image |
+
+### Utility Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/test-email` | Test email configuration |
 
 ### API Response Format
 
@@ -698,12 +725,362 @@ anvima-web/
 
 ### Email Templates
 
-| Email Type | Trigger | Content |
-|------------|---------|---------|
-| Welcome | Registration | Welcome message, getting started |
-| Order Confirmation | Order placed | Order details, items, total |
-| Order Shipped | Status update | Tracking info, delivery date |
-| Password Reset | Forgot password | Reset link (expires in 1 hour) |
+| Email Type | Trigger | API Route | Content |
+|------------|---------|-----------|---------|
+| Verification | Registration | `/api/auth/register` | Verify email link |
+| Welcome | Email verified | `/api/auth/verify-email` | Welcome message, getting started |
+| Order Confirmation | Order placed | `/api/orders` | Order details, items, total, address |
+| Order Shipped | Status → shipped | `/api/admin/orders/[id]` | Tracking info, carrier, delivery date |
+| Order Delivered | Status → delivered | `/api/admin/orders/[id]` | Delivery confirmation |
+| Order Cancelled | Status → cancelled | `/api/admin/orders/[id]` | Cancellation notice, reason |
+| Password Reset | Forgot password | `/api/auth/forgot-password` | Reset link (expires in 1 hour) |
+
+### Email Flow Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     EMAIL NOTIFICATIONS                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  REGISTRATION FLOW                                               │
+│  ┌────────────┐    ┌────────────┐    ┌────────────┐             │
+│  │  Register  │───►│  Verify    │───►│  Welcome   │             │
+│  │   Email    │    │   Email    │    │   Email    │             │
+│  └────────────┘    └────────────┘    └────────────┘             │
+│                                                                  │
+│  ORDER LIFECYCLE                                                 │
+│  ┌────────────┐    ┌────────────┐    ┌────────────┐             │
+│  │   Order    │───►│   Order    │───►│   Order    │             │
+│  │ Confirmed  │    │  Shipped   │    │ Delivered  │             │
+│  └────────────┘    └────────────┘    └────────────┘             │
+│         │                                                        │
+│         └─────────────► Order Cancelled Email                   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Test Email Endpoint
+
+```bash
+# Test email configuration
+GET /api/test-email?email=your@email.com
+
+# Response
+{
+  "success": true,
+  "message": "Test email sent successfully! Check your inbox."
+}
+```
+
+---
+
+## 📦 Inventory Management
+
+### Overview
+
+The inventory management system provides real-time stock tracking, low stock alerts, and easy stock updates for administrators.
+
+### Features
+
+- **Stock Dashboard**: Overview of total products, in-stock, low-stock, and out-of-stock items
+- **Real-time Updates**: Inline stock editing with instant save
+- **Low Stock Alerts**: Visual indicators when stock falls below threshold
+- **Search & Filter**: Find products by name, filter by stock status
+- **Bulk Operations**: Update multiple product stocks efficiently
+- **Pagination**: Handle large product catalogs
+
+### Admin Interface (`/admin/inventory`)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    INVENTORY MANAGEMENT                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐        │
+│  │  Total   │  │In Stock  │  │Low Stock │  │Out of    │        │
+│  │   124    │  │   98     │  │   18     │  │Stock: 8  │        │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘        │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ Search: [________________]  Filter: [All Products ▼]    │   │
+│  ├─────────────────────────────────────────────────────────┤   │
+│  │ Product        │ Category │ Price  │ Stock │ Status    │   │
+│  │────────────────┼──────────┼────────┼───────┼───────────│   │
+│  │ Custom Frame   │ Frames   │ ₹899   │ [25]  │ In Stock  │   │
+│  │ Photo Mug      │ Mugs     │ ₹499   │ [3]   │ Low Stock │   │
+│  │ LED Cushion    │ Cushions │ ₹1299  │ [0]   │ Out Stock │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/admin/inventory` | Get inventory overview with stats |
+| PATCH | `/api/admin/inventory` | Bulk update stock levels |
+| PATCH | `/api/admin/inventory/[id]` | Update single product stock |
+
+### API Examples
+
+```bash
+# Get inventory with filters
+GET /api/admin/inventory?page=1&limit=20&filter=low&search=frame
+
+# Response
+{
+  "success": true,
+  "data": {
+    "stats": {
+      "totalProducts": 124,
+      "inStock": 98,
+      "lowStock": 18,
+      "outOfStock": 8
+    },
+    "products": [...],
+    "pagination": { "page": 1, "totalPages": 7 }
+  }
+}
+
+# Update single product stock
+PATCH /api/admin/inventory/[productId]
+{ "stock": 50, "lowStockThreshold": 10 }
+
+# Bulk update stocks
+PATCH /api/admin/inventory
+{
+  "updates": [
+    { "productId": "...", "stock": 50 },
+    { "productId": "...", "stock": 25 }
+  ]
+}
+```
+
+---
+
+## 📊 Sales Analytics Dashboard
+
+### Overview
+
+Comprehensive analytics dashboard providing insights into sales performance, revenue trends, top products, and customer behavior.
+
+### Features
+
+- **Revenue Overview**: Total revenue with period comparison
+- **Order Statistics**: Total orders, average order value
+- **Customer Insights**: New customers, total customers
+- **Revenue Charts**: Daily/weekly revenue visualization
+- **Top Products**: Best-selling products by quantity and revenue
+- **Order Status**: Distribution of orders by status
+- **Category Performance**: Revenue breakdown by category
+- **Recent Orders**: Quick view of latest orders
+- **Time Period Selection**: 7 days, 30 days, 90 days, 1 year
+
+### Admin Interface (`/admin/analytics`)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    ANALYTICS DASHBOARD                           │
+│                                        Period: [Last 30 days ▼] │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌─────────┐│
+│  │Total Revenue │ │Total Orders  │ │New Customers │ │Avg Order││
+│  │  ₹2,45,890   │ │    156       │ │     42       │ │ ₹1,576  ││
+│  │  ↑ 12.5%     │ │  ↑ 8.3%      │ │  ↑ 15.2%     │ │         ││
+│  └──────────────┘ └──────────────┘ └──────────────┘ └─────────┘│
+│                                                                  │
+│  ┌────────────────────────────────────┐ ┌──────────────────────┐│
+│  │       Revenue Over Time            │ │  Orders by Status    ││
+│  │  ▓                                 │ │                      ││
+│  │  ▓ ▓     ▓                         │ │  Pending:    12      ││
+│  │  ▓ ▓ ▓   ▓ ▓                       │ │  Confirmed:  28      ││
+│  │  ▓ ▓ ▓ ▓ ▓ ▓ ▓                     │ │  Shipped:    45      ││
+│  │  1 2 3 4 5 6 7 8 ...               │ │  Delivered:  68      ││
+│  └────────────────────────────────────┘ └──────────────────────┘│
+│                                                                  │
+│  ┌─────────────────────────┐ ┌──────────────────────────────────┐│
+│  │   Top Selling Products  │ │       Recent Orders              ││
+│  │                         │ │                                  ││
+│  │ 1. Custom Frame ₹45,000 │ │ #ANV-XY12 ₹2,499 Shipped        ││
+│  │ 2. Photo Mug    ₹32,500 │ │ #ANV-AB34 ₹1,299 Processing     ││
+│  │ 3. LED Cushion  ₹28,900 │ │ #ANV-CD56 ₹899   Pending        ││
+│  └─────────────────────────┘ └──────────────────────────────────┘│
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────────┐│
+│  │                  Revenue by Category                         ││
+│  │  Frames: ₹85,000 │ Mugs: ₹45,000 │ Cushions: ₹38,000 │ ...  ││
+│  └──────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### API Endpoint
+
+```bash
+# Get analytics data
+GET /api/admin/analytics?period=30
+
+# Response
+{
+  "success": true,
+  "data": {
+    "overview": {
+      "totalRevenue": 245890,
+      "totalOrders": 156,
+      "avgOrderValue": 1576,
+      "newCustomers": 42,
+      "totalProducts": 124,
+      "totalCustomers": 312,
+      "changes": {
+        "revenue": "12.5",
+        "orders": "8.3",
+        "customers": "15.2"
+      }
+    },
+    "charts": {
+      "revenueByDay": [
+        { "_id": "2024-12-01", "revenue": 12500, "orders": 8 },
+        { "_id": "2024-12-02", "revenue": 18200, "orders": 12 }
+      ],
+      "ordersByStatus": [
+        { "_id": "pending", "count": 12 },
+        { "_id": "delivered", "count": 68 }
+      ],
+      "revenueByCategory": [
+        { "_id": "Frames", "revenue": 85000 },
+        { "_id": "Mugs", "revenue": 45000 }
+      ]
+    },
+    "topProducts": [...],
+    "recentOrders": [...]
+  }
+}
+```
+
+---
+
+## 🖼️ Custom Orders with Image Upload
+
+### Overview
+
+Enhanced custom order system allowing customers to submit bespoke gift requests with multiple image uploads, powered by Cloudinary for reliable image storage.
+
+### Features
+
+- **Multi-Image Upload**: Upload up to 5 reference images
+- **Drag & Drop**: Easy image selection
+- **Image Preview**: See uploaded images before submission
+- **Delete Images**: Remove unwanted images
+- **Cloudinary Storage**: Reliable cloud storage with optimization
+- **Form Validation**: Required fields and format validation
+- **Order Tracking**: Customers receive confirmation emails
+
+### Customer Interface (`/custom-orders`)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    CUSTOM ORDER REQUEST                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Create your perfect personalized gift                          │
+│                                                                  │
+│  Name: [_________________________________]                      │
+│  Email: [________________________________]                      │
+│  Phone: [________________________________]                      │
+│                                                                  │
+│  Product Type: [Select type... ▼]                               │
+│  □ Custom Frame  □ Photo Collage  □ Gift Hamper  □ Other       │
+│                                                                  │
+│  Describe your requirements:                                    │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │                                                          │   │
+│  │                                                          │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                  │
+│  Reference Images (up to 5):                                    │
+│  ┌────────┐ ┌────────┐ ┌────────┐                              │
+│  │  img1  │ │  img2  │ │   +    │                              │
+│  │   ✕    │ │   ✕    │ │  Add   │                              │
+│  └────────┘ └────────┘ └────────┘                              │
+│                                                                  │
+│  Budget Range: [₹500 - ₹2000 ▼]                                │
+│  Delivery Date: [__/__/____]                                    │
+│                                                                  │
+│              [Submit Custom Order Request]                       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/upload/custom-order` | Upload images to Cloudinary |
+| DELETE | `/api/upload/custom-order` | Delete uploaded image |
+| POST | `/api/custom-orders` | Submit custom order request |
+| GET | `/api/custom-orders` | Get custom orders (admin) |
+
+### Image Upload API
+
+```bash
+# Upload image
+POST /api/upload/custom-order
+Content-Type: multipart/form-data
+Body: { file: <image-file> }
+
+# Response
+{
+  "success": true,
+  "data": {
+    "url": "https://res.cloudinary.com/xxx/image/upload/v123/custom-orders/abc123.jpg",
+    "publicId": "custom-orders/abc123"
+  }
+}
+
+# Delete image
+DELETE /api/upload/custom-order
+Body: { "publicId": "custom-orders/abc123" }
+```
+
+### Custom Order Submission
+
+```bash
+# Submit custom order
+POST /api/custom-orders
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "+91 98765 43210",
+  "productType": "custom-frame",
+  "description": "I want a custom photo frame with 5 family photos...",
+  "images": [
+    "https://res.cloudinary.com/xxx/custom-orders/img1.jpg",
+    "https://res.cloudinary.com/xxx/custom-orders/img2.jpg"
+  ],
+  "budget": "1000-2000",
+  "deliveryDate": "2024-12-25"
+}
+
+# Response
+{
+  "success": true,
+  "message": "Custom order submitted successfully",
+  "data": {
+    "orderNumber": "CO-ABC123",
+    "status": "pending"
+  }
+}
+```
+
+### Cloudinary Configuration
+
+```bash
+# .env.local
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+```
 
 ---
 
