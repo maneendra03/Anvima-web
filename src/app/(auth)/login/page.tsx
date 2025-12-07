@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Gift, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Gift, Loader2, AlertCircle } from 'lucide-react'
 import { useAuthStore } from '@/store/auth'
 import { signIn } from 'next-auth/react'
 import toast from 'react-hot-toast'
@@ -13,6 +13,7 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectUrl = searchParams.get('redirect')
+  const errorParam = searchParams.get('error')
   const { login, isLoading, fetchUser } = useAuthStore()
   
   const [formData, setFormData] = useState({
@@ -22,6 +23,29 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [googleLoading, setGoogleLoading] = useState(false)
+  const [oauthError, setOauthError] = useState<string | null>(null)
+
+  // Handle OAuth errors
+  useEffect(() => {
+    if (errorParam) {
+      const errorMessages: Record<string, string> = {
+        'OAuthSignin': 'Error starting the Google sign-in process.',
+        'OAuthCallback': 'Error during Google callback. Please try again.',
+        'OAuthCreateAccount': 'Error creating account with Google.',
+        'EmailCreateAccount': 'Error creating account with email.',
+        'Callback': 'Error during authentication callback.',
+        'OAuthAccountNotLinked': 'This email is already associated with another account.',
+        'EmailSignin': 'Error sending email sign-in link.',
+        'CredentialsSignin': 'Invalid email or password.',
+        'SessionRequired': 'Please sign in to access this page.',
+        'NoSession': 'No session found. Please try signing in again.',
+        'CallbackError': 'Error during authentication. Please try again.',
+        'Default': 'An error occurred during sign-in. Please try again.',
+      }
+      setOauthError(errorMessages[errorParam] || errorMessages['Default'])
+      toast.error(errorMessages[errorParam] || errorMessages['Default'])
+    }
+  }, [errorParam])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -158,6 +182,22 @@ function LoginForm() {
               </Link>
             </p>
           </div>
+
+          {/* OAuth Error Display */}
+          {oauthError && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm text-red-700">{oauthError}</p>
+                <button 
+                  onClick={() => setOauthError(null)}
+                  className="text-xs text-red-600 hover:text-red-800 mt-1 underline"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Field */}
