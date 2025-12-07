@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
+import AuthProvider from '@/components/providers/AuthProvider'
 
 export default function LayoutWrapper({
   children,
@@ -16,17 +17,17 @@ export default function LayoutWrapper({
   const isAdminPage = pathname?.startsWith('/admin')
   
   if (isAdminPage) {
-    return <>{children}</>
+    return <AuthProvider>{children}</AuthProvider>
   }
 
   return (
-    <>
+    <AuthProvider>
       <Header />
       <main className="flex-grow">
         {children}
       </main>
       <Footer />
       <WhatsAppButton />
-    </>
+    </AuthProvider>
   )
 }

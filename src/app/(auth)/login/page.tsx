@@ -4,15 +4,16 @@ import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Gift } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Gift, Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/store/auth'
+import { signIn } from 'next-auth/react'
 import toast from 'react-hot-toast'
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectUrl = searchParams.get('redirect')
-  const { login, isLoading } = useAuthStore()
+  const { login, isLoading, fetchUser } = useAuthStore()
   
   const [formData, setFormData] = useState({
     email: '',
@@ -20,6 +21,7 @@ function LoginForm() {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [googleLoading, setGoogleLoading] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -69,6 +71,39 @@ function LoginForm() {
       }
     } else {
       toast.error(result.message)
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setGoogleLoading(true)
+      const callbackUrl = redirectUrl || '/'
+      
+      const result = await signIn('google', {
+        callbackUrl,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        toast.error(result.error || 'Failed to sign in with Google')
+        setGoogleLoading(false)
+        return
+      }
+
+      if (result?.url) {
+        // Sync the session to set our custom auth cookie
+        await fetch('/api/auth/google-sync', { method: 'POST' })
+        
+        // Fetch user to update auth store
+        await fetchUser()
+        
+        toast.success('Welcome!')
+        router.push(result.url)
+      }
+    } catch (error) {
+      console.error('Google sign-in error:', error)
+      toast.error('Failed to sign in with Google')
+      setGoogleLoading(false)
     }
   }
 
@@ -242,12 +277,16 @@ function LoginForm() {
             <div className="flex-1 h-px bg-charcoal-200" />
           </div>
 
-          {/* Social Login */}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              className="flex items-center justify-center gap-2 px-4 py-3 border border-charcoal-200 rounded-lg hover:bg-charcoal-50 transition-colors"
-            >
+          {/* Google Sign In */}
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={googleLoading || isLoading}
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-charcoal-200 rounded-lg hover:bg-charcoal-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {googleLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin text-charcoal-500" />
+            ) : (
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
@@ -266,18 +305,11 @@ function LoginForm() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              <span className="text-sm font-medium text-charcoal-700">Google</span>
-            </button>
-            <button
-              type="button"
-              className="flex items-center justify-center gap-2 px-4 py-3 border border-charcoal-200 rounded-lg hover:bg-charcoal-50 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-              </svg>
-              <span className="text-sm font-medium text-charcoal-700">Facebook</span>
-            </button>
-          </div>
+            )}
+            <span className="text-sm font-medium text-charcoal-700">
+              {googleLoading ? 'Signing in...' : 'Continue with Google'}
+            </span>
+          </button>
 
           {/* Terms */}
           <p className="mt-8 text-center text-sm text-charcoal-500">
