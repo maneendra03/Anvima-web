@@ -80,7 +80,7 @@ export default function Footer() {
                 <Instagram className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
               <a
-                href="mailto:hello@anvima.com"
+                href="mailto:anvima.creations@gmail.com"
                 className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"
               >
                 <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -128,15 +128,15 @@ export default function Footer() {
             <ul className="space-y-2 sm:space-y-3">
               <li className="flex items-start gap-2 sm:gap-3 text-sm text-cream-300">
                 <MapPin className="w-4 h-4 sm:w-5 sm:h-5 mt-0.5 flex-shrink-0" />
-                <span>Your City, State, Country</span>
+                <span>Hyderabad, Telangana, India</span>
               </li>
               <li className="flex items-center gap-2 sm:gap-3 text-sm text-cream-300">
                 <Phone className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span>+91 XXXXX XXXXX</span>
+                <span>+91 6304742807</span>
               </li>
               <li className="flex items-center gap-2 sm:gap-3 text-sm text-cream-300">
                 <Mail className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                <span>hello@anvima.com</span>
+                <span>anvima.creations@gmail.com</span>
               </li>
             </ul>
           </div>

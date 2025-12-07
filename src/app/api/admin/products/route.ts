@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit
     const search = searchParams.get('search')
     const status = searchParams.get('status')
+    const stock = searchParams.get('stock')
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = {}
@@ -33,6 +34,11 @@ export async function GET(request: NextRequest) {
 
     if (status === 'active') query.isActive = true
     if (status === 'inactive') query.isActive = false
+
+    // Handle low stock filter
+    if (stock === 'low') {
+      query.stock = { $lte: 10 }
+    }
 
     const [products, total] = await Promise.all([
       Product.find(query)
