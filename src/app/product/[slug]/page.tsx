@@ -3,6 +3,7 @@
 import { useState, use, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   Star,
   Heart,
@@ -16,56 +17,159 @@ import {
   Check,
   Minus,
   Plus,
+  Loader2,
 } from 'lucide-react'
-import { products } from '@/data'
 import { useCartStore } from '@/store/cartStore'
 import { useRecentlyViewedStore } from '@/store/recentlyViewed'
+import { useWishlistStore } from '@/store/wishlistStore'
 import ProductReviews from '@/components/product/ProductReviews'
 import RelatedProducts from '@/components/product/RelatedProducts'
 import RecentlyViewed from '@/components/product/RecentlyViewed'
 import SizeGuide, { SizeGuideButton } from '@/components/product/SizeGuide'
+import toast from 'react-hot-toast'
+
+interface ProductImage {
+  url: string
+  alt?: string
+  isPrimary: boolean
+}
+
+interface ProductVariant {
+  name: string
+  options: string[]
+  prices?: { option: string; price: number }[]
+}
+
+interface Product {
+  _id: string
+  name: string
+  slug: string
+  description: string
+  shortDescription?: string
+  price: number
+  comparePrice?: number
+  images: ProductImage[]
+  category: { _id: string; name: string; slug: string }
+  tags: string[]
+  variants: ProductVariant[]
+  customizable: boolean
+  customizationOptions?: {
+    allowText: boolean
+    maxTextLength?: number
+    allowImage: boolean
+    maxImages?: number
+    instructions?: string
+  }
+  stock: number
+  isFeatured: boolean
+  isActive: boolean
+  ratings: {
+    average: number
+    count: number
+  }
+}
+
+interface RelatedProduct {
+  _id: string
+  name: string
+  slug: string
+  price: number
+  comparePrice?: number
+  images: ProductImage[]
+}
 
 export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
-  const product = products.find((p) => p.slug === slug)
+  
+  const [product, setProduct] = useState<Product | null>(null)
+  const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
-  const [selectedSize, setSelectedSize] = useState(
-    product?.customizationOptions?.sizes?.[0]?.name || ''
-  )
-  const [selectedColor, setSelectedColor] = useState(
-    product?.customizationOptions?.colors?.[0]?.name || ''
-  )
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
   const [customText, setCustomText] = useState('')
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
-  const [hasEngraving, setHasEngraving] = useState(false)
   const [showSizeGuide, setShowSizeGuide] = useState(false)
   
   const addItem = useCartStore((state) => state.addItem)
   const addToRecentlyViewed = useRecentlyViewedStore((state) => state.addItem)
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore()
+
+  // Fetch product from API
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        
+        const response = await fetch(`/api/products/${slug}`)
+        const data = await response.json()
+        
+        if (data.success) {
+          setProduct(data.data.product)
+          setRelatedProducts(data.data.relatedProducts || [])
+          
+          // Initialize variant selections
+          if (data.data.product.variants?.length > 0) {
+            const initialVariants: Record<string, string> = {}
+            data.data.product.variants.forEach((variant: ProductVariant) => {
+              if (variant.options?.length > 0) {
+                initialVariants[variant.name] = variant.options[0]
+              }
+            })
+            setSelectedVariants(initialVariants)
+          }
+        } else {
+          setError(data.message || 'Product not found')
+        }
+      } catch (err) {
+        console.error('Failed to fetch product:', err)
+        setError('Failed to load product')
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    fetchProduct()
+  }, [slug])
 
   // Track recently viewed product
   useEffect(() => {
     if (product) {
       addToRecentlyViewed({
-        id: product.id,
+        id: product._id,
         slug: product.slug,
         name: product.name,
         price: product.price,
-        originalPrice: product.originalPrice,
-        image: product.images[0],
+        originalPrice: product.comparePrice,
+        image: product.images[0]?.url || '/placeholder.jpg',
       })
     }
   }, [product, addToRecentlyViewed])
 
-  if (!product) {
+  // Loading state
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-cream-50">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-forest-500" />
+          <p className="text-charcoal-600">Loading product...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error || !product) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-cream-50">
         <div className="text-center">
           <h1 className="text-2xl font-serif font-bold text-charcoal-700 mb-4">
             Product Not Found
           </h1>
+          <p className="text-charcoal-600 mb-4">{error || 'The product you are looking for does not exist.'}</p>
           <Link href="/shop" className="text-forest-500 hover:underline">
             ← Back to Shop
           </Link>
@@ -74,20 +178,26 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     )
   }
 
-  // Calculate price with options
+  // Get image URL helper
+  const getImageUrl = (image: ProductImage | string, index?: number): string => {
+    if (typeof image === 'string') return image
+    return image.url || '/placeholder.jpg'
+  }
+
+  // Calculate price with variant options
   const calculatePrice = () => {
     let price = product.price
     
-    if (selectedSize && product.customizationOptions?.sizes) {
-      const sizeOption = product.customizationOptions.sizes.find(
-        (s) => s.name === selectedSize
-      )
-      if (sizeOption) price += sizeOption.price
-    }
-    
-    if (hasEngraving && product.customizationOptions?.engravingPrice) {
-      price += product.customizationOptions.engravingPrice
-    }
+    // Add variant price modifiers if available
+    product.variants?.forEach(variant => {
+      const selectedOption = selectedVariants[variant.name]
+      if (selectedOption && variant.prices) {
+        const priceInfo = variant.prices.find(p => p.option === selectedOption)
+        if (priceInfo) {
+          price += priceInfo.price
+        }
+      }
+    })
     
     return price
   }
@@ -105,22 +215,40 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
   const handleAddToCart = () => {
     addItem({
-      id: `${product.id}-${Date.now()}`,
-      productId: product.id,
-      slug: product.slug, // Include slug for order API compatibility
+      id: `${product._id}-${Date.now()}`,
+      productId: product._id,
+      slug: product.slug,
       name: product.name,
       price: calculatePrice(),
       quantity,
-      image: product.images[0],
+      image: getImageUrl(product.images[0]),
       customization: {
-        text: customText,
+        text: customText || undefined,
         imageUrl: uploadedImage || undefined,
-        size: selectedSize,
-        color: selectedColor,
-        engraving: hasEngraving ? 'Yes' : undefined,
+        ...selectedVariants,
       },
     })
+    toast.success('Added to cart!')
   }
+
+  const handleWishlistToggle = () => {
+    if (isInWishlist(product._id)) {
+      removeFromWishlist(product._id)
+      toast.success('Removed from wishlist')
+    } else {
+      addToWishlist({
+        productId: product._id,
+        name: product.name,
+        slug: product.slug,
+        price: product.price,
+        comparePrice: product.comparePrice,
+        image: getImageUrl(product.images[0]),
+      })
+      toast.success('Added to wishlist!')
+    }
+  }
+
+  const isWishlisted = isInWishlist(product._id)
 
   return (
     <div className="min-h-screen bg-cream-50 pt-20">
@@ -153,11 +281,19 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               animate={{ opacity: 1 }}
               className="relative aspect-square rounded-2xl overflow-hidden bg-white"
             >
-              <img
-                src={product.images[selectedImage]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
+              {product.images[selectedImage] ? (
+                <Image
+                  src={getImageUrl(product.images[selectedImage])}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                  <span className="text-gray-400">No image</span>
+                </div>
+              )}
               
               {/* Navigation arrows */}
               {product.images.length > 1 && (
@@ -186,21 +322,22 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
             {/* Thumbnails */}
             {product.images.length > 1 && (
-              <div className="flex gap-4">
+              <div className="flex gap-4 overflow-x-auto pb-2">
                 {product.images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                    className={`relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${
                       selectedImage === index
                         ? 'border-forest-500'
                         : 'border-transparent'
                     }`}
                   >
-                    <img
-                      src={image}
+                    <Image
+                      src={getImageUrl(image)}
                       alt={`${product.name} ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   </button>
                 ))}
@@ -212,11 +349,14 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           <div>
             {/* Badges */}
             <div className="flex gap-2 mb-4">
-              {product.bestSeller && (
-                <span className="badge badge-peach">Bestseller</span>
+              {product.isFeatured && (
+                <span className="badge badge-peach">Featured</span>
               )}
-              {product.newArrival && (
-                <span className="badge badge-forest">New Arrival</span>
+              {product.stock === 0 && (
+                <span className="badge bg-red-100 text-red-600">Out of Stock</span>
+              )}
+              {product.stock > 0 && product.stock < 10 && (
+                <span className="badge bg-amber-100 text-amber-600">Only {product.stock} left</span>
               )}
             </div>
 
@@ -231,7 +371,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   <Star
                     key={i}
                     className={`w-5 h-5 ${
-                      i < Math.floor(product.rating)
+                      i < Math.floor(product.ratings?.average || 0)
                         ? 'fill-yellow-400 text-yellow-400'
                         : 'text-gray-300'
                     }`}
@@ -239,7 +379,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 ))}
               </div>
               <span className="text-charcoal-600">
-                {product.rating} ({product.reviewCount} reviews)
+                {product.ratings?.average?.toFixed(1) || '0'} ({product.ratings?.count || 0} reviews)
               </span>
             </div>
 
@@ -248,94 +388,71 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               <span className="text-3xl font-bold text-charcoal-700">
                 ₹{calculatePrice().toLocaleString()}
               </span>
-              {product.originalPrice && (
+              {product.comparePrice && product.comparePrice > product.price && (
                 <>
                   <span className="text-xl text-charcoal-400 line-through">
-                    ₹{product.originalPrice.toLocaleString()}
+                    ₹{product.comparePrice.toLocaleString()}
                   </span>
                   <span className="badge bg-red-100 text-red-600">
                     {Math.round(
-                      ((product.originalPrice - product.price) /
-                        product.originalPrice) *
-                        100
-                    )}
-                    % OFF
+                      ((product.comparePrice - product.price) / product.comparePrice) * 100
+                    )}% OFF
                   </span>
                 </>
               )}
             </div>
 
-            <p className="text-charcoal-600 mb-6">{product.shortDescription}</p>
+            <p className="text-charcoal-600 mb-6">{product.shortDescription || product.description}</p>
+
+            {/* Variant Options */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="space-y-6 border-t border-cream-200 pt-6">
+                <h3 className="font-semibold text-charcoal-700">
+                  Choose Your Options
+                </h3>
+
+                {product.variants.map((variant) => (
+                  <div key={variant.name}>
+                    <label className="block text-sm font-medium text-charcoal-700 mb-2">
+                      {variant.name}
+                    </label>
+                    <div className="flex flex-wrap gap-3">
+                      {variant.options?.map((option) => {
+                        const priceInfo = variant.prices?.find(p => p.option === option)
+                        return (
+                          <button
+                            key={option}
+                            onClick={() => setSelectedVariants(prev => ({ ...prev, [variant.name]: option }))}
+                            className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                              selectedVariants[variant.name] === option
+                                ? 'border-forest-500 bg-forest-50'
+                                : 'border-cream-200 hover:border-cream-300'
+                            }`}
+                          >
+                            <span className="font-medium">{option}</span>
+                            {priceInfo && priceInfo.price > 0 && (
+                              <span className="text-sm text-charcoal-500 ml-1">
+                                (+₹{priceInfo.price})
+                              </span>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Customization Options */}
-            {product.customizable && (
-              <div className="space-y-6 border-t border-cream-200 pt-6">
+            {product.customizable && product.customizationOptions && (
+              <div className="space-y-6 border-t border-cream-200 pt-6 mt-6">
                 <h3 className="font-semibold text-charcoal-700">
                   Customize Your Gift
                 </h3>
 
-                {/* Size Selection */}
-                {product.customizationOptions?.sizes && (
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="block text-sm font-medium text-charcoal-700">
-                        Size
-                      </label>
-                      <SizeGuideButton onClick={() => setShowSizeGuide(true)} />
-                    </div>
-                    <div className="flex flex-wrap gap-3">
-                      {product.customizationOptions.sizes.map((size) => (
-                        <button
-                          key={size.name}
-                          onClick={() => setSelectedSize(size.name)}
-                          className={`px-4 py-2 rounded-lg border-2 transition-all ${
-                            selectedSize === size.name
-                              ? 'border-forest-500 bg-forest-50'
-                              : 'border-cream-200 hover:border-cream-300'
-                          }`}
-                        >
-                          <span className="font-medium">{size.name}</span>
-                          {size.price > 0 && (
-                            <span className="text-sm text-charcoal-500 ml-1">
-                              (+₹{size.price})
-                            </span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Color Selection */}
-                {product.customizationOptions?.colors && (
-                  <div>
-                    <label className="block text-sm font-medium text-charcoal-700 mb-2">
-                      Color / Style
-                    </label>
-                    <div className="flex flex-wrap gap-3">
-                      {product.customizationOptions.colors.map((color) => (
-                        <button
-                          key={color.name}
-                          onClick={() => setSelectedColor(color.name)}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all ${
-                            selectedColor === color.name
-                              ? 'border-forest-500 bg-forest-50'
-                              : 'border-cream-200 hover:border-cream-300'
-                          }`}
-                        >
-                          <span
-                            className="w-5 h-5 rounded-full border border-charcoal-200"
-                            style={{ backgroundColor: color.hex }}
-                          />
-                          <span>{color.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 {/* Text Input */}
-                {product.customizationOptions?.hasText && (
+                {product.customizationOptions.allowText && (
                   <div>
                     <label className="block text-sm font-medium text-charcoal-700 mb-2">
                       Custom Text
@@ -344,19 +461,18 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                       type="text"
                       value={customText}
                       onChange={(e) => setCustomText(e.target.value)}
-                      maxLength={product.customizationOptions.textMaxLength || 50}
+                      maxLength={product.customizationOptions.maxTextLength || 50}
                       placeholder="Enter your message or name"
                       className="input-field"
                     />
                     <p className="text-sm text-charcoal-500 mt-1">
-                      {customText.length}/
-                      {product.customizationOptions.textMaxLength || 50} characters
+                      {customText.length}/{product.customizationOptions.maxTextLength || 50} characters
                     </p>
                   </div>
                 )}
 
                 {/* Image Upload */}
-                {product.customizationOptions?.hasImageUpload && (
+                {product.customizationOptions.allowImage && (
                   <div>
                     <label className="block text-sm font-medium text-charcoal-700 mb-2">
                       Upload Your Photo
@@ -397,23 +513,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   </div>
                 )}
 
-                {/* Engraving Option */}
-                {product.customizationOptions?.hasEngraving && (
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setHasEngraving(!hasEngraving)}
-                      className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
-                        hasEngraving
-                          ? 'border-forest-500 bg-forest-500'
-                          : 'border-cream-300'
-                      }`}
-                    >
-                      {hasEngraving && <Check className="w-4 h-4 text-white" />}
-                    </button>
-                    <span className="text-charcoal-700">
-                      Add engraving (+₹{product.customizationOptions.engravingPrice})
-                    </span>
-                  </div>
+                {/* Instructions */}
+                {product.customizationOptions.instructions && (
+                  <p className="text-sm text-charcoal-500 italic">
+                    {product.customizationOptions.instructions}
+                  </p>
                 )}
               </div>
             )}
@@ -430,7 +534,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 </button>
                 <span className="px-4 font-medium">{quantity}</span>
                 <button
-                  onClick={() => setQuantity(quantity + 1)}
+                  onClick={() => setQuantity(Math.min(product.stock || 99, quantity + 1))}
                   className="p-3 hover:bg-cream-50 rounded-r-full"
                 >
                   <Plus className="w-5 h-5" />
@@ -442,15 +546,23 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleAddToCart}
-                className="flex-1 btn-primary flex items-center justify-center gap-2"
+                disabled={product.stock === 0}
+                className="flex-1 btn-primary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ShoppingBag className="w-5 h-5" />
-                Add to Cart
+                {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
               </motion.button>
 
               {/* Wishlist */}
-              <button className="p-3 border border-cream-200 rounded-full hover:bg-cream-50 transition-colors">
-                <Heart className="w-5 h-5" />
+              <button 
+                onClick={handleWishlistToggle}
+                className={`p-3 border rounded-full transition-colors ${
+                  isWishlisted 
+                    ? 'bg-red-50 border-red-200 text-red-500' 
+                    : 'border-cream-200 hover:bg-cream-50'
+                }`}
+              >
+                <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
               </button>
             </div>
 
@@ -459,7 +571,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               <div className="flex flex-col items-center text-center">
                 <Truck className="w-6 h-6 text-forest-500 mb-2" />
                 <span className="text-sm text-charcoal-600">
-                  {product.deliveryTime} delivery
+                  3-5 days delivery
                 </span>
               </div>
               <div className="flex flex-col items-center text-center">
@@ -480,51 +592,76 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             <h2 className="text-2xl font-serif font-bold text-charcoal-700 mb-4">
               About This Product
             </h2>
-            <p className="text-charcoal-600 leading-relaxed">{product.description}</p>
+            <div className="text-charcoal-600 leading-relaxed whitespace-pre-line">
+              {product.description}
+            </div>
 
             {/* Tags */}
-            <div className="mt-6 flex flex-wrap gap-2">
-              {product.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 bg-cream-100 text-charcoal-600 rounded-full text-sm"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
+            {product.tags && product.tags.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-2">
+                {product.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1 bg-cream-100 text-charcoal-600 rounded-full text-sm"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Product Reviews Section */}
         <div className="mt-16">
-          <ProductReviews productId={product.id} productSlug={product.slug} />
+          <ProductReviews productId={product._id} productSlug={product.slug} />
         </div>
       </div>
 
       {/* Related Products */}
-      <RelatedProducts
-        currentProductId={product.id}
-        category={product.category}
-        tags={product.tags}
-      />
+      {relatedProducts.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-serif font-bold text-charcoal-700 mb-8">
+              You May Also Like
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {relatedProducts.map((relatedProduct) => (
+                <Link
+                  key={relatedProduct._id}
+                  href={`/product/${relatedProduct.slug}`}
+                  className="group"
+                >
+                  <div className="relative aspect-square rounded-xl overflow-hidden bg-cream-50 mb-3">
+                    <Image
+                      src={getImageUrl(relatedProduct.images[0])}
+                      alt={relatedProduct.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <h3 className="font-medium text-charcoal-700 group-hover:text-forest-500 transition-colors line-clamp-2">
+                    {relatedProduct.name}
+                  </h3>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="font-semibold text-charcoal-700">
+                      ₹{relatedProduct.price.toLocaleString()}
+                    </span>
+                    {relatedProduct.comparePrice && (
+                      <span className="text-sm text-charcoal-400 line-through">
+                        ₹{relatedProduct.comparePrice.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Recently Viewed */}
-      <RecentlyViewed excludeId={product.id} />
-
-      {/* Size Guide Modal */}
-      {product.customizationOptions?.sizes && (
-        <SizeGuide
-          sizes={product.customizationOptions.sizes}
-          productType={
-            product.category === 'frames' ? 'frame' :
-            product.category === 'polaroids' ? 'polaroid' :
-            product.category === 'hampers' ? 'gift' : 'general'
-          }
-          isOpen={showSizeGuide}
-          onClose={() => setShowSizeGuide(false)}
-        />
-      )}
+      <RecentlyViewed excludeId={product._id} />
     </div>
   )
 }
