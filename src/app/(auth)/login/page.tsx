@@ -101,12 +101,13 @@ function LoginForm() {
   const handleGoogleSignIn = async () => {
     try {
       setGoogleLoading(true)
-      const callbackUrl = redirectUrl || '/'
+      const callbackUrl = redirectUrl || '/account'
       
-      // For OAuth providers, we need to use redirect: true
-      // The callback will handle syncing the session
+      // Sign in with Google - NextAuth will handle the OAuth flow
+      // After successful sign-in, we'll sync the session in the callback page
       await signIn('google', {
-        callbackUrl: `/api/auth/google-callback?redirect=${encodeURIComponent(callbackUrl)}`,
+        callbackUrl: callbackUrl,
+        redirect: true,
       })
     } catch (error) {
       console.error('Google sign-in error:', error)

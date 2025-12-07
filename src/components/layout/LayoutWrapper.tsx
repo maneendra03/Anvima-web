@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import AuthProvider from '@/components/providers/AuthProvider'
+import { GoogleSessionSync } from '@/components/auth/GoogleSessionSync'
 
 export default function LayoutWrapper({
   children,
@@ -22,6 +23,7 @@ export default function LayoutWrapper({
 
   return (
     <AuthProvider>
+      <GoogleSessionSync />
       <Header />
       <main className="flex-grow">
         {children}

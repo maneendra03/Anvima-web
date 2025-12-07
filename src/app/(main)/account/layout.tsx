@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore, useAuthHydration } from '@/store/auth'
 import { useCartStore } from '@/store/cartStore'
+import { GoogleSessionSync } from '@/components/auth/GoogleSessionSync'
 
 const accountNavigation = [
   { name: 'Profile', href: '/account', icon: User },
@@ -77,7 +78,11 @@ export default function AccountLayout({
   }
 
   return (
-    <div className="min-h-screen bg-cream-50 pt-24 pb-12">
+    <>
+      {/* Sync Google OAuth session with custom auth */}
+      <GoogleSessionSync />
+      
+      <div className="min-h-screen bg-cream-50 pt-24 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Header */}
         <div className="mb-8">
@@ -172,5 +177,6 @@ export default function AccountLayout({
         </div>
       </div>
     </div>
+    </>
   )
 }
