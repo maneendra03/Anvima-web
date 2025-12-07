@@ -79,27 +79,11 @@ function LoginForm() {
       setGoogleLoading(true)
       const callbackUrl = redirectUrl || '/'
       
-      const result = await signIn('google', {
-        callbackUrl,
-        redirect: false,
+      // For OAuth providers, we need to use redirect: true
+      // The callback will handle syncing the session
+      await signIn('google', {
+        callbackUrl: `/api/auth/google-callback?redirect=${encodeURIComponent(callbackUrl)}`,
       })
-
-      if (result?.error) {
-        toast.error(result.error || 'Failed to sign in with Google')
-        setGoogleLoading(false)
-        return
-      }
-
-      if (result?.url) {
-        // Sync the session to set our custom auth cookie
-        await fetch('/api/auth/google-sync', { method: 'POST' })
-        
-        // Fetch user to update auth store
-        await fetchUser()
-        
-        toast.success('Welcome!')
-        router.push(result.url)
-      }
     } catch (error) {
       console.error('Google sign-in error:', error)
       toast.error('Failed to sign in with Google')

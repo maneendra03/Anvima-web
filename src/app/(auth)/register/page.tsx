@@ -11,7 +11,7 @@ import toast from 'react-hot-toast'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const { register, isLoading, fetchUser } = useAuthStore()
+  const { register, isLoading } = useAuthStore()
   
   const [formData, setFormData] = useState({
     name: '',
@@ -30,27 +30,11 @@ export default function RegisterPage() {
     try {
       setGoogleLoading(true)
       
-      const result = await signIn('google', {
-        callbackUrl: '/',
-        redirect: false,
+      // For OAuth providers, we need to use redirect
+      // The callback will handle syncing the session
+      await signIn('google', {
+        callbackUrl: '/api/auth/google-callback?redirect=/',
       })
-
-      if (result?.error) {
-        toast.error(result.error || 'Failed to sign in with Google')
-        setGoogleLoading(false)
-        return
-      }
-
-      if (result?.url) {
-        // Sync the session to set our custom auth cookie
-        await fetch('/api/auth/google-sync', { method: 'POST' })
-        
-        // Fetch user to update auth store
-        await fetchUser()
-        
-        toast.success('Account created successfully!')
-        router.push(result.url)
-      }
     } catch (error) {
       console.error('Google sign-in error:', error)
       toast.error('Failed to sign in with Google')
