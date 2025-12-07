@@ -23,7 +23,7 @@ import {
   Clock,
   CheckCircle
 } from 'lucide-react'
-import { useAuthStore } from '@/store/auth'
+import { useAuthStore, useAuthHydration } from '@/store/auth'
 import { useCartStore } from '@/store/cartStore'
 
 interface Notification {
@@ -54,9 +54,11 @@ export default function AdminLayout({
   const router = useRouter()
   const pathname = usePathname()
   const { user, isAuthenticated, fetchUser, logout, isLoading } = useAuthStore()
+  const hasHydrated = useAuthHydration()
   const clearCart = useCartStore((state) => state.clearCart)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [hasFetchedUser, setHasFetchedUser] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loadingNotifications, setLoadingNotifications] = useState(false)
@@ -163,27 +165,36 @@ export default function AdminLayout({
 
   useEffect(() => {
     setMounted(true)
-    fetchUser()
-  }, [fetchUser])
+  }, [])
+
+  // Only fetch user once after hydration
+  useEffect(() => {
+    if (hasHydrated && !hasFetchedUser) {
+      setHasFetchedUser(true)
+      fetchUser()
+    }
+  }, [hasHydrated, hasFetchedUser, fetchUser])
 
   useEffect(() => {
-    if (mounted && isAuthenticated && user?.role === 'admin') {
+    // Only fetch notifications after we've verified authentication
+    if (mounted && hasHydrated && hasFetchedUser && !isLoading && isAuthenticated && user?.role === 'admin') {
       fetchNotifications()
       // Refresh notifications every 2 minutes
       const interval = setInterval(fetchNotifications, 120000)
       return () => clearInterval(interval)
     }
-  }, [mounted, isAuthenticated, user, fetchNotifications])
+  }, [mounted, hasHydrated, hasFetchedUser, isLoading, isAuthenticated, user, fetchNotifications])
 
   useEffect(() => {
-    if (mounted && !isLoading) {
+    // Only redirect after hydration and user fetch is complete
+    if (mounted && hasHydrated && hasFetchedUser && !isLoading) {
       if (!isAuthenticated) {
         router.push('/login?redirect=/admin')
       } else if (user?.role !== 'admin') {
         router.push('/')
       }
     }
-  }, [mounted, isAuthenticated, isLoading, user, router])
+  }, [mounted, hasHydrated, hasFetchedUser, isAuthenticated, isLoading, user, router])
 
   // Close notification dropdown when clicking outside
   useEffect(() => {
@@ -206,7 +217,8 @@ export default function AdminLayout({
     router.push('/login')
   }
 
-  if (!mounted || isLoading) {
+  // Show loading while hydrating, fetching user, or loading
+  if (!mounted || !hasHydrated || !hasFetchedUser || isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">

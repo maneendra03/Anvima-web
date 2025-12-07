@@ -13,7 +13,7 @@ import {
   LogOut,
   ChevronRight 
 } from 'lucide-react'
-import { useAuthStore } from '@/store/auth'
+import { useAuthStore, useAuthHydration } from '@/store/auth'
 import { useCartStore } from '@/store/cartStore'
 
 const accountNavigation = [
@@ -32,18 +32,27 @@ export default function AccountLayout({
   const router = useRouter()
   const pathname = usePathname()
   const { user, isAuthenticated, logout, fetchUser, isLoading } = useAuthStore()
+  const hasHydrated = useAuthHydration()
   const clearCart = useCartStore((state) => state.clearCart)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [hasFetchedUser, setHasFetchedUser] = useState(false)
 
+  // Only fetch user once after hydration
   useEffect(() => {
-    fetchUser()
-  }, [fetchUser])
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/login?redirect=/account')
+    if (hasHydrated && !hasFetchedUser) {
+      setHasFetchedUser(true)
+      fetchUser()
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [hasHydrated, hasFetchedUser, fetchUser])
+
+  // Only redirect after hydration and fetch is complete
+  useEffect(() => {
+    if (hasHydrated && hasFetchedUser && !isLoading && !isAuthenticated) {
+      // Preserve the current path for redirect after login
+      const currentPath = pathname || '/account'
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`)
+    }
+  }, [hasHydrated, hasFetchedUser, isAuthenticated, isLoading, router, pathname])
 
   const handleLogout = async () => {
     // Clear cart first (this also clears localStorage via persist)
@@ -54,7 +63,8 @@ export default function AccountLayout({
     router.push('/login')
   }
 
-  if (isLoading) {
+  // Show loading while hydrating or fetching user
+  if (!hasHydrated || isLoading || !hasFetchedUser) {
     return (
       <div className="min-h-screen bg-cream-50 flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-forest-500/30 border-t-forest-500 rounded-full animate-spin" />
