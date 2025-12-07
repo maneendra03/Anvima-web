@@ -47,6 +47,7 @@ module.exports = {
         },
         // Deep accents
         forest: {
+          DEFAULT: '#2D5A47',
           500: '#2D5A47',
           600: '#234536',
           700: '#1A3328',

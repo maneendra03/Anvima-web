@@ -187,7 +187,7 @@ export default function ContactPage() {
                 <h3 className="font-semibold text-charcoal-700 mb-4">Quick Contact</h3>
                 <div className="space-y-4">
                   <a
-                    href="mailto:hello@anvima.com"
+                    href="mailto:anvima.creations@gmail.com"
                     className="flex items-center gap-3 text-charcoal-600 hover:text-forest-500 transition-colors"
                   >
                     <div className="w-10 h-10 bg-peach-100 rounded-xl flex items-center justify-center">
@@ -195,12 +195,12 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-sm text-charcoal-500">Email</p>
-                      <p className="font-medium">hello@anvima.com</p>
+                      <p className="font-medium">anvima.creations@gmail.com</p>
                     </div>
                   </a>
 
                   <a
-                    href="tel:+919XXXXXXXXX"
+                    href="tel:+916304742807"
                     className="flex items-center gap-3 text-charcoal-600 hover:text-forest-500 transition-colors"
                   >
                     <div className="w-10 h-10 bg-forest-100 rounded-xl flex items-center justify-center">
@@ -208,7 +208,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-sm text-charcoal-500">Phone</p>
-                      <p className="font-medium">+91 XXXXX XXXXX</p>
+                      <p className="font-medium">+91 6304742807</p>
                     </div>
                   </a>
 
@@ -218,7 +218,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-sm text-charcoal-500">Location</p>
-                      <p className="font-medium">Your City, India</p>
+                      <p className="font-medium">Hyderabad, Telangana, India</p>
                     </div>
                   </div>
                 </div>
@@ -231,7 +231,7 @@ export default function ContactPage() {
                   Get instant replies! Chat with us directly on WhatsApp.
                 </p>
                 <a
-                  href="https://wa.me/919XXXXXXXXX"
+                  href="https://wa.me/916304742807"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-white text-[#25D366] px-4 py-2 rounded-full font-medium hover:bg-white/90 transition-colors"

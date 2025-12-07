@@ -409,6 +409,87 @@ export default function CheckoutPage() {
         )}
 
         <div className="grid lg:grid-cols-3 gap-8">
+          {/* Order Summary - Shows first on mobile, last on desktop */}
+          <div className="lg:col-span-1 order-first lg:order-last">
+            <div className="bg-white rounded-2xl p-6 shadow-sm lg:sticky lg:top-24">
+              <h2 className="text-xl font-semibold text-charcoal-700 mb-6">
+                Order Summary
+              </h2>
+
+              <div className="space-y-4 max-h-64 overflow-y-auto mb-6 pr-2">
+                {items.map((item) => (
+                  <div key={item.id} className="flex gap-3">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-cream-100 flex-shrink-0">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-charcoal-700 text-sm truncate">
+                        {item.name}
+                      </p>
+                      <p className="text-sm text-charcoal-500">Qty: {item.quantity}</p>
+                      {item.customization?.size && (
+                        <p className="text-xs text-charcoal-400">Size: {item.customization.size}</p>
+                      )}
+                    </div>
+                    <p className="font-medium text-charcoal-700 text-sm">
+                      ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-3 border-t border-charcoal-100 pt-4">
+                <div className="flex justify-between text-charcoal-600">
+                  <span>Subtotal</span>
+                  <span>₹{subtotal.toLocaleString('en-IN')}</span>
+                </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Coupon ({appliedCoupon.code})</span>
+                    <span>-₹{couponDiscount.toLocaleString('en-IN')}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-charcoal-600">
+                  <span>Shipping</span>
+                  <span className={shipping === 0 ? 'text-green-600 font-medium' : ''}>
+                    {shipping === 0 ? 'FREE' : `₹${shipping}`}
+                  </span>
+                </div>
+                <div className="flex justify-between text-charcoal-600">
+                  <span>Tax (18% GST)</span>
+                  <span>₹{tax.toLocaleString('en-IN')}</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold text-charcoal-800 pt-3 border-t border-charcoal-100">
+                  <span>Total</span>
+                  <span>₹{total.toLocaleString('en-IN')}</span>
+                </div>
+              </div>
+
+              {/* Coupon Input */}
+              <CouponInput
+                cartTotal={subtotal}
+                onCouponApplied={setAppliedCoupon}
+                appliedCoupon={appliedCoupon}
+              />
+
+              {/* Trust Badges */}
+              <div className="mt-6 pt-6 border-t border-charcoal-100">
+                <div className="flex items-center gap-2 text-sm text-charcoal-500 mb-2">
+                  <Lock className="w-4 h-4" />
+                  <span>Secure checkout powered by Razorpay</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-charcoal-500">
+                  <Truck className="w-4 h-4" />
+                  <span>Free shipping on orders over ₹999</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Form */}
           <div className="lg:col-span-2">
             {/* Step 1: Shipping */}
@@ -691,87 +772,6 @@ export default function CheckoutPage() {
                 )}
               </motion.div>
             )}
-          </div>
-
-          {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl p-6 shadow-sm sticky top-24">
-              <h2 className="text-xl font-semibold text-charcoal-700 mb-6">
-                Order Summary
-              </h2>
-
-              <div className="space-y-4 max-h-64 overflow-y-auto mb-6 pr-2">
-                {items.map((item) => (
-                  <div key={item.id} className="flex gap-3">
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-cream-100 flex-shrink-0">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-charcoal-700 text-sm truncate">
-                        {item.name}
-                      </p>
-                      <p className="text-sm text-charcoal-500">Qty: {item.quantity}</p>
-                      {item.customization?.size && (
-                        <p className="text-xs text-charcoal-400">Size: {item.customization.size}</p>
-                      )}
-                    </div>
-                    <p className="font-medium text-charcoal-700 text-sm">
-                      ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-3 border-t border-charcoal-100 pt-4">
-                <div className="flex justify-between text-charcoal-600">
-                  <span>Subtotal</span>
-                  <span>₹{subtotal.toLocaleString('en-IN')}</span>
-                </div>
-                {appliedCoupon && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Coupon ({appliedCoupon.code})</span>
-                    <span>-₹{couponDiscount.toLocaleString('en-IN')}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-charcoal-600">
-                  <span>Shipping</span>
-                  <span className={shipping === 0 ? 'text-green-600 font-medium' : ''}>
-                    {shipping === 0 ? 'FREE' : `₹${shipping}`}
-                  </span>
-                </div>
-                <div className="flex justify-between text-charcoal-600">
-                  <span>Tax (18% GST)</span>
-                  <span>₹{tax.toLocaleString('en-IN')}</span>
-                </div>
-                <div className="flex justify-between text-lg font-bold text-charcoal-800 pt-3 border-t border-charcoal-100">
-                  <span>Total</span>
-                  <span>₹{total.toLocaleString('en-IN')}</span>
-                </div>
-              </div>
-
-              {/* Coupon Input */}
-              <CouponInput
-                cartTotal={subtotal}
-                onCouponApplied={setAppliedCoupon}
-                appliedCoupon={appliedCoupon}
-              />
-
-              {/* Trust Badges */}
-              <div className="mt-6 pt-6 border-t border-charcoal-100">
-                <div className="flex items-center gap-2 text-sm text-charcoal-500 mb-2">
-                  <Lock className="w-4 h-4" />
-                  <span>Secure checkout powered by Razorpay</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-charcoal-500">
-                  <Truck className="w-4 h-4" />
-                  <span>Free shipping on orders over ₹999</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

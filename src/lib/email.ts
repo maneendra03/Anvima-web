@@ -7,6 +7,15 @@ const smtpUser = process.env.SMTP_USER || process.env.EMAIL_SERVER_USER
 const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_SERVER_PASSWORD
 const smtpSecure = (process.env.SMTP_SECURE === 'true') || smtpPort === 465
 
+// Log email configuration (without sensitive data) for debugging
+console.log('📧 Email Configuration:', {
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpSecure,
+  user: smtpUser ? `${smtpUser.substring(0, 5)}...` : 'NOT SET',
+  passSet: !!smtpPass
+})
+
 const transporter = nodemailer.createTransport({
   host: smtpHost,
   port: smtpPort,
@@ -15,6 +24,15 @@ const transporter = nodemailer.createTransport({
     user: smtpUser,
     pass: smtpPass,
   },
+})
+
+// Verify transporter configuration on startup
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('❌ Email transporter verification failed:', error.message)
+  } else {
+    console.log('✅ Email server is ready to send emails')
+  }
 })
 
 const FROM_EMAIL = process.env.FROM_EMAIL || process.env.EMAIL_FROM?.match(/<(.+)>/)?.[1] || smtpUser || 'noreply@anvimacreations.com'

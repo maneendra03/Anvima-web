@@ -197,7 +197,7 @@ export default function AdminProductsPage() {
           </button>
           <Link
             href="/admin/products/new"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-forest to-forest/80 text-white rounded-xl hover:from-forest/90 hover:to-forest/70 transition-all shadow-lg shadow-forest/25 font-medium"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-forest-600 text-white rounded-xl hover:bg-forest-700 transition-all shadow-lg shadow-forest-600/25 font-medium"
           >
             <Plus className="h-5 w-5" />
             Add Product
@@ -510,7 +510,7 @@ export default function AdminProductsPage() {
             </div>
             <Link
               href="/admin/products/new"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-forest to-forest/80 text-white rounded-xl hover:from-forest/90 hover:to-forest/70 transition-all shadow-lg shadow-forest/25 font-medium"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-forest-600 text-white rounded-xl hover:bg-forest-700 transition-all shadow-lg shadow-forest-600/25 font-medium"
             >
               <Plus className="h-5 w-5" />
               Add your first product
