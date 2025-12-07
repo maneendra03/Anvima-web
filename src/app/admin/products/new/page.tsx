@@ -139,8 +139,8 @@ export default function NewProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!formData.name || !formData.price || !formData.category) {
-      toast.error('Please fill in all required fields')
+    if (!formData.name || !formData.price || !formData.category || !formData.description) {
+      toast.error('Please fill in all required fields (Name, Description, Price, Category)')
       return
     }
 
