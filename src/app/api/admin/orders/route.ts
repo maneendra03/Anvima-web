@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status')
     const paymentStatus = searchParams.get('paymentStatus')
     const search = searchParams.get('search')
+    const sortParam = searchParams.get('sort')
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = {}
@@ -35,10 +36,19 @@ export async function GET(request: NextRequest) {
       ]
     }
 
+    // Handle sort parameter (e.g., -createdAt for descending)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let sortOptions: any = { createdAt: -1 }
+    if (sortParam) {
+      const sortField = sortParam.startsWith('-') ? sortParam.substring(1) : sortParam
+      const sortOrder = sortParam.startsWith('-') ? -1 : 1
+      sortOptions = { [sortField]: sortOrder }
+    }
+
     const [orders, total] = await Promise.all([
       Order.find(query)
         .populate('user', 'name email phone')
-        .sort({ createdAt: -1 })
+        .sort(sortOptions)
         .skip(skip)
         .limit(limit)
         .lean(),

@@ -18,12 +18,18 @@ export async function POST(request: NextRequest) {
       return errorResponse('No image provided', 400)
     }
 
+    // Validate base64 image format
+    if (typeof image === 'string' && !image.startsWith('data:image/') && !image.startsWith('http')) {
+      return errorResponse('Invalid image format. Must be base64 or URL', 400)
+    }
+
     const uploadResult = await uploadToCloudinary(image, folder)
 
     return successResponse(uploadResult, 'Image uploaded successfully')
   } catch (error) {
     console.error('Upload error:', error)
-    return errorResponse('Failed to upload image')
+    const message = error instanceof Error ? error.message : 'Failed to upload image'
+    return errorResponse(message)
   }
 }
 
