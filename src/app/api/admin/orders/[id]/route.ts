@@ -95,6 +95,19 @@ export async function PUT(
     // Send email notifications if enabled (default: true)
     if (sendEmail !== false && status && status !== previousStatus && user?.email) {
       try {
+        // Create meaningful messages for each status
+        const statusMessages: Record<string, string> = {
+          pending: 'Your order is pending confirmation.',
+          confirmed: 'Great news! Your order has been confirmed and is being prepared.',
+          processing: 'Your order is now being processed. We\'re carefully preparing your items.',
+          shipped: 'Your order has been shipped and is on its way!',
+          delivered: 'Your order has been delivered. We hope you love it!',
+          cancelled: 'Your order has been cancelled.',
+          refunded: 'Your order has been refunded.'
+        }
+
+        const emailMessage = notes || statusMessages[status] || `Your order status has been updated to ${status}.`
+
         switch (status) {
           case 'shipped':
             await sendOrderShippedEmail(
@@ -115,6 +128,17 @@ export async function PUT(
           case 'cancelled':
             await sendOrderCancelledEmail(user.email, user.name, order.orderNumber, notes)
             break
+          case 'confirmed':
+          case 'processing':
+            // Send specific status update emails for confirmed and processing
+            await sendOrderStatusUpdateEmail(
+              user.email,
+              user.name,
+              order.orderNumber,
+              status,
+              emailMessage
+            )
+            break
           default:
             // Send generic status update for other statuses
             await sendOrderStatusUpdateEmail(
@@ -122,7 +146,7 @@ export async function PUT(
               user.name,
               order.orderNumber,
               status,
-              notes || `Your order has been ${status}`
+              emailMessage
             )
         }
         console.log(`📧 Order status email sent for ${order.orderNumber} - Status: ${status}`)

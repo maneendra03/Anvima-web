@@ -470,16 +470,25 @@ export async function sendOrderStatusUpdateEmail(
   status: string,
   message: string
 ): Promise<void> {
-  const statusColors: Record<string, { bg: string; text: string; emoji: string }> = {
-    confirmed: { bg: '#DBEAFE', text: '#1E40AF', emoji: '✅' },
-    processing: { bg: '#EDE9FE', text: '#5B21B6', emoji: '⚙️' },
-    shipped: { bg: '#E0E7FF', text: '#3730A3', emoji: '🚚' },
-    delivered: { bg: '#D1FAE5', text: '#065F46', emoji: '🎉' },
-    cancelled: { bg: '#FEE2E2', text: '#991B1B', emoji: '❌' },
-    refunded: { bg: '#FEF3C7', text: '#92400E', emoji: '💰' },
+  const statusConfig: Record<string, { bg: string; text: string; emoji: string; headerBg: string; title: string }> = {
+    pending: { bg: '#FEF3C7', text: '#92400E', emoji: '⏳', headerBg: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', title: 'Order Pending' },
+    confirmed: { bg: '#DBEAFE', text: '#1E40AF', emoji: '✅', headerBg: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)', title: 'Order Confirmed!' },
+    processing: { bg: '#EDE9FE', text: '#5B21B6', emoji: '⚙️', headerBg: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)', title: 'Order Processing' },
+    shipped: { bg: '#E0E7FF', text: '#3730A3', emoji: '🚚', headerBg: 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)', title: 'Order Shipped!' },
+    delivered: { bg: '#D1FAE5', text: '#065F46', emoji: '🎉', headerBg: 'linear-gradient(135deg, #10B981 0%, #059669 100%)', title: 'Order Delivered!' },
+    cancelled: { bg: '#FEE2E2', text: '#991B1B', emoji: '❌', headerBg: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)', title: 'Order Cancelled' },
+    refunded: { bg: '#FEF3C7', text: '#92400E', emoji: '💰', headerBg: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', title: 'Order Refunded' },
   }
 
-  const statusStyle = statusColors[status] || { bg: '#F3F4F6', text: '#374151', emoji: '📦' }
+  const config = statusConfig[status] || { 
+    bg: '#F3F4F6', 
+    text: '#374151', 
+    emoji: '📦', 
+    headerBg: 'linear-gradient(135deg, #FFAA8A 0%, #FF8FA6 100%)',
+    title: 'Order Update'
+  }
+
+  const statusDisplayName = status.charAt(0).toUpperCase() + status.slice(1)
 
   const html = `
     <!DOCTYPE html>
@@ -490,34 +499,46 @@ export async function sendOrderStatusUpdateEmail(
     </head>
     <body style="font-family: 'Inter', Arial, sans-serif; background-color: #FAF7F2; margin: 0; padding: 20px;">
       <div style="max-width: 600px; margin: 0 auto; background-color: #FDFCFA; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-        <div style="background: linear-gradient(135deg, #FFAA8A 0%, #FF8FA6 100%); padding: 40px 20px; text-align: center;">
+        <div style="background: ${config.headerBg}; padding: 40px 20px; text-align: center;">
           <h1 style="color: #FDFCFA; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 28px;">Anvima Creations</h1>
         </div>
         <div style="padding: 40px 30px;">
-          <h2 style="color: #3D3D3D; margin-bottom: 20px; font-size: 24px;">Order Update ${statusStyle.emoji}</h2>
+          <div style="text-align: center; margin-bottom: 30px;">
+            <div style="width: 80px; height: 80px; background-color: ${config.bg}; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 40px;">${config.emoji}</span>
+            </div>
+            <h2 style="color: #3D3D3D; margin-bottom: 10px; font-size: 24px;">${config.title}</h2>
+          </div>
           <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
             Hi ${name},<br><br>
-            There's an update on your order <strong>#${orderNumber}</strong>.
+            We have an update on your order <strong>#${orderNumber}</strong>.
           </p>
-          <div style="background-color: ${statusStyle.bg}; border-radius: 8px; padding: 20px; margin: 20px 0;">
-            <p style="color: ${statusStyle.text}; margin: 0; font-size: 16px; font-weight: 600;">
-              Status: ${status.charAt(0).toUpperCase() + status.slice(1)}
+          <div style="background-color: ${config.bg}; border-radius: 12px; padding: 24px; margin: 24px 0; border-left: 4px solid ${config.text};">
+            <p style="color: ${config.text}; margin: 0 0 8px 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+              Current Status
             </p>
-            <p style="color: ${statusStyle.text}; margin: 10px 0 0 0; font-size: 14px;">
+            <p style="color: ${config.text}; margin: 0 0 12px 0; font-size: 20px; font-weight: 700;">
+              ${config.emoji} ${statusDisplayName}
+            </p>
+            <p style="color: ${config.text}; margin: 0; font-size: 15px; line-height: 1.5;">
               ${message}
             </p>
           </div>
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${APP_URL}/account/orders/${orderNumber}" 
+            <a href="${APP_URL}/account/orders" 
                style="display: inline-block; background-color: #2D5A47; color: #FDFCFA; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
               View Order Details
             </a>
           </div>
-          <p style="color: #999; font-size: 14px; margin-top: 30px;">
-            If you have any questions, feel free to contact our support team.
+          <p style="color: #999; font-size: 14px; margin-top: 30px; text-align: center;">
+            Have questions? Reply to this email or contact us at<br>
+            <a href="mailto:anvima.creations@gmail.com" style="color: #2D5A47;">anvima.creations@gmail.com</a>
           </p>
         </div>
         <div style="background-color: #F5F0E8; padding: 20px; text-align: center;">
+          <p style="color: #666; font-size: 13px; margin: 0 0 8px 0;">
+            Thank you for shopping with Anvima Creations! 💝
+          </p>
           <p style="color: #999; font-size: 12px; margin: 0;">
             © ${new Date().getFullYear()} Anvima Creations. Made with ❤️ in India
           </p>
@@ -529,7 +550,7 @@ export async function sendOrderStatusUpdateEmail(
 
   await sendEmail({
     to: email,
-    subject: `Order Update - ${orderNumber} | Anvima Creations`,
+    subject: `${config.title} - Order #${orderNumber} | Anvima Creations`,
     html,
   })
 }
