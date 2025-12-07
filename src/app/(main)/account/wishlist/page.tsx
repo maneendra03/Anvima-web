@@ -2,90 +2,48 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { Heart, ShoppingCart, Trash2, ExternalLink } from 'lucide-react'
+import Image from 'next/image'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Heart, ShoppingCart, Trash2, ExternalLink, Package } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
+import { useWishlistStore, WishlistItem } from '@/store/wishlistStore'
 import toast from 'react-hot-toast'
 
-interface WishlistImage {
-  url: string
-  isPrimary: boolean
-}
-
-interface WishlistItem {
-  _id: string
-  name: string
-  slug: string
-  price: number
-  comparePrice?: number
-  images: WishlistImage[]
-  stock: number
-}
-
 export default function WishlistPage() {
-  const [wishlist, setWishlist] = useState<WishlistItem[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { items: wishlistItems, removeItem } = useWishlistStore()
+  const [mounted, setMounted] = useState(false)
   const [removingId, setRemovingId] = useState<string | null>(null)
   const addToCart = useCartStore((state) => state.addItem)
 
+  // Handle hydration
   useEffect(() => {
-    fetchWishlist()
+    setMounted(true)
   }, [])
 
-  const fetchWishlist = async () => {
-    try {
-      const response = await fetch('/api/user/wishlist')
-      const data = await response.json()
-      if (data.success) {
-        setWishlist(data.data || [])
-      }
-    } catch (error) {
-      console.error('Error fetching wishlist:', error)
-      toast.error('Failed to load wishlist')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleRemove = async (productId: string) => {
+  const handleRemove = (productId: string) => {
     setRemovingId(productId)
-    try {
-      const response = await fetch('/api/user/wishlist?productId=' + productId, {
-        method: 'DELETE',
-      })
-      const data = await response.json()
-      if (data.success) {
-        setWishlist((prev) => prev.filter((item) => item._id !== productId))
-        toast.success('Removed from wishlist')
-      } else {
-        toast.error(data.message || 'Failed to remove from wishlist')
-      }
-    } catch {
-      toast.error('Failed to remove from wishlist')
-    } finally {
+    setTimeout(() => {
+      removeItem(productId)
+      toast.success('Removed from wishlist')
       setRemovingId(null)
-    }
+    }, 300)
   }
 
   const handleAddToCart = (item: WishlistItem) => {
-    if (item.stock === 0) {
-      toast.error('This item is out of stock')
-      return
-    }
-    const primaryImage = item.images?.find((img) => img.isPrimary)?.url || item.images?.[0]?.url || ''
     addToCart({
-      id: item._id,
-      productId: item._id,
+      id: `${item.productId}-${Date.now()}`,
+      productId: item.productId,
       slug: item.slug,
       name: item.name,
       price: item.price,
-      image: primaryImage,
+      image: item.image,
       quantity: 1,
     })
     toast.success('Added to cart!')
   }
 
-  if (isLoading) {
+  // Show loading during hydration
+  if (!mounted) {
     return (
       <div className="flex items-center justify-center py-10 sm:py-12">
         <div className="w-8 h-8 sm:w-10 sm:h-10 border-3 sm:border-4 border-forest-500/30 border-t-forest-500 rounded-full animate-spin" />
@@ -99,12 +57,12 @@ export default function WishlistPage() {
         <div>
           <h2 className="text-xl sm:text-2xl font-semibold text-charcoal-800">My Wishlist</h2>
           <p className="text-sm text-charcoal-500 mt-1">
-            {wishlist.length} {wishlist.length === 1 ? 'item' : 'items'} saved
+            {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'} saved
           </p>
         </div>
       </div>
 
-      {wishlist.length === 0 ? (
+      {wishlistItems.length === 0 ? (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -125,76 +83,86 @@ export default function WishlistPage() {
         </motion.div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          {wishlist.map((item, index) => {
-            const primaryImage = item.images?.find((img) => img.isPrimary)?.url || item.images?.[0]?.url
-            const discount = item.comparePrice
-              ? Math.round(((item.comparePrice - item.price) / item.comparePrice) * 100)
-              : 0
-            return (
-              <motion.div
-                key={item._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="group bg-white border border-cream-200 rounded-lg sm:rounded-xl overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <Link href={'/product/' + item.slug} className="block relative">
-                  <div className="aspect-square bg-cream-50">
-                    {primaryImage ? (
-                      <img src={primaryImage} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Heart className="w-10 h-10 sm:w-12 sm:h-12 text-charcoal-200" />
-                      </div>
-                    )}
-                  </div>
-                  {discount > 0 && (
-                    <span className="absolute top-2 left-2 sm:top-3 sm:left-3 px-2 py-1 bg-blush-500 text-white text-xs font-medium rounded">
-                      {discount}% OFF
-                    </span>
-                  )}
-                  {item.stock === 0 && (
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                      <span className="px-3 py-1.5 bg-white text-charcoal-800 text-xs sm:text-sm font-medium rounded-lg">Out of Stock</span>
-                    </div>
-                  )}
-                </Link>
-                <div className="p-3 sm:p-4">
-                  <Link href={'/product/' + item.slug}>
-                    <h3 className="text-sm sm:text-base font-medium text-charcoal-800 hover:text-forest-600 transition-colors line-clamp-2">{item.name}</h3>
-                  </Link>
-                  <div className="flex items-center gap-2 mt-1.5 sm:mt-2">
-                    <span className="text-base sm:text-lg font-bold text-charcoal-800">₹{item.price.toLocaleString('en-IN')}</span>
-                    {item.comparePrice && (
-                      <span className="text-xs sm:text-sm text-charcoal-400 line-through">₹{item.comparePrice.toLocaleString('en-IN')}</span>
-                    )}
-                  </div>
-                  <div className="flex gap-2 mt-3 sm:mt-4">
-                    <button
-                      onClick={() => handleAddToCart(item)}
-                      disabled={item.stock === 0}
-                      className="flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 bg-forest-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-forest-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      Add to Cart
-                    </button>
-                    <button
-                      onClick={() => handleRemove(item._id)}
-                      disabled={removingId === item._id}
-                      className="p-2 sm:p-2.5 border border-red-200 text-red-500 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
-                      title="Remove from wishlist"
-                    >
-                      {removingId === item._id ? (
-                        <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-red-300 border-t-red-500 rounded-full animate-spin" />
+          <AnimatePresence mode="popLayout">
+            {wishlistItems.map((item, index) => {
+              const discount = item.comparePrice
+                ? Math.round(((item.comparePrice - item.price) / item.comparePrice) * 100)
+                : 0
+              return (
+                <motion.div
+                  key={item.productId}
+                  layout
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+                  transition={{ delay: index * 0.05 }}
+                  className="group bg-white border border-cream-200 rounded-lg sm:rounded-xl overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  <Link href={`/product/${item.slug}`} className="block relative">
+                    <div className="aspect-square bg-cream-50 relative overflow-hidden">
+                      {item.image ? (
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
                       ) : (
-                        <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Package className="w-10 h-10 sm:w-12 sm:h-12 text-charcoal-200" />
+                        </div>
                       )}
-                    </button>
+                    </div>
+                    {discount > 0 && (
+                      <span className="absolute top-2 left-2 sm:top-3 sm:left-3 px-2 py-1 bg-blush-500 text-white text-xs font-medium rounded">
+                        {discount}% OFF
+                      </span>
+                    )}
+                  </Link>
+                  <div className="p-3 sm:p-4">
+                    <Link href={`/product/${item.slug}`}>
+                      <h3 className="text-sm sm:text-base font-medium text-charcoal-800 hover:text-forest-600 transition-colors line-clamp-2">
+                        {item.name}
+                      </h3>
+                    </Link>
+                    <div className="flex items-center gap-2 mt-1.5 sm:mt-2">
+                      <span className="text-base sm:text-lg font-bold text-charcoal-800">
+                        ₹{item.price.toLocaleString('en-IN')}
+                      </span>
+                      {item.comparePrice && (
+                        <span className="text-xs sm:text-sm text-charcoal-400 line-through">
+                          ₹{item.comparePrice.toLocaleString('en-IN')}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex gap-2 mt-3 sm:mt-4">
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleAddToCart(item)}
+                        className="flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 bg-forest-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-forest-700 transition-colors"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        Add to Cart
+                      </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleRemove(item.productId)}
+                        disabled={removingId === item.productId}
+                        className="p-2 sm:p-2.5 border border-red-200 text-red-500 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                        title="Remove from wishlist"
+                      >
+                        {removingId === item.productId ? (
+                          <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-red-300 border-t-red-500 rounded-full animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                        )}
+                      </motion.button>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            )
-          })}
+                </motion.div>
+              )
+            })}
+          </AnimatePresence>
         </div>
       )}
     </div>

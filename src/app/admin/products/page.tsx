@@ -20,13 +20,19 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
+interface ProductImage {
+  url: string
+  alt?: string
+  isPrimary?: boolean
+}
+
 interface Product {
   _id: string
   name: string
   slug: string
   price: number
   comparePrice?: number
-  images: string[]
+  images: (ProductImage | string)[]
   category: { name: string; slug: string }
   stock: number
   isActive: boolean
@@ -177,6 +183,13 @@ export default function AdminProductsPage() {
       currency: 'INR',
       maximumFractionDigits: 0
     }).format(amount)
+  }
+
+  // Helper to get image URL from either string or object
+  const getImageUrl = (image: ProductImage | string | undefined): string => {
+    if (!image) return ''
+    if (typeof image === 'string') return image
+    return image.url || ''
   }
 
   return (
@@ -350,7 +363,7 @@ export default function AdminProductsPage() {
                           <div className="h-12 w-12 relative rounded-lg overflow-hidden bg-gray-100 shadow-sm flex-shrink-0">
                             {product.images?.[0] ? (
                               <Image
-                                src={product.images[0]}
+                                src={getImageUrl(product.images[0])}
                                 alt={product.name}
                                 fill
                                 className="object-cover"

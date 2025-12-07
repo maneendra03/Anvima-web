@@ -88,6 +88,10 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
+  
+  // Animation states
+  const [addedToCart, setAddedToCart] = useState(false)
+  const [wishlistAnimating, setWishlistAnimating] = useState(false)
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
   const [customText, setCustomText] = useState('')
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
@@ -228,10 +232,16 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         ...selectedVariants,
       },
     })
+    
+    // Trigger animation
+    setAddedToCart(true)
     toast.success('Added to cart!')
+    setTimeout(() => setAddedToCart(false), 1500)
   }
 
   const handleWishlistToggle = () => {
+    setWishlistAnimating(true)
+    
     if (isInWishlist(product._id)) {
       removeFromWishlist(product._id)
       toast.success('Removed from wishlist')
@@ -246,6 +256,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       })
       toast.success('Added to wishlist!')
     }
+    
+    setTimeout(() => setWishlistAnimating(false), 600)
   }
 
   const isWishlisted = isInWishlist(product._id)
@@ -544,26 +556,49 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               {/* Add to Cart */}
               <motion.button
                 whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileTap={{ scale: 0.95 }}
+                animate={addedToCart ? { scale: [1, 1.05, 1] } : {}}
                 onClick={handleAddToCart}
-                disabled={product.stock === 0}
-                className="flex-1 btn-primary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={product.stock === 0 || addedToCart}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-full font-medium transition-all ${
+                  addedToCart 
+                    ? 'bg-emerald-500 text-white' 
+                    : 'btn-primary disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
               >
-                <ShoppingBag className="w-5 h-5" />
-                {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                <motion.div
+                  animate={addedToCart ? { rotate: [0, -10, 10, 0] } : {}}
+                  transition={{ duration: 0.3 }}
+                >
+                  {addedToCart ? (
+                    <Check className="w-5 h-5" />
+                  ) : (
+                    <ShoppingBag className="w-5 h-5" />
+                  )}
+                </motion.div>
+                {product.stock === 0 ? 'Out of Stock' : addedToCart ? 'Added!' : 'Add to Cart'}
               </motion.button>
 
               {/* Wishlist */}
-              <button 
+              <motion.button 
+                whileTap={{ scale: 0.85 }}
+                animate={wishlistAnimating ? { scale: [1, 1.3, 1] } : {}}
                 onClick={handleWishlistToggle}
-                className={`p-3 border rounded-full transition-colors ${
+                className={`p-3 border rounded-full transition-all ${
                   isWishlisted 
                     ? 'bg-red-50 border-red-200 text-red-500' 
                     : 'border-cream-200 hover:bg-cream-50'
                 }`}
               >
-                <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
-              </button>
+                <motion.div
+                  animate={wishlistAnimating && !isWishlisted ? { 
+                    scale: [1, 1.4, 1],
+                  } : {}}
+                  transition={{ duration: 0.4 }}
+                >
+                  <Heart className={`w-5 h-5 transition-all ${isWishlisted ? 'fill-current' : ''}`} />
+                </motion.div>
+              </motion.button>
             </div>
 
             {/* Delivery Info */}
