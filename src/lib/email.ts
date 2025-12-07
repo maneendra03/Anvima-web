@@ -327,79 +327,118 @@ export async function sendOrderConfirmationEmail(
   })
 }
 
+// Shared professional email wrapper for order emails
+function buildOrderEmailHTML({
+  title,
+  subtitle,
+  bodyHtml,
+  ctaUrl,
+  ctaText,
+  note
+}: {
+  title: string
+  subtitle?: string
+  bodyHtml: string
+  ctaUrl?: string
+  ctaText?: string
+  note?: string
+}) {
+  return `
+  <!doctype html>
+  <html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${title}</title>
+    <style>
+      /* Reset */
+      body { margin:0; padding:0; background:#FAF7F2; font-family: Inter, Arial, sans-serif; }
+      a { color: #2D5A47; text-decoration: none; }
+      .container { max-width:680px; margin:24px auto; background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 6px 18px rgba(15,23,42,0.06); }
+      .header { background: linear-gradient(90deg,#FFAA8A 0%,#FF8FA6 100%); padding:24px 28px; text-align:left; color:#fff }
+      .logo { font-family: 'Playfair Display', Georgia, serif; font-size:20px; font-weight:700 }
+      .preheader { font-size:13px; color:#f7efe9; opacity:0.95; margin-top:6px }
+      .body { padding:28px; color:#334155 }
+      .title { font-size:20px; color:#0f172a; margin:0 0 10px; }
+      .subtitle { font-size:14px; color:#475569; margin:0 0 18px }
+      .card { background:#F5F0E8; border-left:4px solid #2D5A47; padding:16px; border-radius:8px; margin:16px 0 }
+      .cta { display:inline-block; background:#2D5A47; color:#fff; padding:12px 20px; border-radius:8px; font-weight:600 }
+      .muted { color:#64748b; font-size:13px }
+      .footer { background:#F7F5F2; padding:18px 28px; font-size:13px; color:#64748b }
+      .small { font-size:12px; color:#94a3b8 }
+      .meta { font-size:13px; color:#0f172a; margin:8px 0 0; }
+      .table { width:100%; border-collapse:collapse; margin-top:12px }
+      .table th { text-align:left; font-size:13px; color:#475569; padding:8px 0 }
+      .table td { padding:8px 0; font-size:14px; color:#0f172a }
+      @media (max-width:520px){ .container{ margin:12px; } .body{ padding:18px } }
+    </style>
+  </head>
+  <body>
+    <div class="container" role="article" aria-roledescription="email">
+      <div class="header">
+        <div class="logo">Anvima Creations</div>
+        <div class="preheader">${subtitle || 'A quick update about your order'}</div>
+      </div>
+
+      <div class="body">
+        <h1 class="title">${title}</h1>
+        ${subtitle ? `<p class="subtitle">${subtitle}</p>` : ''}
+
+        ${bodyHtml}
+
+        ${ctaUrl ? `<p style="text-align:center; margin-top:20px"><a href="${ctaUrl}" class="cta">${ctaText || 'View Order'}</a></p>` : ''}
+
+        ${note ? `<p class="muted small" style="margin-top:18px">${note}</p>` : ''}
+
+        <div style="margin-top:22px" class="small">
+          <p style="margin:0"><strong>Need help?</strong> Reply to this email or contact <a href="mailto:anvima.creations@gmail.com">anvima.creations@gmail.com</a></p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:600;color:#0f172a">Anvima Creations</div>
+            <div class="small">Handmade & personalized gifts — crafted with care</div>
+          </div>
+          <div class="small">© ${new Date().getFullYear()} Anvima Creations</div>
+        </div>
+      </div>
+    </div>
+  </body>
+  </html>
+  `
+}
+
+// Reworked: Order email functions using the professional wrapper
 export async function sendOrderShippedEmail(
   email: string,
   name: string,
   orderNumber: string,
-  trackingDetails: {
-    carrier?: string
-    trackingNumber?: string
-    trackingUrl?: string
-    estimatedDelivery?: string
-  }
+  trackingDetails: { carrier?: string; trackingNumber?: string; trackingUrl?: string; estimatedDelivery?: string }
 ): Promise<void> {
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body style="font-family: 'Inter', Arial, sans-serif; background-color: #FAF7F2; margin: 0; padding: 20px;">
-      <div style="max-width: 600px; margin: 0 auto; background-color: #FDFCFA; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-        <div style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); padding: 40px 20px; text-align: center;">
-          <h1 style="color: #FDFCFA; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 28px;">Anvima Creations</h1>
-        </div>
-        <div style="padding: 40px 30px;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width: 80px; height: 80px; background-color: #E0E7FF; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-              <span style="font-size: 40px;">🚚</span>
-            </div>
-            <h2 style="color: #3D3D3D; margin-bottom: 10px; font-size: 24px;">Your Order is On Its Way!</h2>
-          </div>
-          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-            Hi ${name},<br><br>
-            Great news! Your order <strong>#${orderNumber}</strong> has been shipped and is on its way to you.
-          </p>
-          ${trackingDetails.carrier || trackingDetails.trackingNumber ? `
-          <div style="background-color: #F5F0E8; border-radius: 8px; padding: 20px; margin: 20px 0;">
-            <h3 style="color: #3D3D3D; margin-top: 0; font-size: 16px;">📦 Tracking Information</h3>
-            ${trackingDetails.carrier ? `<p style="margin: 5px 0; color: #666;"><strong>Carrier:</strong> ${trackingDetails.carrier}</p>` : ''}
-            ${trackingDetails.trackingNumber ? `<p style="margin: 5px 0; color: #666;"><strong>Tracking Number:</strong> <span style="font-family: monospace;">${trackingDetails.trackingNumber}</span></p>` : ''}
-            ${trackingDetails.estimatedDelivery ? `<p style="margin: 5px 0; color: #666;"><strong>Estimated Delivery:</strong> ${new Date(trackingDetails.estimatedDelivery).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</p>` : ''}
-          </div>
-          ` : ''}
-          <div style="text-align: center; margin: 30px 0;">
-            ${trackingDetails.trackingUrl ? `
-            <a href="${trackingDetails.trackingUrl}" 
-               style="display: inline-block; background-color: #4F46E5; color: #FDFCFA; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; margin-right: 10px;">
-              Track Package
-            </a>
-            ` : ''}
-            <a href="${APP_URL}/account/orders/${orderNumber}" 
-               style="display: inline-block; background-color: #2D5A47; color: #FDFCFA; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
-              View Order
-            </a>
-          </div>
-          <p style="color: #999; font-size: 14px; margin-top: 30px; text-align: center;">
-            We'll notify you once your package has been delivered.
-          </p>
-        </div>
-        <div style="background-color: #F5F0E8; padding: 20px; text-align: center;">
-          <p style="color: #999; font-size: 12px; margin: 0;">
-            © ${new Date().getFullYear()} Anvima Creations. Made with ❤️ in India
-          </p>
-        </div>
-      </div>
-    </body>
-    </html>
+  const bodyHtml = `
+    <p style="margin:0 0 12px">Good news, ${name}! Your order <strong>#${orderNumber}</strong> has left our facility and is on its way to you.</p>
+
+    <div class="card">
+      <div style="font-weight:600; margin-bottom:8px">Shipping Information</div>
+      <div class="meta">${trackingDetails.carrier ? `Carrier: ${trackingDetails.carrier}` : 'Carrier: —'}</div>
+      <div class="meta">${trackingDetails.trackingNumber ? `Tracking #${trackingDetails.trackingNumber}` : 'Tracking #: —'}</div>
+      ${trackingDetails.estimatedDelivery ? `<div class="meta">Estimated delivery: ${new Date(trackingDetails.estimatedDelivery).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}</div>` : ''}
+    </div>
+
+    ${trackingDetails.trackingUrl ? `<p style="margin:0">Track your package: <a href="${trackingDetails.trackingUrl}">${trackingDetails.trackingUrl}</a></p>` : ''}
   `
 
-  await sendEmail({
-    to: email,
-    subject: `Your Order Has Shipped! - ${orderNumber} | Anvima Creations`,
-    html,
+  const html = buildOrderEmailHTML({
+    title: 'Your order is on the way',
+    subtitle: `Order #${orderNumber} — Shipped`,
+    bodyHtml,
+    ctaUrl: `${APP_URL}/account/orders/${orderNumber}`,
+    ctaText: 'Track Order',
   })
+
+  await sendEmail({ to: email, subject: `Your order has shipped — #${orderNumber}`, html })
 }
 
 export async function sendOrderDeliveredEmail(
@@ -407,60 +446,24 @@ export async function sendOrderDeliveredEmail(
   name: string,
   orderNumber: string
 ): Promise<void> {
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body style="font-family: 'Inter', Arial, sans-serif; background-color: #FAF7F2; margin: 0; padding: 20px;">
-      <div style="max-width: 600px; margin: 0 auto; background-color: #FDFCFA; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-        <div style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); padding: 40px 20px; text-align: center;">
-          <h1 style="color: #FDFCFA; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 28px;">Anvima Creations</h1>
-        </div>
-        <div style="padding: 40px 30px;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width: 80px; height: 80px; background-color: #D1FAE5; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-              <span style="font-size: 40px;">🎉</span>
-            </div>
-            <h2 style="color: #3D3D3D; margin-bottom: 10px; font-size: 24px;">Your Order Has Been Delivered!</h2>
-          </div>
-          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-            Hi ${name},<br><br>
-            Your order <strong>#${orderNumber}</strong> has been delivered! We hope you love your purchase.
-          </p>
-          <div style="background-color: #ECFDF5; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
-            <p style="color: #065F46; margin: 0; font-size: 16px;">
-              <strong>We'd love to hear from you!</strong><br>
-              <span style="font-size: 14px;">Share your experience with others</span>
-            </p>
-          </div>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${APP_URL}/account/orders/${orderNumber}" 
-               style="display: inline-block; background-color: #2D5A47; color: #FDFCFA; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
-              Write a Review
-            </a>
-          </div>
-          <p style="color: #999; font-size: 14px; margin-top: 30px;">
-            If you have any questions about your order, please don't hesitate to contact us.
-          </p>
-        </div>
-        <div style="background-color: #F5F0E8; padding: 20px; text-align: center;">
-          <p style="color: #999; font-size: 12px; margin: 0;">
-            © ${new Date().getFullYear()} Anvima Creations. Made with ❤️ in India
-          </p>
-        </div>
-      </div>
-    </body>
-    </html>
+  const bodyHtml = `
+    <p style="margin:0 0 12px">Hi ${name}, we wanted to let you know that your order <strong>#${orderNumber}</strong> has been delivered. We hope it brings a smile!</p>
+    <div class="card">
+      <div style="font-weight:600">Delivery details</div>
+      <div class="meta">If you did not receive the package or have concerns, please contact our support team.</div>
+    </div>
+    <p style="margin:0">We would love your feedback — consider leaving a review for your purchase.</p>
   `
 
-  await sendEmail({
-    to: email,
-    subject: `Order Delivered! - ${orderNumber} | Anvima Creations`,
-    html,
+  const html = buildOrderEmailHTML({
+    title: 'Delivered — we hope you love it',
+    subtitle: `Order #${orderNumber} — Delivered`,
+    bodyHtml,
+    ctaUrl: `${APP_URL}/account/orders/${orderNumber}`,
+    ctaText: 'View Order & Review',
   })
+
+  await sendEmail({ to: email, subject: `Order delivered — #${orderNumber}`, html })
 }
 
 export async function sendOrderStatusUpdateEmail(
@@ -470,89 +473,23 @@ export async function sendOrderStatusUpdateEmail(
   status: string,
   message: string
 ): Promise<void> {
-  const statusConfig: Record<string, { bg: string; text: string; emoji: string; headerBg: string; title: string }> = {
-    pending: { bg: '#FEF3C7', text: '#92400E', emoji: '⏳', headerBg: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', title: 'Order Pending' },
-    confirmed: { bg: '#DBEAFE', text: '#1E40AF', emoji: '✅', headerBg: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)', title: 'Order Confirmed!' },
-    processing: { bg: '#EDE9FE', text: '#5B21B6', emoji: '⚙️', headerBg: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)', title: 'Order Processing' },
-    shipped: { bg: '#E0E7FF', text: '#3730A3', emoji: '🚚', headerBg: 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)', title: 'Order Shipped!' },
-    delivered: { bg: '#D1FAE5', text: '#065F46', emoji: '🎉', headerBg: 'linear-gradient(135deg, #10B981 0%, #059669 100%)', title: 'Order Delivered!' },
-    cancelled: { bg: '#FEE2E2', text: '#991B1B', emoji: '❌', headerBg: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)', title: 'Order Cancelled' },
-    refunded: { bg: '#FEF3C7', text: '#92400E', emoji: '💰', headerBg: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', title: 'Order Refunded' },
-  }
-
-  const config = statusConfig[status] || { 
-    bg: '#F3F4F6', 
-    text: '#374151', 
-    emoji: '📦', 
-    headerBg: 'linear-gradient(135deg, #FFAA8A 0%, #FF8FA6 100%)',
-    title: 'Order Update'
-  }
-
-  const statusDisplayName = status.charAt(0).toUpperCase() + status.slice(1)
-
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body style="font-family: 'Inter', Arial, sans-serif; background-color: #FAF7F2; margin: 0; padding: 20px;">
-      <div style="max-width: 600px; margin: 0 auto; background-color: #FDFCFA; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-        <div style="background: ${config.headerBg}; padding: 40px 20px; text-align: center;">
-          <h1 style="color: #FDFCFA; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 28px;">Anvima Creations</h1>
-        </div>
-        <div style="padding: 40px 30px;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width: 80px; height: 80px; background-color: ${config.bg}; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-              <span style="font-size: 40px;">${config.emoji}</span>
-            </div>
-            <h2 style="color: #3D3D3D; margin-bottom: 10px; font-size: 24px;">${config.title}</h2>
-          </div>
-          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-            Hi ${name},<br><br>
-            We have an update on your order <strong>#${orderNumber}</strong>.
-          </p>
-          <div style="background-color: ${config.bg}; border-radius: 12px; padding: 24px; margin: 24px 0; border-left: 4px solid ${config.text};">
-            <p style="color: ${config.text}; margin: 0 0 8px 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-              Current Status
-            </p>
-            <p style="color: ${config.text}; margin: 0 0 12px 0; font-size: 20px; font-weight: 700;">
-              ${config.emoji} ${statusDisplayName}
-            </p>
-            <p style="color: ${config.text}; margin: 0; font-size: 15px; line-height: 1.5;">
-              ${message}
-            </p>
-          </div>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${APP_URL}/account/orders" 
-               style="display: inline-block; background-color: #2D5A47; color: #FDFCFA; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
-              View Order Details
-            </a>
-          </div>
-          <p style="color: #999; font-size: 14px; margin-top: 30px; text-align: center;">
-            Have questions? Reply to this email or contact us at<br>
-            <a href="mailto:anvima.creations@gmail.com" style="color: #2D5A47;">anvima.creations@gmail.com</a>
-          </p>
-        </div>
-        <div style="background-color: #F5F0E8; padding: 20px; text-align: center;">
-          <p style="color: #666; font-size: 13px; margin: 0 0 8px 0;">
-            Thank you for shopping with Anvima Creations! 💝
-          </p>
-          <p style="color: #999; font-size: 12px; margin: 0;">
-            © ${new Date().getFullYear()} Anvima Creations. Made with ❤️ in India
-          </p>
-        </div>
-      </div>
-    </body>
-    </html>
+  const bodyHtml = `
+    <p style="margin:0 0 12px">Hello ${name}, here’s the latest update on your order <strong>#${orderNumber}</strong>.</p>
+    <div class="card">
+      <div style="font-weight:600">Status update</div>
+      <div class="meta" style="margin-top:8px;">${message}</div>
+    </div>
   `
 
-  await sendEmail({
-    to: email,
-    subject: `${config.title} - Order #${orderNumber} | Anvima Creations`,
-    html,
+  const html = buildOrderEmailHTML({
+    title: 'Order status updated',
+    subtitle: `Order #${orderNumber} — ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+    bodyHtml,
+    ctaUrl: `${APP_URL}/account/orders/${orderNumber}`,
+    ctaText: 'View Order Details',
   })
+
+  await sendEmail({ to: email, subject: `Order update — #${orderNumber} — ${status}`, html })
 }
 
 export async function sendOrderCancelledEmail(
@@ -561,57 +498,19 @@ export async function sendOrderCancelledEmail(
   orderNumber: string,
   reason?: string
 ): Promise<void> {
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body style="font-family: 'Inter', Arial, sans-serif; background-color: #FAF7F2; margin: 0; padding: 20px;">
-      <div style="max-width: 600px; margin: 0 auto; background-color: #FDFCFA; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-        <div style="background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); padding: 40px 20px; text-align: center;">
-          <h1 style="color: #FDFCFA; margin: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 28px;">Anvima Creations</h1>
-        </div>
-        <div style="padding: 40px 30px;">
-          <h2 style="color: #3D3D3D; margin-bottom: 20px; font-size: 24px;">Order Cancelled</h2>
-          <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-            Hi ${name},<br><br>
-            Your order <strong>#${orderNumber}</strong> has been cancelled.
-          </p>
-          ${reason ? `
-          <div style="background-color: #FEE2E2; border-radius: 8px; padding: 20px; margin: 20px 0;">
-            <p style="color: #991B1B; margin: 0; font-size: 14px;">
-              <strong>Reason:</strong> ${reason}
-            </p>
-          </div>
-          ` : ''}
-          <p style="color: #666; line-height: 1.6;">
-            If you paid for this order, a refund will be processed within 5-7 business days to your original payment method.
-          </p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${APP_URL}/shop" 
-               style="display: inline-block; background-color: #2D5A47; color: #FDFCFA; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
-              Continue Shopping
-            </a>
-          </div>
-          <p style="color: #999; font-size: 14px; margin-top: 30px;">
-            Have questions? Contact our support team and we'll be happy to help.
-          </p>
-        </div>
-        <div style="background-color: #F5F0E8; padding: 20px; text-align: center;">
-          <p style="color: #999; font-size: 12px; margin: 0;">
-            © ${new Date().getFullYear()} Anvima Creations. Made with ❤️ in India
-          </p>
-        </div>
-      </div>
-    </body>
-    </html>
+  const bodyHtml = `
+    <p style="margin:0 0 12px">Hi ${name}, your order <strong>#${orderNumber}</strong> has been cancelled.</p>
+    ${reason ? `<div class="card"><div style="font-weight:600">Reason</div><div class="meta" style="margin-top:8px">${reason}</div></div>` : ''}
+    <p style="margin:0 0 8px">If a payment was captured, a refund will be processed as per our policy. Reach out if you need assistance.</p>
   `
 
-  await sendEmail({
-    to: email,
-    subject: `Order Cancelled - ${orderNumber} | Anvima Creations`,
-    html,
+  const html = buildOrderEmailHTML({
+    title: 'Order cancelled',
+    subtitle: `Order #${orderNumber} — Cancelled`,
+    bodyHtml,
+    ctaUrl: `${APP_URL}/shop`,
+    ctaText: 'Browse more gifts',
   })
+
+  await sendEmail({ to: email, subject: `Order cancelled — #${orderNumber}`, html })
 }
