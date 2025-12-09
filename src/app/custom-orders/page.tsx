@@ -397,34 +397,36 @@ export default function CustomOrdersPage() {
                     Add links to Instagram, YouTube, Pinterest, or any website for design inspiration
                   </p>
                   
-                  {/* Add new link */}
-                  <div className="flex gap-2 mb-3">
+                  {/* Add new link - stacked on mobile, row on larger screens */}
+                  <div className="space-y-2 sm:space-y-0 sm:flex sm:gap-2 mb-3">
                     <select
                       value={newLink.label}
                       onChange={(e) => setNewLink(prev => ({ ...prev, label: e.target.value }))}
-                      className="input-field w-32"
+                      className="input-field w-full sm:w-32"
                     >
-                      <option value="">Type</option>
+                      <option value="">Select Type</option>
                       <option value="Instagram">Instagram</option>
                       <option value="YouTube">YouTube</option>
                       <option value="Pinterest">Pinterest</option>
                       <option value="Website">Website</option>
                       <option value="Other">Other</option>
                     </select>
-                    <input
-                      type="url"
-                      value={newLink.url}
-                      onChange={(e) => setNewLink(prev => ({ ...prev, url: e.target.value }))}
-                      placeholder="https://..."
-                      className="input-field flex-1"
-                    />
-                    <button
-                      type="button"
-                      onClick={addReferenceLink}
-                      className="px-3 py-2 bg-forest-500 text-white rounded-lg hover:bg-forest-600 transition-colors"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
+                    <div className="flex gap-2 w-full">
+                      <input
+                        type="url"
+                        value={newLink.url}
+                        onChange={(e) => setNewLink(prev => ({ ...prev, url: e.target.value }))}
+                        placeholder="Paste your link here..."
+                        className="input-field flex-1 min-w-0"
+                      />
+                      <button
+                        type="button"
+                        onClick={addReferenceLink}
+                        className="px-3 py-2 bg-forest-500 text-white rounded-lg hover:bg-forest-600 transition-colors flex-shrink-0"
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                   
                   {/* Display added links */}
@@ -432,20 +434,20 @@ export default function CustomOrdersPage() {
                     <div className="space-y-2">
                       {referenceLinks.map((link, index) => (
                         <div key={index} className="flex items-center gap-2 p-2 bg-cream-50 rounded-lg">
-                          <LinkIcon className="w-4 h-4 text-forest-500" />
-                          <span className="text-xs font-medium text-charcoal-600 w-20">{link.label}</span>
+                          <LinkIcon className="w-4 h-4 text-forest-500 flex-shrink-0" />
+                          <span className="text-xs font-medium text-charcoal-600 w-16 sm:w-20 flex-shrink-0">{link.label}</span>
                           <a 
                             href={link.url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-sm text-forest-600 hover:underline truncate flex-1"
+                            className="text-sm text-forest-600 hover:underline truncate flex-1 min-w-0"
                           >
                             {link.url}
                           </a>
                           <button
                             type="button"
                             onClick={() => removeReferenceLink(index)}
-                            className="p-1 text-red-500 hover:bg-red-50 rounded"
+                            className="p-1 text-red-500 hover:bg-red-50 rounded flex-shrink-0"
                           >
                             <X className="w-4 h-4" />
                           </button>
