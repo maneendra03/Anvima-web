@@ -3,7 +3,7 @@ import crypto from 'crypto'
 
 // Server-side Razorpay instance - only initialize if keys are available
 const isRazorpayConfigured = process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET && 
-  process.env.RAZORPAY_KEY_ID !== 'rzp_test_your_key_id'
+  process.env.RAZORPAY_KEY_ID.startsWith('rzp_')
 
 export const razorpay = isRazorpayConfigured 
   ? new Razorpay({
