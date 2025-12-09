@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
 import CustomOrder from '@/models/CustomOrder'
 import { getAuthUser } from '@/lib/auth/middleware'
+import { sendCustomOrderNotification } from '@/lib/whatsapp'
 
 // Generate unique request number
 function generateRequestNumber(): string {
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
     await dbConnect()
     
     const body = await request.json()
-    const { name, email, phone, description, budget, targetDate, images } = body
+    const { name, email, phone, description, budget, targetDate, images, referenceLinks } = body
 
     // Validate required fields
     if (!name || !email || !phone || !description) {
@@ -42,8 +43,25 @@ export async function POST(request: NextRequest) {
       deadline: targetDate ? new Date(targetDate) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // Default 2 weeks
       description,
       images: images?.map((img: { url: string }) => img.url) || [],
+      referenceLinks: referenceLinks || [],
       status: 'pending'
     })
+
+    // Send WhatsApp notification to admin
+    try {
+      await sendCustomOrderNotification({
+        requestNumber: customOrder.requestNumber,
+        customerName: name,
+        customerPhone: phone,
+        customerEmail: email,
+        budget: budget || 'Not specified',
+        description: description,
+        deadline: targetDate || 'Not specified',
+      })
+      console.log('✅ WhatsApp notification logged for custom order:', customOrder.requestNumber)
+    } catch (whatsappError) {
+      console.error('Failed to send WhatsApp notification:', whatsappError)
+    }
 
     return NextResponse.json({
       success: true,

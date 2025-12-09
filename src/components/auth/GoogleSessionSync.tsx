@@ -2,6 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import { useAuthStore } from '@/store/auth'
 
 /**
@@ -12,6 +13,8 @@ export function GoogleSessionSync() {
   const { data: session, status } = useSession()
   const { user, fetchUser, isAuthenticated } = useAuthStore()
   const hasSynced = useRef(false)
+  const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     // Only sync if:
@@ -38,11 +41,15 @@ export function GoogleSessionSync() {
         }),
       })
         .then((res) => res.json())
-        .then((data) => {
+        .then(async (data) => {
           if (data.success) {
             console.log('✅ Google session synced successfully')
             // Fetch the user to update the auth store
-            fetchUser()
+            await fetchUser()
+            // Redirect to home page if on login/register page
+            if (pathname === '/login' || pathname === '/register' || pathname === '/account') {
+              router.push('/')
+            }
           } else {
             console.error('❌ Failed to sync Google session:', data.message)
           }
@@ -51,7 +58,7 @@ export function GoogleSessionSync() {
           console.error('❌ Error syncing Google session:', error)
         })
     }
-  }, [session, status, isAuthenticated, fetchUser])
+  }, [session, status, isAuthenticated, fetchUser, router, pathname])
 
   // Also fetch user if we have a custom auth cookie but no user in store
   useEffect(() => {

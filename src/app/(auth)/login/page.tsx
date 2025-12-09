@@ -101,7 +101,8 @@ function LoginForm() {
   const handleGoogleSignIn = async () => {
     try {
       setGoogleLoading(true)
-      const callbackUrl = redirectUrl || '/account'
+      // Always redirect to home page after successful Google login
+      const callbackUrl = redirectUrl || '/'
       
       // Sign in with Google - NextAuth will handle the OAuth flow
       // After successful sign-in, we'll sync the session in the callback page

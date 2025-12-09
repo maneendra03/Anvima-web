@@ -6,6 +6,7 @@ import Product from '@/models/Product'
 import User from '@/models/User'
 import { requireAuth, isAuthenticated } from '@/lib/auth/middleware'
 import { sendOrderConfirmationEmail } from '@/lib/email'
+import { sendOrderNotification } from '@/lib/whatsapp'
 
 // Generate unique order number
 function generateOrderNumber(): string {
@@ -256,6 +257,21 @@ export async function POST(request: NextRequest) {
           }
         )
         console.log('✅ Order confirmation email sent to:', user.email)
+
+        // Send WhatsApp notification to admin
+        try {
+          await sendOrderNotification({
+            orderNumber: order.orderNumber,
+            customerName: shippingAddress.name || user.name,
+            customerPhone: shippingAddress.phone,
+            total: order.total,
+            itemsCount: orderItems.length,
+            shippingAddress: addressString,
+          })
+          console.log('✅ WhatsApp notification logged for order:', order.orderNumber)
+        } catch (whatsappError) {
+          console.error('Failed to send WhatsApp notification:', whatsappError)
+        }
       }
     } catch (emailError) {
       // Don't fail the order if email fails

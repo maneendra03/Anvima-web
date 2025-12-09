@@ -40,6 +40,7 @@ const adminNavItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/products', label: 'Products', icon: Package },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
+  { href: '/admin/custom-orders', label: 'Custom Orders', icon: Gift },
   { href: '/admin/categories', label: 'Categories', icon: FolderOpen },
   { href: '/admin/coupons', label: 'Coupons', icon: Tag },
   { href: '/admin/users', label: 'Users', icon: Users },
@@ -177,11 +178,18 @@ export default function AdminLayout({
 
   useEffect(() => {
     // Only fetch notifications after we've verified authentication
+    // Add a small delay to prioritize rendering the UI first
     if (mounted && hasHydrated && hasFetchedUser && !isLoading && isAuthenticated && user?.role === 'admin') {
-      fetchNotifications()
-      // Refresh notifications every 2 minutes
-      const interval = setInterval(fetchNotifications, 120000)
-      return () => clearInterval(interval)
+      const timeoutId = setTimeout(() => {
+        fetchNotifications()
+      }, 1000) // Delay notification fetch by 1 second
+      
+      // Refresh notifications every 5 minutes (less frequent to reduce load)
+      const interval = setInterval(fetchNotifications, 300000)
+      return () => {
+        clearTimeout(timeoutId)
+        clearInterval(interval)
+      }
     }
   }, [mounted, hasHydrated, hasFetchedUser, isLoading, isAuthenticated, user, fetchNotifications])
 

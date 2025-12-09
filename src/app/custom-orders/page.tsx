@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Upload, Calendar, Send, Sparkles, Check, MessageCircle, X, Loader2, Image as ImageIcon } from 'lucide-react'
+import { Upload, Calendar, Send, Sparkles, Check, MessageCircle, X, Loader2, Image as ImageIcon, Link as LinkIcon, Plus } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface UploadedImage {
@@ -10,6 +10,11 @@ interface UploadedImage {
   publicId: string
   isUploading?: boolean
   previewUrl?: string
+}
+
+interface ReferenceLink {
+  label: string
+  url: string
 }
 
 export default function CustomOrdersPage() {
@@ -22,6 +27,8 @@ export default function CustomOrdersPage() {
     targetDate: '',
   })
   const [images, setImages] = useState<UploadedImage[]>([])
+  const [referenceLinks, setReferenceLinks] = useState<ReferenceLink[]>([])
+  const [newLink, setNewLink] = useState({ label: '', url: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
 
@@ -114,6 +121,36 @@ export default function CustomOrdersPage() {
     }
   }
 
+  const addReferenceLink = () => {
+    if (!newLink.url) {
+      toast.error('Please enter a URL')
+      return
+    }
+    
+    // Basic URL validation
+    try {
+      new URL(newLink.url)
+    } catch {
+      toast.error('Please enter a valid URL')
+      return
+    }
+    
+    if (referenceLinks.length >= 5) {
+      toast.error('Maximum 5 reference links allowed')
+      return
+    }
+    
+    setReferenceLinks(prev => [...prev, { 
+      label: newLink.label || 'Reference', 
+      url: newLink.url 
+    }])
+    setNewLink({ label: '', url: '' })
+  }
+
+  const removeReferenceLink = (index: number) => {
+    setReferenceLinks(prev => prev.filter((_, i) => i !== index))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -137,7 +174,8 @@ export default function CustomOrdersPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          images: images.map(img => ({ url: img.url, publicId: img.publicId }))
+          images: images.map(img => ({ url: img.url, publicId: img.publicId })),
+          referenceLinks: referenceLinks.map(link => link.url)
         })
       })
 
@@ -347,6 +385,76 @@ export default function CustomOrdersPage() {
                   )}
                   <p className="text-xs text-charcoal-400 mt-2">
                     {images.length}/5 images uploaded
+                  </p>
+                </div>
+
+                {/* Reference Links */}
+                <div>
+                  <label className="block text-sm font-medium text-charcoal-700 mb-2">
+                    Reference Links (Optional)
+                  </label>
+                  <p className="text-xs text-charcoal-500 mb-3">
+                    Add links to Instagram, YouTube, Pinterest, or any website for design inspiration
+                  </p>
+                  
+                  {/* Add new link */}
+                  <div className="flex gap-2 mb-3">
+                    <select
+                      value={newLink.label}
+                      onChange={(e) => setNewLink(prev => ({ ...prev, label: e.target.value }))}
+                      className="input-field w-32"
+                    >
+                      <option value="">Type</option>
+                      <option value="Instagram">Instagram</option>
+                      <option value="YouTube">YouTube</option>
+                      <option value="Pinterest">Pinterest</option>
+                      <option value="Website">Website</option>
+                      <option value="Other">Other</option>
+                    </select>
+                    <input
+                      type="url"
+                      value={newLink.url}
+                      onChange={(e) => setNewLink(prev => ({ ...prev, url: e.target.value }))}
+                      placeholder="https://..."
+                      className="input-field flex-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={addReferenceLink}
+                      className="px-3 py-2 bg-forest-500 text-white rounded-lg hover:bg-forest-600 transition-colors"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+                  
+                  {/* Display added links */}
+                  {referenceLinks.length > 0 && (
+                    <div className="space-y-2">
+                      {referenceLinks.map((link, index) => (
+                        <div key={index} className="flex items-center gap-2 p-2 bg-cream-50 rounded-lg">
+                          <LinkIcon className="w-4 h-4 text-forest-500" />
+                          <span className="text-xs font-medium text-charcoal-600 w-20">{link.label}</span>
+                          <a 
+                            href={link.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-sm text-forest-600 hover:underline truncate flex-1"
+                          >
+                            {link.url}
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => removeReferenceLink(index)}
+                            className="p-1 text-red-500 hover:bg-red-50 rounded"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-charcoal-400 mt-2">
+                    {referenceLinks.length}/5 links added
                   </p>
                 </div>
 
