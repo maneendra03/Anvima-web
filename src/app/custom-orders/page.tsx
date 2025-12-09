@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Upload, Calendar, Send, Sparkles, Check, MessageCircle, X, Loader2, Image as ImageIcon, Link as LinkIcon, Plus } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { compressImage } from '@/lib/image-compress'
 
 interface UploadedImage {
   url: string
@@ -48,15 +49,15 @@ export default function CustomOrdersPage() {
       return
     }
 
-    for (const file of Array.from(files)) {
-      // Validate file size (10MB max)
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error(`${file.name} is too large. Max size: 10MB`)
+    for (const originalFile of Array.from(files)) {
+      // Validate file size (10MB max for original)
+      if (originalFile.size > 10 * 1024 * 1024) {
+        toast.error(`${originalFile.name} is too large. Max size: 10MB`)
         continue
       }
 
       // Create preview URL
-      const previewUrl = URL.createObjectURL(file)
+      const previewUrl = URL.createObjectURL(originalFile)
       const tempId = `temp-${Date.now()}-${Math.random()}`
       
       // Add placeholder with loading state
@@ -68,8 +69,16 @@ export default function CustomOrdersPage() {
       }])
 
       try {
+        // Compress image before upload for faster upload speed
+        const compressedFile = await compressImage(originalFile, {
+          maxWidth: 1600,
+          maxHeight: 1600,
+          quality: 0.85,
+          maxSizeMB: 2
+        })
+        
         const formData = new FormData()
-        formData.append('file', file)
+        formData.append('file', compressedFile)
 
         const res = await fetch('/api/upload/custom-order', {
           method: 'POST',

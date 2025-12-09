@@ -32,20 +32,30 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Convert file to base64
+    // Convert file to buffer for upload_stream (faster than base64)
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
-    const base64 = `data:${file.type};base64,${buffer.toString('base64')}`
 
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(base64, {
-      folder: 'anvima/custom-orders',
-      resource_type: 'image',
-      transformation: [
-        { width: 1200, height: 1200, crop: 'limit' },
-        { quality: 'auto' },
-        { fetch_format: 'auto' }
-      ]
+    // Upload to Cloudinary using upload_stream for better performance
+    const result = await new Promise<any>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'anvima/custom-orders',
+          resource_type: 'image',
+          // Use eager transformations for faster initial upload
+          eager: [
+            { width: 800, height: 800, crop: 'limit', quality: 'auto', format: 'webp' }
+          ],
+          eager_async: true, // Process transformations async for faster response
+          // Optimize upload speed
+          timeout: 60000,
+        },
+        (error, result) => {
+          if (error) reject(error)
+          else resolve(result)
+        }
+      )
+      uploadStream.end(buffer)
     })
 
     return NextResponse.json({
