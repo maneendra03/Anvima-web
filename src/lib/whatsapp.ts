@@ -1,12 +1,14 @@
 /**
- * WhatsApp Notification Utility
+ * WhatsApp & Push Notification Utility
  * 
- * This module provides functions to send WhatsApp notifications
- * when orders are placed. Since WhatsApp Business API requires
- * a paid subscription, we use the web.whatsapp.com API for now.
+ * This module provides functions to send notifications when orders are placed:
+ * 1. Push notification via ntfy.sh (free, instant)
+ * 2. WhatsApp link generation for manual messaging
+ * 3. Email notification (via existing email system)
  */
 
 const ADMIN_WHATSAPP = process.env.ADMIN_WHATSAPP || '916304742807'
+const NTFY_TOPIC = process.env.NTFY_TOPIC || 'anvima-orders' // Free push notification service
 
 interface OrderDetails {
   orderNumber: string
@@ -25,6 +27,27 @@ interface CustomOrderDetails {
   budget: string
   description: string
   deadline: string
+}
+
+/**
+ * Send instant push notification via ntfy.sh (FREE)
+ * Install ntfy app on your phone and subscribe to your topic
+ */
+async function sendPushNotification(title: string, message: string, priority: 'low' | 'default' | 'high' | 'urgent' = 'high'): Promise<void> {
+  try {
+    await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+      method: 'POST',
+      headers: {
+        'Title': title,
+        'Priority': priority,
+        'Tags': 'shopping_cart,rupee',
+      },
+      body: message
+    })
+    console.log('✅ Push notification sent via ntfy.sh')
+  } catch (error) {
+    console.error('Failed to send push notification:', error)
+  }
 }
 
 /**
@@ -75,23 +98,39 @@ Check admin panel for full details and reference images.`
 }
 
 /**
- * Send order notification - logs the WhatsApp link
- * In production, you would integrate with WhatsApp Business API
+ * Send order notification - Push + WhatsApp link
  */
 export async function sendOrderNotification(order: OrderDetails): Promise<void> {
-  const whatsappLink = generateOrderWhatsAppLink(order)
-  console.log('📱 WhatsApp Order Notification Link:', whatsappLink)
+  // 1. Send instant push notification to your phone
+  const pushMessage = `Order #${order.orderNumber}
+Customer: ${order.customerName}
+Phone: ${order.customerPhone}
+Total: ₹${order.total.toLocaleString('en-IN')}
+Items: ${order.itemsCount}`
+
+  await sendPushNotification('🎁 New Order!', pushMessage, 'urgent')
   
-  // TODO: Integrate with WhatsApp Business API for automatic messages
-  // For now, the admin can click the link in logs or we can send via email
+  // 2. Log WhatsApp link for reference
+  const whatsappLink = generateOrderWhatsAppLink(order)
+  console.log('📱 WhatsApp Link:', whatsappLink)
 }
 
 /**
  * Send custom order notification
  */
 export async function sendCustomOrderNotification(order: CustomOrderDetails): Promise<void> {
+  // 1. Send instant push notification
+  const pushMessage = `Request #${order.requestNumber}
+Customer: ${order.customerName}
+Phone: ${order.customerPhone}
+Budget: ${order.budget}
+${order.description.substring(0, 100)}...`
+
+  await sendPushNotification('✨ Custom Order Request!', pushMessage, 'high')
+  
+  // 2. Log WhatsApp link
   const whatsappLink = generateCustomOrderWhatsAppLink(order)
-  console.log('📱 WhatsApp Custom Order Notification Link:', whatsappLink)
+  console.log('📱 WhatsApp Link:', whatsappLink)
 }
 
 /**
