@@ -1,20 +1,10 @@
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
-import WhatsAppButton from '@/components/ui/WhatsAppButton'
+// MainLayout - Header/Footer are already rendered by LayoutWrapper in root layout
+// This layout is just a pass-through to avoid duplicate components
 
 export default function MainLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <>
-      <Header />
-      <main className="flex-grow">
-        {children}
-      </main>
-      <Footer />
-      <WhatsAppButton />
-    </>
-  )
+  return <>{children}</>
 }

@@ -22,6 +22,10 @@ export interface IUser extends Document {
     state: string
     pincode: string
     isDefault: boolean
+    location?: {
+      lat: number
+      lng: number
+    }
   }[]
   wishlist: mongoose.Types.ObjectId[]
   createdAt: Date
@@ -37,6 +41,10 @@ const AddressSchema = new Schema({
   state: { type: String, required: true },
   pincode: { type: String, required: true },
   isDefault: { type: Boolean, default: false },
+  location: {
+    lat: { type: Number },
+    lng: { type: Number },
+  },
 })
 
 const UserSchema = new Schema<IUser>(

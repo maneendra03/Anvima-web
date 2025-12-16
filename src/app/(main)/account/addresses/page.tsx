@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MapPin, Plus, Edit2, Trash2, Check, X, Home, Building } from 'lucide-react'
+import { MapPin, Plus, Edit2, Trash2, Check, X, Home, Building, Navigation, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface Address {
@@ -14,6 +14,10 @@ interface Address {
   state: string
   pincode: string
   isDefault: boolean
+  location?: {
+    lat: number
+    lng: number
+  }
 }
 
 const indianStates = [
@@ -38,9 +42,11 @@ export default function AddressesPage() {
     state: '',
     pincode: '',
     isDefault: false,
+    location: null as { lat: number; lng: number } | null,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSaving, setIsSaving] = useState(false)
+  const [isGettingLocation, setIsGettingLocation] = useState(false)
 
   useEffect(() => {
     fetchAddresses()
@@ -71,6 +77,7 @@ export default function AddressesPage() {
         state: address.state,
         pincode: address.pincode,
         isDefault: address.isDefault,
+        location: address.location || null,
       })
     } else {
       setEditingAddress(null)
@@ -82,10 +89,112 @@ export default function AddressesPage() {
         state: '',
         pincode: '',
         isDefault: addresses.length === 0,
+        location: null,
       })
     }
     setErrors({})
     setIsModalOpen(true)
+  }
+
+  // Get live location and auto-fill address using reverse geocoding
+  const handleGetLiveLocation = async () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser')
+      return
+    }
+
+    setIsGettingLocation(true)
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords
+        
+        try {
+          // Use free reverse geocoding API
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+            {
+              headers: {
+                'Accept-Language': 'en',
+              },
+            }
+          )
+          
+          if (!response.ok) throw new Error('Failed to get address')
+          
+          const data = await response.json()
+          const addr = data.address || {}
+          
+          // Map the response to form fields
+          const streetParts = [
+            addr.house_number,
+            addr.road || addr.street,
+            addr.neighbourhood || addr.suburb,
+          ].filter(Boolean)
+          
+          const street = streetParts.join(', ') || data.display_name?.split(',').slice(0, 2).join(',') || ''
+          
+          // Map state names to match our dropdown
+          const stateMapping: Record<string, string> = {
+            'Telangana': 'Telangana',
+            'Andhra Pradesh': 'Andhra Pradesh',
+            'Karnataka': 'Karnataka',
+            'Tamil Nadu': 'Tamil Nadu',
+            'Maharashtra': 'Maharashtra',
+            'Delhi': 'Delhi',
+            'National Capital Territory of Delhi': 'Delhi',
+            // Add more mappings as needed
+          }
+          
+          const detectedState = addr.state || addr.state_district || ''
+          const mappedState = stateMapping[detectedState] || 
+            indianStates.find(s => detectedState.toLowerCase().includes(s.toLowerCase())) || 
+            ''
+          
+          setFormData(prev => ({
+            ...prev,
+            address: street,
+            city: addr.city || addr.town || addr.village || addr.county || '',
+            state: mappedState,
+            pincode: addr.postcode || '',
+            location: { lat: latitude, lng: longitude },
+          }))
+          
+          toast.success('Location detected! Please verify the address details.')
+        } catch (error) {
+          console.error('Reverse geocoding error:', error)
+          // Still save coordinates even if reverse geocoding fails
+          setFormData(prev => ({
+            ...prev,
+            location: { lat: latitude, lng: longitude },
+          }))
+          toast.error('Could not auto-fill address. Please enter manually.')
+        } finally {
+          setIsGettingLocation(false)
+        }
+      },
+      (error) => {
+        setIsGettingLocation(false)
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error('Please allow location access to use this feature')
+            break
+          case error.POSITION_UNAVAILABLE:
+            toast.error('Location information unavailable')
+            break
+          case error.TIMEOUT:
+            toast.error('Location request timed out')
+            break
+          default:
+            toast.error('Failed to get location')
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    )
   }
 
   const closeModal = () => {
@@ -330,6 +439,33 @@ export default function AddressesPage() {
               </div>
 
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                {/* Prominent Use My Location Button */}
+                <button
+                  type="button"
+                  onClick={handleGetLiveLocation}
+                  disabled={isGettingLocation}
+                  className="w-full py-3.5 px-4 bg-gradient-to-r from-forest-500 to-forest-600 text-white rounded-xl font-medium hover:from-forest-600 hover:to-forest-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3 shadow-lg shadow-forest-500/20"
+                >
+                  {isGettingLocation ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Detecting your location...
+                    </>
+                  ) : (
+                    <>
+                      <Navigation className="w-5 h-5" />
+                      📍 Use My Current Location
+                    </>
+                  )}
+                </button>
+
+                {formData.location && (
+                  <p className="text-sm text-green-600 flex items-center justify-center gap-1.5 -mt-2">
+                    <Check className="w-4 h-4" />
+                    Location detected! Please verify the details below.
+                  </p>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-charcoal-700 mb-1">

@@ -12,7 +12,10 @@ import {
   Lock, 
   Check,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Navigation,
+  MapPin,
+  Plus
 } from 'lucide-react'
 import { useCartStore, CartItem } from '@/store/cartStore'
 import { useAuthStore } from '@/store/auth'
@@ -75,6 +78,19 @@ export default function CheckoutPage() {
   } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null)
+  const [isGettingLocation, setIsGettingLocation] = useState(false)
+  const [savedAddresses, setSavedAddresses] = useState<Array<{
+    _id: string
+    name: string
+    phone: string
+    address: string
+    city: string
+    state: string
+    pincode: string
+    isDefault: boolean
+  }>>([])
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
+  const [addressMode, setAddressMode] = useState<'saved' | 'new'>('saved')
 
   const [formData, setFormData] = useState({
     email: user?.email || '',
@@ -108,9 +124,124 @@ export default function CheckoutPage() {
     }
   }, [user])
 
+  // Fetch saved addresses on mount
+  useEffect(() => {
+    const fetchSavedAddresses = async () => {
+      if (!isAuthenticated) return
+      try {
+        const response = await fetch('/api/user/addresses')
+        const data = await response.json()
+        if (data.success && data.data?.addresses?.length > 0) {
+          setSavedAddresses(data.data.addresses)
+          // Auto-select default address
+          const defaultAddr = data.data.addresses.find((a: any) => a.isDefault)
+          if (defaultAddr) {
+            setSelectedAddressId(defaultAddr._id)
+            fillAddressFromSaved(defaultAddr)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch addresses:', error)
+      }
+    }
+    fetchSavedAddresses()
+  }, [isAuthenticated])
+
+  // Fill form with saved address
+  const fillAddressFromSaved = (addr: typeof savedAddresses[0]) => {
+    const nameParts = addr.name.split(' ')
+    setFormData(prev => ({
+      ...prev,
+      firstName: nameParts[0] || prev.firstName,
+      lastName: nameParts.slice(1).join(' ') || prev.lastName,
+      phone: addr.phone || prev.phone,
+      address: addr.address,
+      city: addr.city,
+      state: addr.state,
+      pincode: addr.pincode,
+    }))
+  }
+
+  // Handle saved address selection
+  const handleAddressSelect = (addressId: string) => {
+    setSelectedAddressId(addressId)
+    const addr = savedAddresses.find(a => a._id === addressId)
+    if (addr) {
+      fillAddressFromSaved(addr)
+    }
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
     setError(null)
+  }
+
+  // Get live location and auto-fill address
+  const handleGetLiveLocation = async () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser')
+      return
+    }
+
+    setIsGettingLocation(true)
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords
+        
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+            { headers: { 'Accept-Language': 'en' } }
+          )
+          
+          if (!response.ok) throw new Error('Failed to get address')
+          
+          const data = await response.json()
+          const addr = data.address || {}
+          
+          const streetParts = [
+            addr.house_number,
+            addr.road || addr.street,
+            addr.neighbourhood || addr.suburb,
+          ].filter(Boolean)
+          
+          const street = streetParts.join(', ') || data.display_name?.split(',').slice(0, 2).join(',') || ''
+          
+          setFormData(prev => ({
+            ...prev,
+            address: street,
+            city: addr.city || addr.town || addr.village || addr.county || '',
+            state: addr.state || addr.state_district || '',
+            pincode: addr.postcode || '',
+          }))
+          
+          toast.success('Location detected! Please verify the address.')
+        } catch (error) {
+          console.error('Reverse geocoding error:', error)
+          toast.error('Could not auto-fill address. Please enter manually.')
+        } finally {
+          setIsGettingLocation(false)
+        }
+      },
+      (error) => {
+        setIsGettingLocation(false)
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error('Please allow location access to use this feature')
+            break
+          case error.POSITION_UNAVAILABLE:
+            toast.error('Location information unavailable')
+            break
+          case error.TIMEOUT:
+            toast.error('Location request timed out')
+            break
+          default:
+            toast.error('Failed to get location')
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    )
   }
 
   const validateShippingForm = () => {
@@ -504,6 +635,127 @@ export default function CheckoutPage() {
                   Shipping Information
                 </h2>
 
+                {/* Address Mode Toggle - Only show if saved addresses exist */}
+                {savedAddresses.length > 0 && (
+                  <div className="mb-6">
+                    <div className="grid grid-cols-2 gap-3 p-1 bg-cream-100 rounded-xl">
+                      <button
+                        type="button"
+                        onClick={() => setAddressMode('saved')}
+                        className={`py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
+                          addressMode === 'saved'
+                            ? 'bg-white text-forest-700 shadow-sm'
+                            : 'text-charcoal-500 hover:text-charcoal-700'
+                        }`}
+                      >
+                        <MapPin className="w-4 h-4" />
+                        Saved Address
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddressMode('new')
+                          setSelectedAddressId(null)
+                          setFormData(prev => ({
+                            ...prev,
+                            address: '',
+                            city: '',
+                            state: '',
+                            pincode: '',
+                            landmark: '',
+                          }))
+                        }}
+                        className={`py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
+                          addressMode === 'new'
+                            ? 'bg-white text-forest-700 shadow-sm'
+                            : 'text-charcoal-500 hover:text-charcoal-700'
+                        }`}
+                      >
+                        <Plus className="w-4 h-4" />
+                        New Address
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Saved Addresses Section - Only visible when addressMode is 'saved' */}
+                {savedAddresses.length > 0 && addressMode === 'saved' && (
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-charcoal-700 mb-3">
+                      Select delivery address
+                    </label>
+                    <div className="grid gap-3">
+                      {savedAddresses.map((addr) => (
+                        <button
+                          key={addr._id}
+                          type="button"
+                          onClick={() => handleAddressSelect(addr._id)}
+                          className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                            selectedAddressId === addr._id
+                              ? 'border-forest-500 bg-forest-50'
+                              : 'border-charcoal-200 hover:border-charcoal-300'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <MapPin className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
+                              selectedAddressId === addr._id ? 'text-forest-600' : 'text-charcoal-400'
+                            }`} />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-charcoal-800">{addr.name}</span>
+                                {addr.isDefault && (
+                                  <span className="text-xs px-2 py-0.5 bg-forest-100 text-forest-700 rounded-full">Default</span>
+                                )}
+                              </div>
+                              <p className="text-sm text-charcoal-600 mt-1">{addr.phone}</p>
+                              <p className="text-sm text-charcoal-500 mt-1">
+                                {addr.address}, {addr.city}, {addr.state} - {addr.pincode}
+                              </p>
+                            </div>
+                            {selectedAddressId === addr._id && (
+                              <Check className="w-5 h-5 text-forest-600 flex-shrink-0" />
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Continue button for saved address */}
+                    {selectedAddressId && (
+                      <button
+                        type="button"
+                        onClick={() => setStep(2)}
+                        className="w-full mt-6 py-4 bg-forest-600 text-white rounded-lg font-semibold hover:bg-forest-700 transition-colors"
+                      >
+                        Continue to Payment
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* New Address Form - Only visible when addressMode is 'new' OR no saved addresses */}
+                {(addressMode === 'new' || savedAddresses.length === 0) && (
+                  <>
+                    {/* Use My Location Button - Prominent */}
+                    <button
+                      type="button"
+                      onClick={handleGetLiveLocation}
+                      disabled={isGettingLocation}
+                      className="w-full mb-6 py-4 px-4 bg-gradient-to-r from-forest-500 to-forest-600 text-white rounded-xl font-medium hover:from-forest-600 hover:to-forest-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3 shadow-lg shadow-forest-500/20"
+                    >
+                      {isGettingLocation ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Detecting your location...
+                        </>
+                      ) : (
+                        <>
+                          <Navigation className="w-5 h-5" />
+                          📍 Use My Current Location
+                        </>
+                      )}
+                    </button>
+
                 <form onSubmit={handleShippingSubmit}>
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="sm:col-span-2">
@@ -637,6 +889,8 @@ export default function CheckoutPage() {
                     Continue to Payment
                   </button>
                 </form>
+                  </>
+                )}
               </motion.div>
             )}
 
