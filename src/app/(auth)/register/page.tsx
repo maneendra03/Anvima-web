@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -11,7 +11,7 @@ import toast from 'react-hot-toast'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const { register, isLoading } = useAuthStore()
+  const { register, isLoading, isAuthenticated } = useAuthStore()
   
   const [formData, setFormData] = useState({
     name: '',
@@ -25,6 +25,13 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/')
+    }
+  }, [isAuthenticated, router])
 
   const handleGoogleSignIn = async () => {
     try {

@@ -14,7 +14,7 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const redirectUrl = searchParams.get('redirect')
   const errorParam = searchParams.get('error')
-  const { login, isLoading, fetchUser } = useAuthStore()
+  const { login, isLoading, fetchUser, isAuthenticated } = useAuthStore()
   
   const [formData, setFormData] = useState({
     email: '',
@@ -24,6 +24,13 @@ function LoginForm() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [googleLoading, setGoogleLoading] = useState(false)
   const [oauthError, setOauthError] = useState<string | null>(null)
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace(redirectUrl || '/')
+    }
+  }, [isAuthenticated, router, redirectUrl])
 
   // Handle OAuth errors
   useEffect(() => {
