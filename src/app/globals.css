@@ -5,11 +5,16 @@
 @tailwind utilities;
 
 :root {
-  --peach-primary: #FFAA8A;
-  --blush-primary: #FF8FA6;
-  --cream-primary: #FAF7F2;
-  --forest-primary: #2D5A47;
-  --charcoal-primary: #3D3D3D;
+  /* Primary Brand Colors */
+  --peach-primary: #E4B09E;
+  --blush-primary: #DE8F9D;
+  --cream-primary: #FBF9F5;
+  --forest-primary: #3D6B5E;
+  --charcoal-primary: #374151;
+  
+  /* Accent Colors */
+  --gold-accent: #D4A026;
+  --lavender-accent: #B39FD9;
 }
 
 * {
@@ -56,8 +61,8 @@ html {
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background-color: #FDFCFA;
-  color: #3D3D3D;
+  background-color: #FEFDFB;
+  color: #374151;
   line-height: 1.5; /* Better readability */
 }
 

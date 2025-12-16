@@ -26,38 +26,9 @@ const footerLinks = {
 
 export default function Footer() {
   return (
-    <footer className="bg-charcoal-700 text-cream-100">
-      {/* Newsletter Section */}
-      <div className="bg-forest-600 py-6 sm:py-8 lg:py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-5 lg:gap-6">
-            <div className="text-center md:text-left">
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-serif font-semibold text-white mb-1 sm:mb-2">
-                Stay in the Loop
-              </h3>
-              <p className="text-xs sm:text-sm text-cream-200">
-                Get exclusive offers, gift ideas, and updates on new collections.
-              </p>
-            </div>
-            <form className="flex w-full md:w-auto gap-2 sm:gap-3">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="px-3 sm:px-4 py-2 sm:py-2.5 text-sm rounded-full bg-white/10 border border-white/20 text-white placeholder-cream-300 focus:outline-none focus:border-white/50 w-full md:w-56 lg:w-72"
-              />
-              <button
-                type="submit"
-                className="px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5 text-sm bg-peach-400 text-charcoal-700 rounded-full font-medium hover:bg-peach-500 transition-colors whitespace-nowrap"
-              >
-                Subscribe
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-
+    <footer className="bg-black text-white">
       {/* Main Footer */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8">
           {/* Brand */}
           <div className="col-span-2 lg:col-span-2">
@@ -66,7 +37,7 @@ export default function Footer() {
                 Anvima
               </h2>
             </Link>
-            <p className="text-sm text-cream-300 mb-4 sm:mb-5 lg:mb-6 max-w-sm">
+            <p className="text-sm text-gray-400 mb-4 sm:mb-5 lg:mb-6 max-w-sm">
               Creating personalized gifts that capture your precious moments.
               Handcrafted with love, delivered with care.
             </p>
@@ -96,7 +67,7 @@ export default function Footer() {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-cream-300 hover:text-white transition-colors"
+                    className="text-sm text-gray-400 hover:text-white transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -113,7 +84,7 @@ export default function Footer() {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-cream-300 hover:text-white transition-colors"
+                    className="text-sm text-gray-400 hover:text-white transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -126,15 +97,15 @@ export default function Footer() {
           <div>
             <h3 className="text-sm sm:text-base font-semibold text-white mb-3 sm:mb-4">Contact</h3>
             <ul className="space-y-2 sm:space-y-3">
-              <li className="flex items-start gap-2 sm:gap-3 text-sm text-cream-300">
+              <li className="flex items-start gap-2 sm:gap-3 text-sm text-gray-400">
                 <MapPin className="w-4 h-4 sm:w-5 sm:h-5 mt-0.5 flex-shrink-0" />
                 <span>Hyderabad, Telangana, India</span>
               </li>
-              <li className="flex items-center gap-2 sm:gap-3 text-sm text-cream-300">
+              <li className="flex items-center gap-2 sm:gap-3 text-sm text-gray-400">
                 <Phone className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 <span>+91 6304742807</span>
               </li>
-              <li className="flex items-center gap-2 sm:gap-3 text-sm text-cream-300">
+              <li className="flex items-center gap-2 sm:gap-3 text-sm text-gray-400">
                 <Mail className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                 <span>anvima.creations@gmail.com</span>
               </li>
@@ -144,10 +115,10 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="border-t border-white/10 mt-8 sm:mt-10 lg:mt-12 pt-6 sm:pt-8 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
-          <p className="text-cream-400 text-xs sm:text-sm">
+          <p className="text-gray-500 text-xs sm:text-sm">
             © {new Date().getFullYear()} Anvima Creations. All rights reserved.
           </p>
-          <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm text-cream-400">
+          <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-500">
             <Link href="/faq#privacy" className="hover:text-white transition-colors">
               Privacy Policy
             </Link>

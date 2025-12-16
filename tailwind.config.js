@@ -16,48 +16,74 @@ module.exports = {
     },
     extend: {
       colors: {
-        // Soft pastels
+        // Refined Rose Gold - Luxurious & warm
         peach: {
-          50: '#FFF8F5',
-          100: '#FFEDE5',
-          200: '#FFDACC',
-          300: '#FFC4AD',
-          400: '#FFAA8A',
-          500: '#FF8F66',
-          600: '#E67A52',
+          50: '#FDF8F6',
+          100: '#FAEFEB',
+          200: '#F5DDD4',
+          300: '#EEC9BC',
+          400: '#E4B09E',
+          500: '#D9967F',
+          600: '#C47B63',
         },
+        // Soft Dusty Rose - Elegant & romantic
         blush: {
-          50: '#FFF5F7',
-          100: '#FFE8EC',
-          200: '#FFD1DA',
-          300: '#FFB3C2',
-          400: '#FF8FA6',
-          500: '#FF6B8A',
-          600: '#E65577',
+          50: '#FCF5F6',
+          100: '#F9E8EB',
+          200: '#F2D0D6',
+          300: '#E9B3BC',
+          400: '#DE8F9D',
+          500: '#D06B7E',
+          600: '#B85466',
         },
-        // Warm beige
+        // Warm Ivory - Clean & luxurious
         cream: {
-          50: '#FDFCFA',
-          100: '#FAF7F2',
-          200: '#F5EFE6',
-          300: '#EDE4D6',
-          400: '#E0D4C2',
-          500: '#D4C4AC',
-          600: '#BFA98D',
+          50: '#FEFDFB',
+          100: '#FBF9F5',
+          200: '#F6F2EB',
+          300: '#EDE7DC',
+          400: '#E0D7C9',
+          500: '#CFC3B0',
+          600: '#B8A890',
         },
-        // Deep accents
+        // Deep Sage - Sophisticated & calming
         forest: {
-          DEFAULT: '#2D5A47',
-          500: '#2D5A47',
-          600: '#234536',
-          700: '#1A3328',
-          800: '#12231B',
+          DEFAULT: '#3D6B5E',
+          400: '#4A8073',
+          500: '#3D6B5E',
+          600: '#30554A',
+          700: '#244038',
+          800: '#182B26',
         },
+        // Rich Charcoal - Professional & readable
         charcoal: {
-          500: '#3D3D3D',
-          600: '#2D2D2D',
-          700: '#1F1F1F',
-          800: '#141414',
+          200: '#9CA3AF',
+          300: '#6B7280',
+          400: '#4B5563',
+          500: '#374151',
+          600: '#1F2937',
+          700: '#111827',
+          800: '#0D1117',
+        },
+        // NEW: Gold Accent - Premium feel
+        gold: {
+          50: '#FFFBEB',
+          100: '#FEF3C7',
+          200: '#FDE68A',
+          300: '#FCD34D',
+          400: '#FBBF24',
+          500: '#D4A026',
+          600: '#B8860B',
+        },
+        // NEW: Lavender - Soft accent
+        lavender: {
+          50: '#F8F6FC',
+          100: '#F0EBF8',
+          200: '#E2D8F1',
+          300: '#CFC0E6',
+          400: '#B39FD9',
+          500: '#9678C9',
+          600: '#7C5CB0',
         },
       },
       fontFamily: {
