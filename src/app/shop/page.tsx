@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { Filter, Grid, List, Star, ShoppingBag, X, SlidersHorizontal, Eye, Loader2 } from 'lucide-react'
 // QuickViewModal disabled temporarily - will be updated to work with API products
 // import QuickViewModal from '@/components/product/QuickViewModal'
@@ -42,6 +43,7 @@ interface Product {
 type SortOption = 'featured' | 'price-low' | 'price-high' | 'rating' | 'newest'
 
 export default function ShopPage() {
+  const router = useRouter()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -337,14 +339,17 @@ export default function ShopPage() {
 
                             {/* Quick actions */}
                             <div className="absolute bottom-1.5 sm:bottom-2 lg:bottom-3 right-1.5 sm:right-2 lg:right-3 flex gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Link
-                                href={`/product/${product.slug}`}
-                                onClick={(e) => e.stopPropagation()}
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  router.push(`/product/${product.slug}`)
+                                }}
                                 className="p-1.5 sm:p-2 lg:p-3 bg-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-transform"
                                 title="View Product"
                               >
                                 <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-charcoal-600" />
-                              </Link>
+                              </button>
                               <button
                                 className="p-1.5 sm:p-2 lg:p-3 bg-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition-transform"
                               >
