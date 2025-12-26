@@ -112,7 +112,7 @@ export default function Header() {
 
       <nav className="border-b border-charcoal-100 relative">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 sm:h-18 md:h-20">
+          <div className="flex items-center justify-between h-[72px] sm:h-20 md:h-24">
             {/* Mobile menu button */}
             <button
               className="md:hidden flex items-center justify-center w-10 h-10 -ml-1 text-charcoal-700 hover:text-charcoal-900 active:bg-gray-100 rounded-lg"
@@ -276,7 +276,7 @@ export default function Header() {
 
       {/* Mobile Menu - Simplified without AnimatePresence */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-[1000]" style={{ top: bannerCoupon ? '104px' : '64px' }}>
+        <div className="md:hidden fixed inset-0 z-[1000]" style={{ top: bannerCoupon ? '112px' : '72px' }}>
           {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-black/40"
@@ -383,7 +383,7 @@ export default function Header() {
             className="fixed inset-0 bg-white z-[10000]"
           >
             <div className="h-full flex flex-col">
-              <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 h-16 sm:h-18 md:h-20 border-b border-charcoal-100">
+              <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 h-[72px] sm:h-20 md:h-24 border-b border-charcoal-100">
                 <span className="text-sm text-charcoal-500 uppercase tracking-wide">Search</span>
                 <button
                   onClick={() => {
