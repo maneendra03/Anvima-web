@@ -129,7 +129,7 @@ export default function Header() {
 
             {/* Logo - Center on mobile, left on desktop */}
             <Link href="/" className="flex items-center md:mr-12">
-              <span className="text-xl sm:text-2xl md:text-3xl font-serif font-semibold tracking-tight text-charcoal-900">
+              <span className="text-2xl sm:text-3xl md:text-4xl font-serif font-semibold tracking-tight text-charcoal-900">
                 ANVIMA
               </span>
             </Link>
