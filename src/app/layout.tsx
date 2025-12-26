@@ -1,7 +1,14 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
 import LayoutWrapper from '@/components/layout/LayoutWrapper'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 0.9, // Slightly zoomed out on mobile
+  maximumScale: 5,
+  userScalable: true,
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXTAUTH_URL || 'http://localhost:3000'),
