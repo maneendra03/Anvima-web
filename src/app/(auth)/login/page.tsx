@@ -179,14 +179,14 @@ function LoginForm() {
         >
           <div className="text-center mb-8">
             <Link href="/" className="inline-block mb-6">
-              <span className="font-playfair text-3xl text-forest-600">Anvima</span>
+              <span className="font-playfair text-3xl text-charcoal-900">Anvima</span>
             </Link>
             <h2 className="text-2xl font-semibold text-charcoal-800 mb-2">
               Sign in to your account
             </h2>
             <p className="text-charcoal-500">
               Don&apos;t have an account?{' '}
-              <Link href="/register" className="text-forest-600 hover:text-forest-700 font-medium">
+              <Link href="/register" className="text-charcoal-900 hover:text-charcoal-800 font-medium">
                 Sign up
               </Link>
             </p>
@@ -222,7 +222,7 @@ function LoginForm() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 transition-colors text-base ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 transition-colors text-base ${
                     errors.email ? 'border-red-500' : 'border-charcoal-200'
                   }`}
                   placeholder="you@example.com"
@@ -247,7 +247,7 @@ function LoginForm() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 transition-colors text-base ${
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 transition-colors text-base ${
                     errors.password ? 'border-red-500' : 'border-charcoal-200'
                   }`}
                   placeholder="••••••••"
@@ -271,13 +271,13 @@ function LoginForm() {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 text-forest-600 border-charcoal-300 rounded focus:ring-forest-500"
+                  className="w-4 h-4 text-charcoal-900 border-charcoal-300 rounded focus:ring-charcoal-500"
                 />
                 <span className="ml-2 text-sm text-charcoal-600">Remember me</span>
               </label>
               <Link
                 href="/forgot-password"
-                className="text-sm text-forest-600 hover:text-forest-700 font-medium"
+                className="text-sm text-charcoal-900 hover:text-charcoal-800 font-medium"
               >
                 Forgot password?
               </Link>
@@ -287,7 +287,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-forest-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-forest-700 focus:ring-4 focus:ring-forest-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-charcoal-900 text-white py-3 px-4 rounded-lg font-medium hover:bg-charcoal-800 focus:ring-4 focus:ring-charcoal-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>
@@ -347,11 +347,11 @@ function LoginForm() {
           {/* Terms */}
           <p className="mt-8 text-center text-sm text-charcoal-500">
             By signing in, you agree to our{' '}
-            <Link href="/faq" className="text-forest-600 hover:underline">
+            <Link href="/faq" className="text-charcoal-900 hover:underline">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="/faq" className="text-forest-600 hover:underline">
+            <Link href="/faq" className="text-charcoal-900 hover:underline">
               Privacy Policy
             </Link>
           </p>
@@ -364,7 +364,7 @@ function LoginForm() {
 function LoginLoading() {
   return (
     <div className="min-h-screen bg-cream-50 flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-forest"></div>
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-charcoal-900"></div>
     </div>
   )
 }

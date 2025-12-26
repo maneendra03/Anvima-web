@@ -82,8 +82,8 @@ function VerifyEmailContent() {
   if (status === 'loading') {
     return (
       <div className="text-center py-12">
-        <div className="w-16 h-16 bg-forest-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <RefreshCw className="w-8 h-8 text-forest-600 animate-spin" />
+        <div className="w-16 h-16 bg-charcoal-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <RefreshCw className="w-8 h-8 text-charcoal-900 animate-spin" />
         </div>
         <h2 className="font-playfair text-xl text-charcoal-800">
           Verifying your email...
@@ -99,8 +99,8 @@ function VerifyEmailContent() {
         animate={{ opacity: 1, scale: 1 }}
         className="text-center"
       >
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle className="w-8 h-8 text-green-500" />
+        <div className="w-16 h-16 bg-charcoal-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle className="w-8 h-8 text-charcoal-700" />
         </div>
         <h2 className="font-playfair text-2xl text-charcoal-800 mb-2">
           Email Verified! 🎉
@@ -116,7 +116,7 @@ function VerifyEmailContent() {
         </p>
         <Link
           href="/login"
-          className="inline-flex items-center gap-2 bg-forest-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-forest-700 transition-colors"
+          className="inline-flex items-center gap-2 bg-charcoal-900 text-white py-3 px-6 rounded-lg font-medium hover:bg-charcoal-800 transition-colors"
         >
           Continue to Login
           <ArrowRight className="w-5 h-5" />
@@ -154,14 +154,14 @@ function VerifyEmailContent() {
               type="email"
               value={resendEmail}
               onChange={(e) => setResendEmail(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-charcoal-200 rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 transition-colors"
+              className="w-full pl-10 pr-4 py-3 border border-charcoal-200 rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 transition-colors"
               placeholder="Enter your email"
             />
           </div>
           <button
             type="submit"
             disabled={isResending}
-            className="w-full bg-forest-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-forest-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full bg-charcoal-900 text-white py-3 px-4 rounded-lg font-medium hover:bg-charcoal-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {isResending ? (
               <>
@@ -180,7 +180,7 @@ function VerifyEmailContent() {
 
       <p className="mt-6 text-sm text-charcoal-500">
         Already verified?{' '}
-        <Link href="/login" className="text-forest-600 hover:underline font-medium">
+        <Link href="/login" className="text-charcoal-900 hover:underline font-medium">
           Sign in
         </Link>
       </p>
@@ -192,7 +192,7 @@ export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-cream-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-forest-500/30 border-t-forest-500 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-charcoal-500/30 border-t-charcoal-500 rounded-full animate-spin" />
       </div>
     }>
       <div className="min-h-screen bg-cream-50 flex items-center justify-center px-4 py-12">

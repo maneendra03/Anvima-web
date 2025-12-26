@@ -46,7 +46,7 @@ export default function WishlistPage() {
   if (!mounted) {
     return (
       <div className="flex items-center justify-center py-10 sm:py-12">
-        <div className="w-8 h-8 sm:w-10 sm:h-10 border-3 sm:border-4 border-forest-500/30 border-t-forest-500 rounded-full animate-spin" />
+        <div className="w-8 h-8 sm:w-10 sm:h-10 border-3 sm:border-4 border-charcoal-500/30 border-t-charcoal-500 rounded-full animate-spin" />
       </div>
     )
   }
@@ -75,7 +75,7 @@ export default function WishlistPage() {
           </p>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-forest-600 text-white rounded-lg text-sm sm:text-base font-medium hover:bg-forest-700 transition-colors"
+            className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-charcoal-900 text-white rounded-lg text-sm sm:text-base font-medium hover:bg-charcoal-800 transition-colors"
           >
             Explore Products
             <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -106,6 +106,7 @@ export default function WishlistPage() {
                           alt={item.name}
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          unoptimized
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
@@ -121,7 +122,7 @@ export default function WishlistPage() {
                   </Link>
                   <div className="p-3 sm:p-4">
                     <Link href={`/product/${item.slug}`}>
-                      <h3 className="text-sm sm:text-base font-medium text-charcoal-800 hover:text-forest-600 transition-colors line-clamp-2">
+                      <h3 className="text-sm sm:text-base font-medium text-charcoal-800 hover:text-charcoal-900 transition-colors line-clamp-2">
                         {item.name}
                       </h3>
                     </Link>
@@ -139,7 +140,7 @@ export default function WishlistPage() {
                       <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleAddToCart(item)}
-                        className="flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 bg-forest-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-forest-700 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 bg-charcoal-900 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-charcoal-800 transition-colors"
                       >
                         <ShoppingCart className="w-4 h-4" />
                         Add to Cart

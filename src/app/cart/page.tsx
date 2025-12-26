@@ -92,7 +92,7 @@ export default function CartPage() {
                             <p>Engraving: Yes</p>
                           )}
                           {item.customization.imageUrl && (
-                            <p className="text-forest-500">📷 Custom photo uploaded</p>
+                            <p className="text-charcoal-700">📷 Custom photo uploaded</p>
                           )}
                         </div>
                       )}
@@ -166,7 +166,7 @@ export default function CartPage() {
                   </div>
                   <div className="flex justify-between text-charcoal-600">
                     <span>Shipping</span>
-                    <span className="text-forest-500">Free</span>
+                    <span className="text-charcoal-700">Free</span>
                   </div>
                   <div className="border-t border-cream-200 pt-4 flex justify-between text-lg font-bold text-charcoal-700">
                     <span>Total</span>
@@ -180,7 +180,7 @@ export default function CartPage() {
                     <input
                       type="text"
                       placeholder="Promo code"
-                      className="flex-1 px-4 py-2 border border-cream-200 rounded-lg focus:border-forest-500 outline-none"
+                      className="flex-1 px-4 py-2 border border-cream-200 rounded-lg focus:border-charcoal-500 outline-none"
                     />
                     <button className="px-4 py-2 bg-cream-100 rounded-lg font-medium hover:bg-cream-200 transition-colors">
                       Apply
@@ -200,7 +200,7 @@ export default function CartPage() {
                 </Link>
 
                 <Link href="/shop">
-                  <button className="w-full mt-3 text-forest-500 font-medium hover:underline">
+                  <button className="w-full mt-3 text-charcoal-700 font-medium hover:underline">
                     ← Continue Shopping
                   </button>
                 </Link>
@@ -208,11 +208,11 @@ export default function CartPage() {
                 {/* Trust Badges */}
                 <div className="mt-6 pt-6 border-t border-cream-200">
                   <div className="flex items-center gap-2 text-sm text-charcoal-500">
-                    <span className="w-2 h-2 bg-green-500 rounded-full" />
+                    <span className="w-2 h-2 bg-charcoal-700 rounded-full" />
                     Secure checkout with SSL encryption
                   </div>
                   <div className="flex items-center gap-2 text-sm text-charcoal-500 mt-2">
-                    <span className="w-2 h-2 bg-green-500 rounded-full" />
+                    <span className="w-2 h-2 bg-charcoal-700 rounded-full" />
                     Free shipping on all orders
                   </div>
                 </div>

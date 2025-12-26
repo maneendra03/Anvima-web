@@ -46,7 +46,7 @@ export default function RecentlyViewed({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-serif font-bold text-charcoal-700 flex items-center gap-2">
-            <Clock className="w-6 h-6 text-forest-500" />
+            <Clock className="w-6 h-6 text-charcoal-500" />
             {title}
           </h2>
           
@@ -94,11 +94,11 @@ export default function RecentlyViewed({
                       />
                     </div>
                     <div className="p-4">
-                      <h3 className="font-medium text-charcoal-700 truncate group-hover:text-forest-600 transition-colors">
+                      <h3 className="font-medium text-charcoal-700 truncate group-hover:text-charcoal-900 transition-colors">
                         {item.name}
                       </h3>
                       <div className="mt-2 flex items-center gap-2">
-                        <span className="text-lg font-bold text-forest-600">
+                        <span className="text-lg font-bold text-charcoal-900">
                           ₹{item.price.toLocaleString('en-IN')}
                         </span>
                         {item.originalPrice && item.originalPrice > item.price && (

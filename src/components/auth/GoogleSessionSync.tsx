@@ -1,9 +1,22 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAuthStore } from '@/store/auth'
+
+// Check if logout is pending (survives page navigation)
+function isLogoutPending(): boolean {
+  if (typeof window === 'undefined') return false
+  return localStorage.getItem('anvima-logout-pending') === 'true'
+}
+
+// Clear the pending logout flag
+function clearLogoutPending(): void {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('anvima-logout-pending')
+  }
+}
 
 /**
  * This component syncs the NextAuth session (from Google OAuth) with our custom auth system.
@@ -11,12 +24,34 @@ import { useAuthStore } from '@/store/auth'
  */
 export function GoogleSessionSync() {
   const { data: session, status } = useSession()
-  const { user, fetchUser, isAuthenticated } = useAuthStore()
+  const { user, fetchUser, isAuthenticated, _isLoggingOut, setLoggingOut } = useAuthStore()
   const hasSynced = useRef(false)
   const router = useRouter()
   const pathname = usePathname()
 
+  // Handle pending logout state that survives page navigation
   useEffect(() => {
+    if (isLogoutPending()) {
+      console.log('🚫 Logout pending - clearing any remaining session')
+      // Clear the flag
+      clearLogoutPending()
+      // Ensure NextAuth session is cleared
+      if (status === 'authenticated') {
+        signOut({ redirect: false })
+      }
+      // Reset the logging out flag in store
+      setLoggingOut(false)
+      return
+    }
+  }, [status, setLoggingOut])
+
+  useEffect(() => {
+    // Don't sync if we're logging out or logout is pending
+    if (_isLoggingOut || isLogoutPending()) {
+      hasSynced.current = false // Reset sync flag so next login works
+      return
+    }
+    
     // Only sync if:
     // 1. NextAuth session exists with a user
     // 2. Our custom auth doesn't have a user yet
@@ -44,6 +79,8 @@ export function GoogleSessionSync() {
         .then(async (data) => {
           if (data.success) {
             console.log('✅ Google session synced successfully')
+            // Clear logout pending flag since we're now logged in
+            clearLogoutPending()
             // Fetch the user to update the auth store
             await fetchUser()
             // Redirect to home page if on login/register page
@@ -58,14 +95,18 @@ export function GoogleSessionSync() {
           console.error('❌ Error syncing Google session:', error)
         })
     }
-  }, [session, status, isAuthenticated, fetchUser, router, pathname])
+  }, [session, status, isAuthenticated, fetchUser, router, pathname, _isLoggingOut])
 
-  // Also fetch user if we have a custom auth cookie but no user in store
+  // Reset sync flag when session becomes unauthenticated (user logged out)
   useEffect(() => {
-    if (!isAuthenticated && !user && status !== 'loading') {
-      fetchUser()
+    if (status === 'unauthenticated') {
+      hasSynced.current = false
     }
-  }, [isAuthenticated, user, status, fetchUser])
+  }, [status])
+
+  // NOTE: We intentionally removed the auto-fetch on !isAuthenticated
+  // This was causing re-login after logout. The fetchUser should only
+  // be called explicitly after successful login, not automatically.
 
   return null
 }

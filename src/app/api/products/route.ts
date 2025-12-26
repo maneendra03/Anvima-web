@@ -39,10 +39,32 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
+      // Improved search: handle singular/plural, partial matches
+      // Remove trailing 's' for singular form and add both variants
+      const searchTerm = search.trim()
+      const singularTerm = searchTerm.endsWith('s') ? searchTerm.slice(0, -1) : searchTerm
+      const pluralTerm = searchTerm.endsWith('s') ? searchTerm : searchTerm + 's'
+      
+      // Create regex patterns for fuzzy matching
+      const searchRegex = new RegExp(searchTerm, 'i')
+      const singularRegex = new RegExp(singularTerm, 'i')
+      const pluralRegex = new RegExp(pluralTerm, 'i')
+      
       query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { tags: { $in: [new RegExp(search, 'i')] } }
+        // Match exact search term
+        { name: searchRegex },
+        { description: searchRegex },
+        { shortDescription: searchRegex },
+        // Match singular form
+        { name: singularRegex },
+        { description: singularRegex },
+        // Match plural form  
+        { name: pluralRegex },
+        { description: pluralRegex },
+        // Match in tags (both forms)
+        { tags: { $in: [searchRegex, singularRegex, pluralRegex] } },
+        // Match in SKU
+        { sku: searchRegex }
       ]
     }
 

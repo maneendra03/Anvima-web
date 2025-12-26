@@ -426,9 +426,9 @@ export default function CheckoutPage() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 200 }}
-            className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
+            className="w-24 h-24 bg-charcoal-100 rounded-full flex items-center justify-center mx-auto mb-6"
           >
-            <Check className="w-12 h-12 text-green-500" />
+            <Check className="w-12 h-12 text-charcoal-700" />
           </motion.div>
           <h1 className="text-3xl font-serif font-bold text-charcoal-700 mb-4">
             Order Placed Successfully!
@@ -438,7 +438,7 @@ export default function CheckoutPage() {
           </p>
           {orderData && (
             <p className="text-charcoal-600 mb-8">
-              Order Number: <span className="font-bold text-forest-600">{orderData.orderNumber}</span>
+              Order Number: <span className="font-bold text-charcoal-900">{orderData.orderNumber}</span>
             </p>
           )}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -446,7 +446,7 @@ export default function CheckoutPage() {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="px-8 py-3 bg-forest-600 text-white rounded-full font-medium hover:bg-forest-700"
+                className="px-8 py-3 bg-charcoal-900 text-white rounded-full font-medium hover:bg-charcoal-800"
               >
                 View My Orders
               </motion.button>
@@ -455,7 +455,7 @@ export default function CheckoutPage() {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="px-8 py-3 border-2 border-forest-600 text-forest-600 rounded-full font-medium hover:bg-forest-50"
+                className="px-8 py-3 border-2 border-charcoal-900 text-charcoal-900 rounded-full font-medium hover:bg-charcoal-50"
               >
                 Continue Shopping
               </motion.button>
@@ -474,7 +474,7 @@ export default function CheckoutPage() {
           <h1 className="text-2xl font-serif font-bold text-charcoal-700 mb-4">
             Your cart is empty
           </h1>
-          <Link href="/shop" className="text-forest-600 hover:underline">
+          <Link href="/shop" className="text-charcoal-700 hover:underline">
             ← Back to Shop
           </Link>
         </div>
@@ -488,7 +488,7 @@ export default function CheckoutPage() {
         {/* Back button */}
         <Link
           href="/cart"
-          className="inline-flex items-center gap-2 text-charcoal-600 hover:text-forest-600 mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-charcoal-600 hover:text-charcoal-900 mb-6 transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
           Back to Cart
@@ -498,27 +498,27 @@ export default function CheckoutPage() {
         <div className="flex items-center justify-center gap-4 mb-12">
           <div
             className={`flex items-center gap-2 ${
-              step >= 1 ? 'text-forest-600' : 'text-charcoal-400'
+              step >= 1 ? 'text-charcoal-900' : 'text-charcoal-400'
             }`}
           >
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                step >= 1 ? 'bg-forest-600 text-white' : 'bg-cream-200'
+                step >= 1 ? 'bg-charcoal-900 text-white' : 'bg-cream-200'
               }`}
             >
               {step > 1 ? <Check className="w-5 h-5" /> : '1'}
             </div>
             <span className="font-medium hidden sm:block">Shipping</span>
           </div>
-          <div className={`w-20 h-1 rounded ${step >= 2 ? 'bg-forest-600' : 'bg-cream-200'}`} />
+          <div className={`w-20 h-1 rounded ${step >= 2 ? 'bg-charcoal-900' : 'bg-cream-200'}`} />
           <div
             className={`flex items-center gap-2 ${
-              step >= 2 ? 'text-forest-600' : 'text-charcoal-400'
+              step >= 2 ? 'text-charcoal-900' : 'text-charcoal-400'
             }`}
           >
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                step >= 2 ? 'bg-forest-600 text-white' : 'bg-cream-200'
+                step >= 2 ? 'bg-charcoal-900 text-white' : 'bg-cream-200'
               }`}
             >
               2

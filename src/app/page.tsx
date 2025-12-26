@@ -1,19 +1,23 @@
-import Hero from '@/components/home/Hero'
-import Categories from '@/components/home/Categories'
-import Bestsellers from '@/components/home/Bestsellers'
+import HeroBanner from '@/components/home/HeroBanner'
+import CategoryStrip from '@/components/home/CategoryStrip'
+import FeaturedProducts from '@/components/home/FeaturedProducts'
+import PromoBanner from '@/components/home/PromoBanner'
+import NewArrivals from '@/components/home/NewArrivals'
 import HowItWorks from '@/components/home/HowItWorks'
 import Testimonials from '@/components/home/Testimonials'
-import InstagramFeed from '@/components/home/InstagramFeed'
+import ShopTheLook from '@/components/home/ShopTheLook'
 
 export default function Home() {
   return (
     <>
-      <Hero />
-      <Categories />
-      <Bestsellers />
+      <HeroBanner />
+      <CategoryStrip />
+      <FeaturedProducts />
+      <PromoBanner />
+      <NewArrivals />
+      <ShopTheLook />
       <HowItWorks />
       <Testimonials />
-      <InstagramFeed />
     </>
   )
 }

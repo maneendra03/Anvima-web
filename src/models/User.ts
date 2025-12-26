@@ -1,6 +1,23 @@
 import mongoose, { Schema, Document, Model } from 'mongoose'
 import bcrypt from 'bcryptjs'
 
+export interface ICartItem {
+  _id?: mongoose.Types.ObjectId
+  productId: mongoose.Types.ObjectId
+  slug: string
+  name: string
+  price: number
+  quantity: number
+  image: string
+  customization?: {
+    text?: string
+    imageUrl?: string
+    size?: string
+    color?: string
+    engraving?: string
+  }
+}
+
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId
   name: string
@@ -28,6 +45,13 @@ export interface IUser extends Document {
     }
   }[]
   wishlist: mongoose.Types.ObjectId[]
+  cart: ICartItem[]
+  notificationPreferences?: {
+    orderUpdates: boolean
+    promotions: boolean
+    newsletter: boolean
+    sms: boolean
+  }
   createdAt: Date
   updatedAt: Date
   comparePassword(candidatePassword: string): Promise<boolean>
@@ -46,6 +70,22 @@ const AddressSchema = new Schema({
     lng: { type: Number },
   },
 })
+
+const CartItemSchema = new Schema({
+  productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+  slug: { type: String, required: true },
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  quantity: { type: Number, required: true, default: 1 },
+  image: { type: String, required: true },
+  customization: {
+    text: { type: String },
+    imageUrl: { type: String },
+    size: { type: String },
+    color: { type: String },
+    engraving: { type: String },
+  },
+}, { _id: true })
 
 const UserSchema = new Schema<IUser>(
   {
@@ -95,6 +135,13 @@ const UserSchema = new Schema<IUser>(
         ref: 'Product',
       },
     ],
+    cart: [CartItemSchema],
+    notificationPreferences: {
+      orderUpdates: { type: Boolean, default: true },
+      promotions: { type: Boolean, default: false },
+      newsletter: { type: Boolean, default: true },
+      sms: { type: Boolean, default: false },
+    },
   },
   {
     timestamps: true,

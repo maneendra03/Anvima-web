@@ -219,8 +219,10 @@ export default function AdminLayout({
   const handleLogout = async () => {
     // Clear cart first (this also clears localStorage via persist)
     clearCart()
-    // Then logout
+    // Then logout - clears auth state, localStorage, and NextAuth session
     await logout()
+    // Small delay to ensure NextAuth session is cleared
+    await new Promise(resolve => setTimeout(resolve, 100))
     // Navigate to login
     router.push('/login')
   }

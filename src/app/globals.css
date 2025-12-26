@@ -1,195 +1,406 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+/* Professional Fonts - Elegant & Modern */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Primary Brand Colors */
-  --peach-primary: #E4B09E;
-  --blush-primary: #DE8F9D;
-  --cream-primary: #FBF9F5;
-  --forest-primary: #3D6B5E;
-  --charcoal-primary: #374151;
-  
-  /* Accent Colors */
-  --gold-accent: #D4A026;
-  --lavender-accent: #B39FD9;
+  /* Professional Color System - Black & White */
+  --color-bg: #FEFEFE;
+  --color-bg-secondary: #FAF9F7;
+  --color-text-primary: #1F2937;
+  --color-text-secondary: #6B7280;
+  --color-accent: #000000;
+  --color-accent-dark: #171717;
+  --color-cta: #000000;
+  --color-cta-hover: #262626;
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-/* Prevent zoom on input focus in iOS */
-@media screen and (max-width: 768px) {
-  input, select, textarea {
-    font-size: 16px !important;
+@layer base {
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
   }
-}
 
-/* Mobile-first balanced compact sizing */
-html {
-  font-size: 14px; /* Balanced base font on mobile */
-}
-
-@media (min-width: 480px) {
   html {
-    font-size: 15px;
-  }
-}
-
-@media (min-width: 640px) {
-  html {
-    font-size: 15px;
-  }
-}
-
-@media (min-width: 1024px) {
-  html {
+    scroll-behavior: smooth;
     font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+  }
+
+  /* Typography Scale - Professional */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  h1 { @apply text-3xl md:text-4xl lg:text-5xl xl:text-6xl; }
+  h2 { @apply text-2xl md:text-3xl lg:text-4xl; }
+  h3 { @apply text-xl md:text-2xl lg:text-3xl; }
+  h4 { @apply text-lg md:text-xl; }
+
+  p {
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  a {
+    text-decoration: none;
+    transition: all 0.2s ease;
   }
 }
 
-body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background-color: #FEFDFB;
-  color: #374151;
-  line-height: 1.5; /* Better readability */
+@layer components {
+  /* Professional Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-medium transition-all duration-300 ease-out;
+  }
+
+  .btn-primary {
+    @apply bg-forest-700 text-white px-6 py-3 md:px-8 md:py-3.5 
+           text-sm md:text-base tracking-wide uppercase
+           hover:bg-forest-600 active:scale-[0.98]
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border border-charcoal-800 text-charcoal-800 
+           px-6 py-3 md:px-8 md:py-3.5 text-sm md:text-base tracking-wide uppercase
+           hover:bg-charcoal-800 hover:text-white active:scale-[0.98];
+  }
+
+  .btn-accent {
+    @apply bg-accent-500 text-white px-6 py-3 md:px-8 md:py-3.5 
+           text-sm md:text-base tracking-wide
+           hover:bg-accent-600 active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-charcoal-700 px-4 py-2 
+           text-sm tracking-wide
+           hover:bg-charcoal-100 active:scale-[0.98];
+  }
+
+  .btn-link {
+    @apply text-charcoal-700 text-sm tracking-wide underline-offset-4
+           hover:underline hover:text-charcoal-900;
+  }
+
+  /* Professional Cards */
+  .card {
+    @apply bg-white transition-all duration-300;
+  }
+
+  .card-elevated {
+    @apply bg-white shadow-card hover:shadow-card-hover transition-shadow duration-300;
+  }
+
+  .card-bordered {
+    @apply bg-white border border-charcoal-200 hover:border-charcoal-300 transition-colors duration-300;
+  }
+
+  /* Product Card - Clean & Professional */
+  .product-card {
+    @apply bg-white cursor-pointer;
+  }
+
+  .product-card-image {
+    @apply relative overflow-hidden bg-cream-200;
+  }
+
+  .product-card-image img {
+    @apply w-full h-full object-cover transition-transform duration-700 ease-out;
+  }
+
+  .product-card:hover .product-card-image img {
+    @apply scale-105;
+  }
+
+  .product-card-content {
+    @apply p-4 md:p-5;
+  }
+
+  .product-card-title {
+    @apply font-sans text-sm md:text-base font-medium text-charcoal-800 
+           transition-colors duration-200
+           line-clamp-2;
+  }
+
+  .product-card:hover .product-card-title {
+    @apply text-charcoal-600;
+  }
+
+  .product-card-price {
+    @apply font-sans text-base md:text-lg font-semibold text-charcoal-900 mt-2;
+  }
+
+  .product-card-price-old {
+    @apply text-sm text-charcoal-400 line-through ml-2;
+  }
+
+  /* Form Elements - Minimal & Clean */
+  .input {
+    @apply w-full px-4 py-3 md:py-3.5 text-base
+           bg-white border border-charcoal-200
+           placeholder:text-charcoal-400
+           focus:border-charcoal-400 focus:ring-0 focus:outline-none
+           transition-colors duration-200;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 md:py-3.5 text-base rounded-lg
+           bg-white border border-charcoal-300
+           text-charcoal-800 placeholder:text-charcoal-400
+           focus:border-charcoal-500 focus:ring-2 focus:ring-charcoal-200 focus:outline-none
+           transition-all duration-200;
+  }
+
+  .input-underline {
+    @apply w-full px-0 py-3 text-base
+           bg-transparent border-0 border-b border-charcoal-200
+           placeholder:text-charcoal-400
+           focus:border-charcoal-800 focus:ring-0 focus:outline-none
+           transition-colors duration-200;
+  }
+
+  .textarea {
+    @apply w-full px-4 py-3 md:py-4 text-base
+           bg-white border border-charcoal-200 resize-none
+           placeholder:text-charcoal-400
+           focus:border-charcoal-400 focus:ring-0 focus:outline-none
+           transition-colors duration-200;
+  }
+
+  .textarea-field {
+    @apply w-full px-4 py-3 md:py-4 text-base rounded-lg
+           bg-white border border-charcoal-300 resize-none
+           text-charcoal-800 placeholder:text-charcoal-400
+           focus:border-charcoal-500 focus:ring-2 focus:ring-charcoal-200 focus:outline-none
+           transition-all duration-200;
+  }
+
+  .select {
+    @apply w-full px-4 py-3 md:py-3.5 text-base
+           bg-white border border-charcoal-200 appearance-none
+           focus:border-charcoal-400 focus:ring-0 focus:outline-none
+           transition-colors duration-200;
+  }
+
+  .select-field {
+    @apply w-full px-4 py-3 md:py-3.5 text-base rounded-lg
+           bg-white border border-charcoal-300 appearance-none
+           text-charcoal-800
+           focus:border-charcoal-500 focus:ring-2 focus:ring-charcoal-200 focus:outline-none
+           transition-all duration-200;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-charcoal-700 mb-2 tracking-wide;
+  }
+
+  /* Badges - Subtle & Professional */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 text-xs font-medium tracking-wider uppercase;
+  }
+
+  .badge-primary {
+    @apply bg-charcoal-900 text-white;
+  }
+
+  .badge-secondary {
+    @apply bg-charcoal-100 text-charcoal-700;
+  }
+
+  .badge-accent {
+    @apply bg-accent-100 text-accent-700;
+  }
+
+  .badge-success {
+    @apply bg-charcoal-100 text-charcoal-700;
+  }
+
+  .badge-sale {
+    @apply bg-red-50 text-red-600;
+  }
+
+  /* Section Layouts */
+  .section {
+    @apply py-12 md:py-16 lg:py-20 xl:py-24;
+  }
+
+  .section-sm {
+    @apply py-8 md:py-12 lg:py-16;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 md:px-6 lg:px-8;
+  }
+
+  /* Navigation Styles */
+  .nav-link {
+    @apply text-sm font-medium tracking-wide text-charcoal-600 
+           hover:text-charcoal-900 transition-colors duration-200
+           relative;
+  }
+
+  .nav-link-active {
+    @apply text-charcoal-900;
+  }
+
+  .nav-link::after {
+    @apply content-[''] absolute bottom-0 left-0 w-0 h-px bg-charcoal-900 
+           transition-all duration-300;
+  }
+
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+
+  /* Dividers */
+  .divider {
+    @apply h-px bg-charcoal-200;
+  }
+
+  .divider-vertical {
+    @apply w-px h-4 bg-charcoal-300;
+  }
+
+  /* Legacy support classes */
+  .btn-peach {
+    @apply bg-accent-500 text-white px-6 py-3 rounded-none text-sm tracking-wide
+           hover:bg-accent-600 active:scale-[0.98];
+  }
+
+  .badge-peach {
+    @apply bg-accent-100 text-accent-700;
+  }
+
+  .badge-forest {
+    @apply bg-charcoal-100 text-charcoal-700;
+  }
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', Georgia, serif;
-  line-height: 1.25;
-}
-
-/* Mobile compact heading sizes - balanced */
-h1 {
-  @apply text-2xl sm:text-3xl lg:text-4xl;
-}
-
-h2 {
-  @apply text-xl sm:text-2xl lg:text-3xl;
-}
-
-h3 {
-  @apply text-lg sm:text-xl lg:text-2xl;
-}
-
-/* Balanced spacing utilities for mobile */
 @layer utilities {
+  /* Spacing utilities */
   .section-padding {
-    @apply py-6 sm:py-10 lg:py-14;
+    @apply py-12 md:py-16 lg:py-20;
   }
   
   .container-padding {
-    @apply px-4 sm:px-5 lg:px-6;
+    @apply px-4 md:px-6 lg:px-8;
   }
-  
-  .card-padding {
-    @apply p-3 sm:p-4 lg:p-6;
+
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
   }
-  
-  .compact-gap {
-    @apply gap-3 sm:gap-4 lg:gap-6;
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-accent-500 to-accent-600 bg-clip-text text-transparent;
+  }
+
+  /* Aspect ratios */
+  .aspect-product {
+    aspect-ratio: 3/4;
+  }
+
+  .aspect-hero {
+    aspect-ratio: 16/9;
+  }
+
+  /* Hover effects */
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-1;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-[1.02];
+  }
+
+  /* Image styles */
+  .img-cover {
+    @apply w-full h-full object-cover;
+  }
+
+  .img-contain {
+    @apply w-full h-full object-contain;
   }
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Minimal */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #FAF7F2;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D4C4AC;
-  border-radius: 4px;
+  background: #D1D5DB;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #BFA98D;
+  background: #9CA3AF;
 }
 
 /* Selection */
 ::selection {
-  background-color: #FFAA8A;
-  color: #1F1F1F;
+  background-color: var(--color-accent);
+  color: white;
 }
 
-/* Focus styles */
+/* Focus styles - Professional */
 *:focus-visible {
-  outline: 2px solid #2D5A47;
+  outline: 2px solid var(--color-cta);
   outline-offset: 2px;
 }
 
-/* Smooth scroll */
-html {
-  scroll-behavior: smooth;
+/* Smooth image loading */
+img {
+  opacity: 1;
+  transition: opacity 0.3s ease;
 }
 
-/* Image hover effects */
-.image-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* Animation for page transitions */
+.page-transition {
+  animation: pageIn 0.4s ease-out;
 }
 
-.image-hover:hover {
-  transform: scale(1.02);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Button hover effects - balanced sizing */
-.btn-primary {
-  @apply bg-forest-500 text-white px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-300 hover:bg-forest-600 hover:shadow-lg active:scale-95;
+/* WhatsApp button */
+.whatsapp-pulse {
+  animation: pulse 2s infinite;
 }
 
-.btn-secondary {
-  @apply bg-transparent border-2 border-forest-500 text-forest-500 px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-300 hover:bg-forest-500 hover:text-white;
-}
-
-.btn-peach {
-  @apply bg-peach-400 text-charcoal-700 px-4 py-2 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-300 hover:bg-peach-500 hover:shadow-lg active:scale-95;
-}
-
-/* Card styles - more compact */
-.card {
-  @apply bg-white rounded-lg sm:rounded-xl lg:rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md;
-}
-
-/* Glass effect */
-.glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-/* Gradient backgrounds */
-.gradient-peach {
-  background: linear-gradient(135deg, #FFF8F5 0%, #FFEDE5 100%);
-}
-
-.gradient-hero {
-  background: linear-gradient(180deg, #FDFCFA 0%, #FAF7F2 50%, #FFF8F5 100%);
-}
-
-/* Animation delays for staggered effects */
-.delay-100 { animation-delay: 100ms; }
-.delay-200 { animation-delay: 200ms; }
-.delay-300 { animation-delay: 300ms; }
-.delay-400 { animation-delay: 400ms; }
-.delay-500 { animation-delay: 500ms; }
-
-/* WhatsApp button pulse */
 @keyframes pulse {
   0%, 100% {
     transform: scale(1);
@@ -201,42 +412,16 @@ html {
   }
 }
 
-.whatsapp-pulse {
-  animation: pulse 2s infinite;
+/* Mobile optimizations */
+@media screen and (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
 }
 
-/* Product image container */
-.product-image-container {
-  @apply relative overflow-hidden rounded-xl;
-}
-
-.product-image-container::after {
-  content: '';
-  @apply absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition-opacity duration-300;
-}
-
-.product-image-container:hover::after {
-  @apply opacity-100;
-}
-
-/* Form input styles - balanced sizing */
-.input-field {
-  @apply w-full px-3 py-2 sm:px-4 sm:py-2.5 lg:px-4 lg:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border border-cream-300 bg-white focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20 transition-all duration-200 outline-none;
-}
-
-.textarea-field {
-  @apply w-full px-3 py-2 sm:px-4 sm:py-2.5 lg:px-4 lg:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border border-cream-300 bg-white focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20 transition-all duration-200 outline-none resize-none;
-}
-
-/* Badge - balanced sizing */
-.badge {
-  @apply inline-flex items-center px-2.5 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-medium;
-}
-
-.badge-peach {
-  @apply bg-peach-100 text-peach-600;
-}
-
-.badge-forest {
-  @apply bg-forest-500/10 text-forest-600;
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
 }

@@ -63,11 +63,15 @@ export default function AboutPage() {
               viewport={{ once: true }}
             >
               <div className="relative">
-                <img
-                  src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&h=700&fit=crop"
-                  alt="Crafting memories"
-                  className="rounded-2xl shadow-lg"
-                />
+                <div className="rounded-2xl shadow-lg bg-gradient-to-br from-rose-100 via-pink-50 to-amber-100 h-[450px] flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <div className="w-20 h-20 mx-auto bg-white/40 rounded-full flex items-center justify-center mb-4">
+                      <span className="text-4xl">🎁</span>
+                    </div>
+                    <p className="text-charcoal-600 font-serif text-xl">Crafting Memories</p>
+                    <p className="text-charcoal-500 text-sm mt-2">Since 2020</p>
+                  </div>
+                </div>
                 <div className="absolute -bottom-6 -right-6 bg-peach-100 rounded-2xl p-6 shadow-lg">
                   <p className="text-2xl font-serif font-bold text-forest-600">500+</p>
                   <p className="text-charcoal-600">Happy Customers</p>
@@ -217,11 +221,12 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="order-1 lg:order-2"
             >
-              <img
-                src="https://images.unsplash.com/photo-1607469256872-48074e807b0f?w=600&h=500&fit=crop"
-                alt="Sustainable materials"
-                className="rounded-2xl shadow-lg"
-              />
+              <div className="bg-gradient-to-br from-green-100 via-emerald-100 to-teal-100 rounded-2xl shadow-lg aspect-[6/5] flex items-center justify-center">
+                <div className="text-center p-8">
+                  <Leaf className="w-20 h-20 mx-auto text-forest-500 mb-4" />
+                  <p className="text-forest-700 font-serif text-xl">Eco-Friendly Crafting</p>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>

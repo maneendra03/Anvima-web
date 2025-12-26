@@ -14,7 +14,6 @@ import {
   ChevronRight 
 } from 'lucide-react'
 import { useAuthStore, useAuthHydration } from '@/store/auth'
-import { useCartStore } from '@/store/cartStore'
 import { GoogleSessionSync } from '@/components/auth/GoogleSessionSync'
 
 const accountNavigation = [
@@ -34,7 +33,6 @@ export default function AccountLayout({
   const pathname = usePathname()
   const { user, isAuthenticated, logout, fetchUser, isLoading } = useAuthStore()
   const hasHydrated = useAuthHydration()
-  const clearCart = useCartStore((state) => state.clearCart)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [hasFetchedUser, setHasFetchedUser] = useState(false)
 
@@ -56,10 +54,10 @@ export default function AccountLayout({
   }, [hasHydrated, hasFetchedUser, isAuthenticated, isLoading, router, pathname])
 
   const handleLogout = async () => {
-    // Clear cart first (this also clears localStorage via persist)
-    clearCart()
-    // Then logout
+    // Perform logout - clears auth state, localStorage, and NextAuth session
     await logout()
+    // Small delay to ensure NextAuth session is cleared
+    await new Promise(resolve => setTimeout(resolve, 100))
     // Navigate to login
     router.push('/login')
   }
@@ -68,7 +66,7 @@ export default function AccountLayout({
   if (!hasHydrated || isLoading || !hasFetchedUser) {
     return (
       <div className="min-h-screen bg-cream-50 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-forest-500/30 border-t-forest-500 rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-charcoal-500/30 border-t-charcoal-500 rounded-full animate-spin" />
       </div>
     )
   }
@@ -144,7 +142,7 @@ export default function AccountLayout({
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-6 py-4 transition-colors ${
                       isActive
-                        ? 'bg-forest-50 text-forest-600 border-l-4 border-forest-600'
+                        ? 'bg-charcoal-50 text-charcoal-900 border-l-4 border-charcoal-900'
                         : 'text-charcoal-600 hover:bg-cream-50 border-l-4 border-transparent'
                     }`}
                   >

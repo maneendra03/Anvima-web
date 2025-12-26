@@ -84,62 +84,62 @@ const User = mongoose.models.User || mongoose.model('User', UserSchema)
 const Category = mongoose.models.Category || mongoose.model('Category', CategorySchema)
 const Product = mongoose.models.Product || mongoose.model('Product', ProductSchema)
 
-// Seed data
+// Seed data - Using placeholder images that will gracefully fallback in UI
 const categories = [
   {
     name: 'Photo Frames',
     slug: 'photo-frames',
     description: 'Beautiful customized photo frames for every occasion',
-    image: 'https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=400',
+    image: '',
     order: 1
   },
   {
     name: 'Mugs & Cups',
     slug: 'mugs-cups',
     description: 'Personalized mugs and cups for your daily coffee',
-    image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400',
+    image: '',
     order: 2
   },
   {
     name: 'Cushions & Pillows',
     slug: 'cushions-pillows',
     description: 'Custom cushions and pillows for home decor',
-    image: 'https://images.unsplash.com/photo-1629949009765-40fc74c9ec21?w=400',
+    image: '',
     order: 3
   },
   {
     name: 'Keychains',
     slug: 'keychains',
     description: 'Personalized keychains that make perfect gifts',
-    image: 'https://images.unsplash.com/photo-1585634917202-6f044d8c9a87?w=400',
+    image: '',
     order: 4
   },
   {
     name: 'Lamps & Lights',
     slug: 'lamps-lights',
     description: 'Custom photo lamps and night lights',
-    image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400',
+    image: '',
     order: 5
   },
   {
     name: 'Gifts for Him',
     slug: 'gifts-for-him',
     description: 'Special customized gifts for men',
-    image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400',
+    image: '',
     order: 6
   },
   {
     name: 'Gifts for Her',
     slug: 'gifts-for-her',
     description: 'Beautiful personalized gifts for women',
-    image: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=400',
+    image: '',
     order: 7
   },
   {
     name: 'Anniversary Gifts',
     slug: 'anniversary-gifts',
     description: 'Make anniversaries special with custom gifts',
-    image: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400',
+    image: '',
     order: 8
   }
 ]
@@ -154,10 +154,7 @@ const products = [
     comparePrice: 799,
     sku: 'PF-001',
     stock: 50,
-    images: [
-      'https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=600',
-      'https://images.unsplash.com/photo-1582053433976-25c00369fc93?w=600'
-    ],
+    images: [],
     categorySlug: 'photo-frames',
     tags: ['photo frame', 'wooden', 'personalized', 'gift'],
     isFeatured: true,

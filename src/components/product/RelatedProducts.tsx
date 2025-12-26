@@ -108,7 +108,7 @@ export default function RelatedProducts({
                         </span>
                       )}
                       {product.newArrival && (
-                        <span className="px-2 py-1 bg-forest-500 text-white text-xs font-medium rounded-full">
+                        <span className="px-2 py-1 bg-charcoal-900 text-white text-xs font-medium rounded-full">
                           New
                         </span>
                       )}
@@ -133,7 +133,7 @@ export default function RelatedProducts({
                 {/* Product Info */}
                 <div className="p-4">
                   <Link href={`/product/${product.slug}`}>
-                    <h3 className="font-medium text-charcoal-700 truncate group-hover:text-forest-600 transition-colors">
+                    <h3 className="font-medium text-charcoal-700 truncate group-hover:text-charcoal-900 transition-colors">
                       {product.name}
                     </h3>
                   </Link>
@@ -152,7 +152,7 @@ export default function RelatedProducts({
                   {/* Price & Add to Cart */}
                   <div className="flex items-center justify-between mt-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold text-forest-600">
+                      <span className="text-lg font-bold text-charcoal-900">
                         ₹{product.price.toLocaleString('en-IN')}
                       </span>
                       {product.originalPrice && product.originalPrice > product.price && (
@@ -165,7 +165,7 @@ export default function RelatedProducts({
                     {!product.customizationOptions && (
                       <button
                         onClick={() => handleQuickAdd(product)}
-                        className="p-2 bg-forest-600 text-white rounded-full hover:bg-forest-700 transition-colors"
+                        className="p-2 bg-charcoal-900 text-white rounded-full hover:bg-charcoal-800 transition-colors"
                         title="Quick add to cart"
                       >
                         <ShoppingBag className="w-4 h-4" />

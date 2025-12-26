@@ -45,7 +45,7 @@ interface EmailOptions {
   html: string
 }
 
-async function sendEmail({ to, subject, html }: EmailOptions): Promise<void> {
+export async function sendEmail({ to, subject, html }: EmailOptions): Promise<void> {
   try {
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,

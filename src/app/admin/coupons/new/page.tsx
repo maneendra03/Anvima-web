@@ -34,6 +34,8 @@ export default function NewCouponPage() {
     validFrom: '',
     validUntil: '',
     isActive: true,
+    showInBanner: false,
+    bannerText: '',
   })
 
   const validateForm = () => {
@@ -90,6 +92,8 @@ export default function NewCouponPage() {
           validFrom: formData.validFrom,
           validUntil: formData.validUntil,
           isActive: formData.isActive,
+          showInBanner: formData.showInBanner,
+          bannerText: formData.bannerText.trim() || undefined,
         }),
       })
 
@@ -398,7 +402,7 @@ export default function NewCouponPage() {
             </div>
           </div>
 
-          <div className="mt-4">
+          <div className="mt-4 space-y-3">
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
@@ -411,6 +415,39 @@ export default function NewCouponPage() {
                 Activate coupon immediately (can be deactivated later)
               </span>
             </label>
+
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                name="showInBanner"
+                checked={formData.showInBanner}
+                onChange={handleChange}
+                className="w-5 h-5 text-forest-600 border-gray-300 rounded focus:ring-forest-500"
+              />
+              <span className="text-sm text-gray-700">
+                Show this coupon in website banner (top announcement bar)
+              </span>
+            </label>
+
+            {formData.showInBanner && (
+              <div className="ml-8 mt-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Custom Banner Text (Optional)
+                </label>
+                <input
+                  type="text"
+                  name="bannerText"
+                  value={formData.bannerText}
+                  onChange={handleChange}
+                  placeholder="e.g., Get 20% off on your first order!"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500"
+                  maxLength={100}
+                />
+                <p className="text-gray-500 text-xs mt-1">
+                  Leave empty to auto-generate: "Use code {formData.code || 'CODE'} to get {formData.discountType === 'percentage' ? `${formData.discountValue || '0'}%` : `₹${formData.discountValue || '0'}`} off"
+                </p>
+              </div>
+            )}
           </div>
         </motion.div>
 

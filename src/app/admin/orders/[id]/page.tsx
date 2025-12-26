@@ -219,14 +219,19 @@ export default function AdminOrderDetailPage() {
             <div className="divide-y">
               {order.items.map((item, index) => (
                 <div key={index} className="p-4 flex gap-4">
-                  <div className="h-20 w-20 relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                    {item.product?.images?.[0] && (
+                  <div className="h-20 w-20 relative rounded-lg overflow-hidden bg-gradient-to-br from-cream-100 to-cream-200 flex-shrink-0">
+                    {item.product?.images?.[0] ? (
                       <Image
                         src={item.product.images[0]}
                         alt={item.name}
                         fill
                         className="object-cover"
+                        unoptimized
                       />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Package className="w-8 h-8 text-charcoal-300" />
+                      </div>
                     )}
                   </div>
                   <div className="flex-1">

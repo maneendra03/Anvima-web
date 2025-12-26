@@ -507,13 +507,20 @@ export default function OrderDetailPage({ params }: Props) {
           <div className="divide-y divide-gray-200">
             {order.items.map((item, index) => (
               <div key={index} className="p-4 flex gap-4">
-                <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                  <Image
-                    src={item.image || '/placeholder.svg'}
-                    alt={item.name}
-                    fill
-                    className="object-cover"
-                  />
+                <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-cream-100 to-cream-200">
+                  {item.image ? (
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Package className="w-8 h-8 text-charcoal-300" />
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <Link

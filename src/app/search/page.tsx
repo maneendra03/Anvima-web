@@ -92,9 +92,26 @@ function SearchContent() {
   const [discountedOnly, setDiscountedOnly] = useState(false)
   const [showSortDropdown, setShowSortDropdown] = useState(false)
   const [wishlist, setWishlist] = useState<string[]>([])
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set())
   
   const addItem = useCartStore((state) => state.addItem)
   const itemsPerPage = 20
+
+  // Handle image error without infinite loops
+  const handleImageError = (productId: string) => {
+    setFailedImages(prev => new Set(prev).add(productId))
+  }
+
+  // Check if image should show
+  const shouldShowImage = (product: Product): boolean => {
+    const id = product._id || product.id || ''
+    return !failedImages.has(id) && !!product.images?.[0]
+  }
+
+  // Check if URL is external
+  const isExternalUrl = (url: string): boolean => {
+    return url.startsWith('http://') || url.startsWith('https://')
+  }
 
   const fetchProducts = useCallback(async () => {
     if (!query) {
@@ -356,13 +373,21 @@ function SearchContent() {
         >
           <div className="flex flex-col sm:flex-row">
             <Link href={`/product/${product.slug}`} className="sm:w-48 md:w-56 flex-shrink-0">
-              <div className="relative aspect-square sm:h-full">
-                <Image
-                  src={product.images?.[0] || '/placeholder.svg'}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                />
+              <div className="relative aspect-square sm:h-full bg-gradient-to-br from-cream-100 to-cream-200">
+                {shouldShowImage(product) ? (
+                  <Image
+                    src={product.images[0]}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                    onError={() => handleImageError(product._id || product.id || '')}
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Package className="w-12 h-12 text-charcoal-300" />
+                  </div>
+                )}
                 {discount > 0 && (
                   <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
                     {discount}% OFF
@@ -450,13 +475,21 @@ function SearchContent() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-lg border border-cream-200 overflow-hidden group hover:shadow-lg transition-all"
       >
-        <Link href={`/product/${product.slug}`} className="block relative aspect-square overflow-hidden">
-          <Image
-            src={product.images?.[0] || '/placeholder.svg'}
-            alt={product.name}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-          />
+        <Link href={`/product/${product.slug}`} className="block relative aspect-square overflow-hidden bg-gradient-to-br from-cream-100 to-cream-200">
+          {shouldShowImage(product) ? (
+            <Image
+              src={product.images[0]}
+              alt={product.name}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              unoptimized
+              onError={() => handleImageError(product._id || product.id || '')}
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Package className="w-16 h-16 text-charcoal-300" />
+            </div>
+          )}
           {/* Badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
             {discount > 0 && (

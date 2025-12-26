@@ -7,19 +7,22 @@ import { categories } from '@/data'
 
 export default function Categories() {
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 md:py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-12 md:mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-charcoal-700 mb-4">
-            Explore Our Collections
+          <p className="text-sm tracking-[0.2em] uppercase text-charcoal-400 mb-4">
+            Browse by category
+          </p>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-charcoal-900 mb-4">
+            Our Collections
           </h2>
           <p className="text-charcoal-500 max-w-2xl mx-auto">
-            From personalized frames to curated hampers, find the perfect gift for every occasion
+            Find the perfect personalized gift for every occasion
           </p>
         </motion.div>
 
@@ -33,33 +36,32 @@ export default function Categories() {
               transition={{ delay: index * 0.1 }}
             >
               <Link href={`/shop?category=${category.slug}`}>
-                <div className="group relative rounded-2xl overflow-hidden aspect-[4/5] bg-cream-100">
-                  {/* Image placeholder */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-peach-100 to-cream-200">
-                    <img
-                      src={`https://images.unsplash.com/photo-${
-                        index === 0 ? '1513519245088-0e12902e5a38' :
-                        index === 1 ? '1526170375885-4d8ecf77b99f' :
-                        index === 2 ? '1549465220-1a8b9238cd48' :
-                        index === 3 ? '1518199266791-5375a83190b7' :
-                        '1514228742587-6b1558fcca3d'
-                      }?w=300&h=400&fit=crop`}
-                      alt={category.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
+                <div className={`group relative overflow-hidden aspect-[4/5] ${
+                  index === 0 ? 'bg-gradient-to-br from-peach-100 to-peach-300' :
+                  index === 1 ? 'bg-gradient-to-br from-amber-100 to-amber-300' :
+                  index === 2 ? 'bg-gradient-to-br from-rose-100 to-rose-300' :
+                  index === 3 ? 'bg-gradient-to-br from-violet-100 to-violet-300' :
+                  'bg-gradient-to-br from-teal-100 to-teal-300'
+                }`}>
+                  {/* Icon */}
+                  <div className="absolute inset-0 flex items-center justify-center transition-transform duration-700 group-hover:scale-110">
+                    <span className="text-6xl md:text-7xl opacity-60">
+                      {index === 0 ? '🖼️' : index === 1 ? '☕' : index === 2 ? '🛋️' : index === 3 ? '🔑' : '💡'}
+                    </span>
                   </div>
                   
                   {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal-800/80 via-charcoal-800/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal-900/70 via-transparent to-transparent" />
                   
                   {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <h3 className="text-white font-semibold text-lg mb-1">
+                  <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
+                    <h3 className="text-white font-medium text-base md:text-lg tracking-wide">
                       {category.name}
                     </h3>
-                    <p className="text-cream-200 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
-                      Explore <ArrowRight className="w-4 h-4" />
-                    </p>
+                    <div className="mt-2 flex items-center gap-1 text-white/80 text-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                      <span>Shop Now</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
                   </div>
                 </div>
               </Link>

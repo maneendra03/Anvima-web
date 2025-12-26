@@ -2,18 +2,42 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Send, Gift, Sparkles } from 'lucide-react'
+import { Send, Gift, Sparkles, Loader2 } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 export default function Newsletter() {
   const [email, setEmail] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would integrate with your email service
-    setIsSubmitted(true)
-    setEmail('')
-    setTimeout(() => setIsSubmitted(false), 3000)
+    if (!email.trim()) return
+    
+    setIsSubmitting(true)
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        setIsSubmitted(true)
+        setEmail('')
+        toast.success(data.message || 'Subscribed successfully!')
+        setTimeout(() => setIsSubmitted(false), 5000)
+      } else {
+        toast.error(data.message || 'Failed to subscribe')
+      }
+    } catch (error) {
+      console.error('Newsletter subscription error:', error)
+      toast.error('Failed to subscribe. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -50,12 +74,17 @@ export default function Newsletter() {
             />
             <motion.button
               type="submit"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="btn-primary flex items-center justify-center gap-2 whitespace-nowrap"
+              disabled={isSubmitting}
+              whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+              whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+              className="btn-primary flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-70"
             >
-              <Send className="w-4 h-4" />
-              Subscribe
+              {isSubmitting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+              {isSubmitting ? 'Subscribing...' : 'Subscribe'}
             </motion.button>
           </form>
 

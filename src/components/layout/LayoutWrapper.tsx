@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import AuthProvider from '@/components/providers/AuthProvider'
+import CartSyncProvider from '@/components/providers/CartSyncProvider'
 import { GoogleSessionSync } from '@/components/auth/GoogleSessionSync'
 
 export default function LayoutWrapper({
@@ -18,18 +19,26 @@ export default function LayoutWrapper({
   const isAdminPage = pathname?.startsWith('/admin')
   
   if (isAdminPage) {
-    return <AuthProvider>{children}</AuthProvider>
+    return (
+      <AuthProvider>
+        <CartSyncProvider>
+          {children}
+        </CartSyncProvider>
+      </AuthProvider>
+    )
   }
 
   return (
     <AuthProvider>
-      <GoogleSessionSync />
-      <Header />
-      <main className="flex-grow">
-        {children}
-      </main>
-      <Footer />
-      <WhatsAppButton />
+      <CartSyncProvider>
+        <GoogleSessionSync />
+        <Header />
+        <main className="flex-grow">
+          {children}
+        </main>
+        <Footer />
+        <WhatsAppButton />
+      </CartSyncProvider>
     </AuthProvider>
   )
 }

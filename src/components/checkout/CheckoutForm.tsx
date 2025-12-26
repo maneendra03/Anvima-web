@@ -94,7 +94,7 @@ export default function RazorpayCheckout({
         orderId: orderId,
       },
       theme: {
-        color: '#2D5A47', // Forest green
+        color: '#000000', // Black
       },
       handler: async function (response: RazorpayResponse) {
         try {
@@ -149,7 +149,7 @@ export default function RazorpayCheckout({
 
       {/* Payment Info */}
       <div className="bg-cream-50 rounded-lg p-4 space-y-3">
-        <div className="flex items-center gap-2 text-forest-600">
+        <div className="flex items-center gap-2 text-charcoal-700">
           <Shield className="w-5 h-5" />
           <span className="font-medium">Secure Payment</span>
         </div>
@@ -185,9 +185,9 @@ export default function RazorpayCheckout({
       </div>
 
       {/* Amount Display */}
-      <div className="flex justify-between items-center p-4 bg-forest-50 rounded-lg">
-        <span className="font-medium text-forest-800">Amount to Pay</span>
-        <span className="text-2xl font-bold text-forest-600">
+      <div className="flex justify-between items-center p-4 bg-charcoal-50 rounded-lg">
+        <span className="font-medium text-charcoal-800">Amount to Pay</span>
+        <span className="text-2xl font-bold text-charcoal-900">
           ₹{amount.toLocaleString('en-IN')}
         </span>
       </div>
@@ -196,7 +196,7 @@ export default function RazorpayCheckout({
       <button
         onClick={handlePayment}
         disabled={isProcessing || !scriptLoaded}
-        className="w-full bg-forest-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-forest-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full bg-charcoal-900 text-white py-4 px-6 rounded-lg font-semibold hover:bg-charcoal-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {isProcessing ? (
           <>

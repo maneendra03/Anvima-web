@@ -180,7 +180,7 @@ export default function ProductReviews({ productId, productSlug }: ProductReview
 
         <button
           onClick={() => setShowWriteReview(true)}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-forest text-white rounded-full hover:bg-forest/90 transition-colors font-medium"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-charcoal-900 text-white rounded-full hover:bg-charcoal-800 transition-colors font-medium"
         >
           <MessageSquare className="h-5 w-5" />
           Write a Review
@@ -214,7 +214,7 @@ export default function ProductReviews({ productId, productSlug }: ProductReview
       {/* Reviews List */}
       {loading ? (
         <div className="flex items-center justify-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-4 border-forest/20 border-t-forest"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-4 border-charcoal-900/20 border-t-charcoal-900"></div>
         </div>
       ) : reviews.length > 0 ? (
         <div className="space-y-6">
@@ -228,7 +228,7 @@ export default function ProductReviews({ productId, productSlug }: ProductReview
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-forest/10 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-charcoal-900/10 rounded-full flex items-center justify-center">
                     {review.user.avatar ? (
                       <img
                         src={review.user.avatar}
@@ -236,7 +236,7 @@ export default function ProductReviews({ productId, productSlug }: ProductReview
                         className="w-full h-full rounded-full object-cover"
                       />
                     ) : (
-                      <User className="h-5 w-5 text-forest" />
+                      <User className="h-5 w-5 text-charcoal-900" />
                     )}
                   </div>
                   <div>
@@ -260,7 +260,7 @@ export default function ProductReviews({ productId, productSlug }: ProductReview
               <div className="mt-4 flex items-center gap-4">
                 <button
                   onClick={() => handleHelpful(review._id)}
-                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-forest transition-colors"
+                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-charcoal-900 transition-colors"
                 >
                   <ThumbsUp className="h-4 w-4" />
                   Helpful ({review.helpfulCount})
@@ -308,7 +308,7 @@ export default function ProductReviews({ productId, productSlug }: ProductReview
                   <p className="text-gray-600 mb-4">Please login to write a review</p>
                   <a
                     href="/login"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-forest text-white rounded-full hover:bg-forest/90 transition-colors"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-charcoal-900 text-white rounded-full hover:bg-charcoal-800 transition-colors"
                   >
                     Login to Continue
                   </a>
@@ -338,7 +338,7 @@ export default function ProductReviews({ productId, productSlug }: ProductReview
                       value={newTitle}
                       onChange={(e) => setNewTitle(e.target.value)}
                       placeholder="Sum up your review in a few words"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest/20 focus:border-forest"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-charcoal-900/20 focus:border-charcoal-900"
                     />
                   </div>
 
@@ -352,7 +352,7 @@ export default function ProductReviews({ productId, productSlug }: ProductReview
                       onChange={(e) => setNewComment(e.target.value)}
                       placeholder="What did you like or dislike about this product?"
                       rows={4}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest/20 focus:border-forest resize-none"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-charcoal-900/20 focus:border-charcoal-900 resize-none"
                       required
                     />
                   </div>
@@ -369,7 +369,7 @@ export default function ProductReviews({ productId, productSlug }: ProductReview
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="flex-1 px-6 py-3 bg-forest text-white rounded-full hover:bg-forest/90 transition-colors font-medium disabled:opacity-50"
+                      className="flex-1 px-6 py-3 bg-charcoal-900 text-white rounded-full hover:bg-charcoal-800 transition-colors font-medium disabled:opacity-50"
                     >
                       {submitting ? 'Submitting...' : 'Submit Review'}
                     </button>

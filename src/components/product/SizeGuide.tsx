@@ -142,8 +142,8 @@ export default function SizeGuide({ sizes, productType = 'general', isOpen, onCl
             {/* Header */}
             <div className="sticky top-0 bg-white border-b border-cream-200 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-forest-100 rounded-full flex items-center justify-center">
-                  <Ruler className="w-5 h-5 text-forest-600" />
+                <div className="w-10 h-10 bg-charcoal-100 rounded-full flex items-center justify-center">
+                  <Ruler className="w-5 h-5 text-charcoal-900" />
                 </div>
                 <div>
                   <h2 className="text-xl font-serif font-bold text-charcoal-700">
@@ -171,7 +171,7 @@ export default function SizeGuide({ sizes, productType = 'general', isOpen, onCl
                       onClick={() => setSelectedSize(size.name)}
                       className={`px-4 py-2 rounded-lg border font-medium transition-all ${
                         selectedSize === size.name
-                          ? 'border-forest-600 bg-forest-50 text-forest-700'
+                          ? 'border-charcoal-900 bg-charcoal-50 text-charcoal-900'
                           : 'border-charcoal-200 hover:border-charcoal-300'
                       }`}
                     >
@@ -241,11 +241,11 @@ export default function SizeGuide({ sizes, productType = 'general', isOpen, onCl
                               }}
                             >
                               {selectedSize === size.name && (
-                                <Info className="w-4 h-4 text-forest-600" />
+                                <Info className="w-4 h-4 text-charcoal-900" />
                               )}
                             </motion.div>
                             <span className={`mt-2 text-xs font-medium ${
-                              selectedSize === size.name ? 'text-forest-600' : 'text-charcoal-500'
+                              selectedSize === size.name ? 'text-charcoal-900' : 'text-charcoal-500'
                             }`}>
                               {size.name}
                             </span>
@@ -280,7 +280,7 @@ export default function SizeGuide({ sizes, productType = 'general', isOpen, onCl
             <div className="sticky bottom-0 bg-white border-t border-cream-200 px-6 py-4">
               <button
                 onClick={onClose}
-                className="w-full py-3 bg-forest-600 text-white rounded-lg font-medium hover:bg-forest-700 transition-colors"
+                className="w-full py-3 bg-charcoal-900 text-white rounded-lg font-medium hover:bg-charcoal-800 transition-colors"
               >
                 Got it, thanks!
               </button>
@@ -297,7 +297,7 @@ export function SizeGuideButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center gap-1 text-sm text-forest-600 hover:text-forest-700 transition-colors"
+      className="inline-flex items-center gap-1 text-sm text-charcoal-900 hover:text-charcoal-800 transition-colors"
     >
       <Ruler className="w-4 h-4" />
       Size Guide

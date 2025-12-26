@@ -306,7 +306,7 @@ export default function AddressesPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-10 h-10 border-4 border-forest-500/30 border-t-forest-500 rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-charcoal-500/30 border-t-charcoal-500 rounded-full animate-spin" />
       </div>
     )
   }
@@ -320,7 +320,7 @@ export default function AddressesPage() {
         </div>
         <button
           onClick={() => openModal()}
-          className="flex items-center gap-2 px-4 py-2 bg-forest-600 text-white rounded-lg font-medium hover:bg-forest-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-charcoal-900 text-white rounded-lg font-medium hover:bg-charcoal-800 transition-colors"
         >
           <Plus className="w-5 h-5" />
           Add Address
@@ -339,7 +339,7 @@ export default function AddressesPage() {
           <p className="text-charcoal-500 mb-6">Add an address to make checkout faster</p>
           <button
             onClick={() => openModal()}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-forest-600 text-white rounded-lg font-medium hover:bg-forest-700 transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-charcoal-900 text-white rounded-lg font-medium hover:bg-charcoal-800 transition-colors"
           >
             <Plus className="w-5 h-5" />
             Add Your First Address
@@ -355,12 +355,12 @@ export default function AddressesPage() {
               transition={{ delay: index * 0.05 }}
               className={`relative border rounded-xl p-4 ${
                 address.isDefault
-                  ? 'border-forest-500 bg-forest-50/50'
+                  ? 'border-charcoal-500 bg-charcoal-50/50'
                   : 'border-cream-200 bg-white'
               }`}
             >
               {address.isDefault && (
-                <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-1 bg-forest-100 text-forest-700 text-xs font-medium rounded-full">
+                <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-1 bg-charcoal-100 text-charcoal-700 text-xs font-medium rounded-full">
                   <Check className="w-3 h-3" />
                   Default
                 </span>
@@ -397,7 +397,7 @@ export default function AddressesPage() {
                 {!address.isDefault && (
                   <button
                     onClick={() => handleSetDefault(address._id)}
-                    className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-sm text-forest-600 hover:bg-forest-50 rounded-lg transition-colors"
+                    className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-sm text-charcoal-900 hover:bg-charcoal-50 rounded-lg transition-colors"
                   >
                     <Check className="w-4 h-4" />
                     Set as Default
@@ -444,7 +444,7 @@ export default function AddressesPage() {
                   type="button"
                   onClick={handleGetLiveLocation}
                   disabled={isGettingLocation}
-                  className="w-full py-3.5 px-4 bg-gradient-to-r from-forest-500 to-forest-600 text-white rounded-xl font-medium hover:from-forest-600 hover:to-forest-700 transition-all disabled:opacity-50 flex items-center justify-center gap-3 shadow-lg shadow-forest-500/20"
+                  className="w-full py-3.5 px-4 bg-gradient-to-r from-charcoal-700 to-charcoal-900 text-white rounded-xl font-medium hover:from-charcoal-800 hover:to-charcoal-950 transition-all disabled:opacity-50 flex items-center justify-center gap-3 shadow-lg shadow-charcoal-500/20"
                 >
                   {isGettingLocation ? (
                     <>
@@ -476,7 +476,7 @@ export default function AddressesPage() {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 ${
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 ${
                         errors.name ? 'border-red-500' : 'border-charcoal-200'
                       }`}
                       placeholder="John Doe"
@@ -493,7 +493,7 @@ export default function AddressesPage() {
                       value={formData.phone}
                       onChange={handleChange}
                       maxLength={10}
-                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 ${
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 ${
                         errors.phone ? 'border-red-500' : 'border-charcoal-200'
                       }`}
                       placeholder="9876543210"
@@ -511,7 +511,7 @@ export default function AddressesPage() {
                     value={formData.address}
                     onChange={handleChange}
                     rows={2}
-                    className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 ${
+                    className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 ${
                       errors.address ? 'border-red-500' : 'border-charcoal-200'
                     }`}
                     placeholder="House/Flat No., Street, Landmark"
@@ -529,7 +529,7 @@ export default function AddressesPage() {
                       name="city"
                       value={formData.city}
                       onChange={handleChange}
-                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 ${
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 ${
                         errors.city ? 'border-red-500' : 'border-charcoal-200'
                       }`}
                       placeholder="Mumbai"
@@ -544,7 +544,7 @@ export default function AddressesPage() {
                       name="state"
                       value={formData.state}
                       onChange={handleChange}
-                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 bg-white ${
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 bg-white ${
                         errors.state ? 'border-red-500' : 'border-charcoal-200'
                       }`}
                     >
@@ -569,7 +569,7 @@ export default function AddressesPage() {
                     value={formData.pincode}
                     onChange={handleChange}
                     maxLength={6}
-                    className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 ${
+                    className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 ${
                       errors.pincode ? 'border-red-500' : 'border-charcoal-200'
                     }`}
                     placeholder="400001"
@@ -583,7 +583,7 @@ export default function AddressesPage() {
                     name="isDefault"
                     checked={formData.isDefault}
                     onChange={handleChange}
-                    className="w-4 h-4 text-forest-600 border-charcoal-300 rounded focus:ring-forest-500"
+                    className="w-4 h-4 text-charcoal-900 border-charcoal-300 rounded focus:ring-charcoal-500"
                   />
                   <span className="text-sm text-charcoal-700">
                     Set as default delivery address
@@ -594,7 +594,7 @@ export default function AddressesPage() {
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="flex-1 py-3 bg-forest-600 text-white rounded-lg font-medium hover:bg-forest-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-charcoal-900 text-white rounded-lg font-medium hover:bg-charcoal-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {isSaving ? (
                       <>

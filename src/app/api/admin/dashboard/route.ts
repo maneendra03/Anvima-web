@@ -27,7 +27,7 @@ export async function GET() {
       monthlySales
     ] = await Promise.all([
       // Total users (excluding admins)
-      User.countDocuments({ role: 'customer' }),
+      User.countDocuments({ role: 'user' }),
       
       // Total active products
       Product.countDocuments({ isActive: true }),

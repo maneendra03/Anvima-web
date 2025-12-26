@@ -1,19 +1,58 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { User, Mail, Phone, Camera, Check } from 'lucide-react'
 import { useAuthStore } from '@/store/auth'
+import { useWishlistStore } from '@/store/wishlistStore'
 import toast from 'react-hot-toast'
+
+interface AccountStats {
+  orders: number
+  reviews: number
+  coupons: number
+}
 
 export default function ProfilePage() {
   const { user, fetchUser } = useAuthStore()
+  const wishlistItems = useWishlistStore((state) => state.items)
   const [isEditing, setIsEditing] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [stats, setStats] = useState<AccountStats>({ orders: 0, reviews: 0, coupons: 0 })
+  const [statsLoading, setStatsLoading] = useState(true)
   const [formData, setFormData] = useState({
     name: user?.name || '',
     phone: user?.phone || '',
   })
+
+  // Fetch account stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Fetch orders count
+        const ordersRes = await fetch('/api/user/orders')
+        const ordersData = await ordersRes.json()
+        const ordersCount = ordersData.success ? ordersData.data?.orders?.length || 0 : 0
+
+        // Fetch available coupons
+        const couponsRes = await fetch('/api/coupons')
+        const couponsData = await couponsRes.json()
+        const couponsCount = couponsData.success ? couponsData.data?.length || 0 : 0
+
+        setStats({
+          orders: ordersCount,
+          reviews: 0, // Reviews count could be fetched if there's an API
+          coupons: couponsCount,
+        })
+      } catch (error) {
+        console.error('Failed to fetch account stats:', error)
+      } finally {
+        setStatsLoading(false)
+      }
+    }
+
+    fetchStats()
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -59,7 +98,7 @@ export default function ProfilePage() {
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="px-4 py-2 text-forest-600 hover:bg-forest-50 rounded-lg transition-colors font-medium"
+            className="px-4 py-2 text-charcoal-900 hover:bg-charcoal-50 rounded-lg transition-colors font-medium"
           >
             Edit Profile
           </button>
@@ -82,7 +121,7 @@ export default function ProfilePage() {
               </span>
             </div>
           )}
-          <button className="absolute bottom-0 right-0 w-8 h-8 bg-forest-600 rounded-full flex items-center justify-center text-white hover:bg-forest-700 transition-colors">
+          <button className="absolute bottom-0 right-0 w-8 h-8 bg-charcoal-900 rounded-full flex items-center justify-center text-white hover:bg-charcoal-800 transition-colors">
             <Camera className="w-4 h-4" />
           </button>
         </div>
@@ -90,7 +129,7 @@ export default function ProfilePage() {
           <h3 className="text-xl font-semibold text-charcoal-800">{user.name}</h3>
           <p className="text-charcoal-500">{user.email}</p>
           {user.isVerified && (
-            <span className="inline-flex items-center gap-1 mt-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+            <span className="inline-flex items-center gap-1 mt-2 px-2 py-1 bg-charcoal-100 text-charcoal-700 text-xs rounded-full">
               <Check className="w-3 h-3" />
               Verified Account
             </span>
@@ -114,7 +153,7 @@ export default function ProfilePage() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-charcoal-200 rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500"
+                  className="w-full pl-10 pr-4 py-3 border border-charcoal-200 rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500"
                   placeholder="Your full name"
                 />
               </div>
@@ -151,7 +190,7 @@ export default function ProfilePage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-charcoal-200 rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500"
+                  className="w-full pl-10 pr-4 py-3 border border-charcoal-200 rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500"
                   placeholder="Your phone number"
                   maxLength={10}
                 />
@@ -195,7 +234,7 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="px-6 py-3 bg-forest-600 text-white rounded-lg font-medium hover:bg-forest-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-6 py-3 bg-charcoal-900 text-white rounded-lg font-medium hover:bg-charcoal-800 transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {isLoading ? (
                 <>
@@ -228,19 +267,31 @@ export default function ProfilePage() {
         <h3 className="text-lg font-semibold text-charcoal-800 mb-4">Account Overview</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-gradient-to-br from-peach-50 to-peach-100 rounded-xl p-4 text-center">
-            <p className="text-3xl font-bold text-peach-600">0</p>
+            {statsLoading ? (
+              <div className="h-9 w-8 mx-auto bg-peach-200 animate-pulse rounded" />
+            ) : (
+              <p className="text-3xl font-bold text-peach-600">{stats.orders}</p>
+            )}
             <p className="text-sm text-charcoal-600">Orders</p>
           </div>
           <div className="bg-gradient-to-br from-blush-50 to-blush-100 rounded-xl p-4 text-center">
-            <p className="text-3xl font-bold text-blush-600">0</p>
+            <p className="text-3xl font-bold text-blush-600">{wishlistItems.length}</p>
             <p className="text-sm text-charcoal-600">Wishlist</p>
           </div>
-          <div className="bg-gradient-to-br from-forest-50 to-forest-100 rounded-xl p-4 text-center">
-            <p className="text-3xl font-bold text-forest-600">0</p>
+          <div className="bg-gradient-to-br from-charcoal-50 to-charcoal-100 rounded-xl p-4 text-center">
+            {statsLoading ? (
+              <div className="h-9 w-8 mx-auto bg-charcoal-200 animate-pulse rounded" />
+            ) : (
+              <p className="text-3xl font-bold text-charcoal-900">{stats.reviews}</p>
+            )}
             <p className="text-sm text-charcoal-600">Reviews</p>
           </div>
           <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4 text-center">
-            <p className="text-3xl font-bold text-amber-600">0</p>
+            {statsLoading ? (
+              <div className="h-9 w-8 mx-auto bg-amber-200 animate-pulse rounded" />
+            ) : (
+              <p className="text-3xl font-bold text-amber-600">{stats.coupons}</p>
+            )}
             <p className="text-sm text-charcoal-600">Coupons</p>
           </div>
         </div>

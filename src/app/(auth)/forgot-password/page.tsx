@@ -88,7 +88,7 @@ export default function ForgotPasswordPage() {
                         setEmail(e.target.value)
                         setError('')
                       }}
-                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 transition-colors ${
+                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 transition-colors ${
                         error ? 'border-red-500' : 'border-charcoal-200'
                       }`}
                       placeholder="you@example.com"
@@ -100,7 +100,7 @@ export default function ForgotPasswordPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-forest-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-forest-700 focus:ring-4 focus:ring-forest-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full bg-charcoal-900 text-white py-3 px-4 rounded-lg font-medium hover:bg-charcoal-800 focus:ring-4 focus:ring-charcoal-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isLoading ? (
                     <>
@@ -122,8 +122,8 @@ export default function ForgotPasswordPage() {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center"
             >
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-green-500" />
+              <div className="w-16 h-16 bg-charcoal-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-charcoal-700" />
               </div>
               <h2 className="font-playfair text-2xl text-charcoal-800 mb-2">
                 Check your email
@@ -137,7 +137,7 @@ export default function ForgotPasswordPage() {
                   Didn&apos;t receive the email? Check your spam folder or{' '}
                   <button
                     onClick={() => setIsSubmitted(false)}
-                    className="text-forest-600 hover:underline font-medium"
+                    className="text-charcoal-900 hover:underline font-medium"
                   >
                     try again
                   </button>
@@ -149,7 +149,7 @@ export default function ForgotPasswordPage() {
           <div className="mt-6 text-center">
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 text-charcoal-600 hover:text-forest-600 transition-colors"
+              className="inline-flex items-center gap-2 text-charcoal-600 hover:text-charcoal-900 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to login
@@ -159,7 +159,7 @@ export default function ForgotPasswordPage() {
 
         <p className="text-center text-sm text-charcoal-500 mt-6">
           Remember your password?{' '}
-          <Link href="/login" className="text-forest-600 hover:underline font-medium">
+          <Link href="/login" className="text-charcoal-900 hover:underline font-medium">
             Sign in
           </Link>
         </p>

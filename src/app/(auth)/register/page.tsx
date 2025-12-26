@@ -136,7 +136,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-cream-50 flex">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-forest-600 to-forest-800 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-charcoal-800 to-charcoal-900 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-20 w-40 h-40 bg-white rounded-full" />
           <div className="absolute bottom-40 right-20 w-60 h-60 bg-white rounded-full" />
@@ -197,14 +197,14 @@ export default function RegisterPage() {
         >
           <div className="text-center mb-8">
             <Link href="/" className="inline-block mb-6">
-              <span className="font-playfair text-3xl text-forest-600">Anvima</span>
+              <span className="font-playfair text-3xl text-charcoal-900">Anvima</span>
             </Link>
             <h2 className="text-2xl font-semibold text-charcoal-800 mb-2">
               Create your account
             </h2>
             <p className="text-charcoal-500">
               Already have an account?{' '}
-              <Link href="/login" className="text-forest-600 hover:text-forest-700 font-medium">
+              <Link href="/login" className="text-charcoal-900 hover:text-charcoal-800 font-medium">
                 Sign in
               </Link>
             </p>
@@ -224,7 +224,7 @@ export default function RegisterPage() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 transition-colors ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 transition-colors ${
                     errors.name ? 'border-red-500' : 'border-charcoal-200'
                   }`}
                   placeholder="Your full name"
@@ -246,7 +246,7 @@ export default function RegisterPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 transition-colors ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 transition-colors ${
                     errors.email ? 'border-red-500' : 'border-charcoal-200'
                   }`}
                   placeholder="you@example.com"
@@ -268,7 +268,7 @@ export default function RegisterPage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 transition-colors ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 transition-colors ${
                     errors.phone ? 'border-red-500' : 'border-charcoal-200'
                   }`}
                   placeholder="9876543210"
@@ -291,7 +291,7 @@ export default function RegisterPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 transition-colors ${
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 transition-colors ${
                     errors.password ? 'border-red-500' : 'border-charcoal-200'
                   }`}
                   placeholder="••••••••"
@@ -341,7 +341,7 @@ export default function RegisterPage() {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 transition-colors ${
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 transition-colors ${
                     errors.confirmPassword ? 'border-red-500' : 'border-charcoal-200'
                   }`}
                   placeholder="••••••••"
@@ -366,15 +366,15 @@ export default function RegisterPage() {
                   type="checkbox"
                   checked={acceptTerms}
                   onChange={(e) => setAcceptTerms(e.target.checked)}
-                  className="w-4 h-4 mt-0.5 text-forest-600 border-charcoal-300 rounded focus:ring-forest-500"
+                  className="w-4 h-4 mt-0.5 text-charcoal-900 border-charcoal-300 rounded focus:ring-charcoal-500"
                 />
                 <span className="text-sm text-charcoal-600">
                   I agree to the{' '}
-                  <Link href="/faq" className="text-forest-600 hover:underline">
+                  <Link href="/faq" className="text-charcoal-900 hover:underline">
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link href="/faq" className="text-forest-600 hover:underline">
+                  <Link href="/faq" className="text-charcoal-900 hover:underline">
                     Privacy Policy
                   </Link>
                 </span>
@@ -386,7 +386,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-forest-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-forest-700 focus:ring-4 focus:ring-forest-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-charcoal-900 text-white py-3 px-4 rounded-lg font-medium hover:bg-charcoal-800 focus:ring-4 focus:ring-charcoal-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>

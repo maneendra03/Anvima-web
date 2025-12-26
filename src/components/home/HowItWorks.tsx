@@ -6,72 +6,69 @@ import { Upload, Palette, Truck } from 'lucide-react'
 const steps = [
   {
     icon: Upload,
-    title: 'Upload & Choose',
+    number: '01',
+    title: 'Choose & Upload',
     description: 'Select your favorite product and upload your photos or add personalized text',
-    color: 'bg-peach-100 text-peach-600',
   },
   {
     icon: Palette,
-    title: 'Customize',
-    description: 'Preview your design in real-time. Adjust size, color, and finishing touches',
-    color: 'bg-blush-100 text-blush-600',
+    number: '02',
+    title: 'We Customize',
+    description: 'Our artisans carefully craft your design with attention to every detail',
   },
   {
     icon: Truck,
-    title: 'Receive & Enjoy',
-    description: 'We carefully craft and ship your gift. Delivered to your doorstep with love',
-    color: 'bg-forest-500/10 text-forest-600',
+    number: '03',
+    title: 'Delivered to You',
+    description: 'Receive your beautifully packaged gift, ready to create memories',
   },
 ]
 
 export default function HowItWorks() {
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 md:py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12 md:mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-charcoal-700 mb-4">
+          <p className="text-sm tracking-[0.2em] uppercase text-charcoal-400 mb-4">
+            Simple Process
+          </p>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-charcoal-900 mb-4">
             How It Works
           </h2>
-          <p className="text-charcoal-500 max-w-2xl mx-auto">
-            Creating your perfect personalized gift is easy with our simple 3-step process
+          <p className="text-charcoal-500 max-w-xl mx-auto">
+            Creating your perfect personalized gift is easy
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8 relative">
-          {/* Connection line - desktop only */}
-          <div className="hidden md:block absolute top-20 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-peach-200 via-blush-200 to-forest-200" />
-
+        <div className="grid md:grid-cols-3 gap-8 md:gap-12">
           {steps.map((step, index) => (
             <motion.div
               key={step.title}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.2 }}
+              transition={{ delay: index * 0.15 }}
               className="text-center relative"
             >
-              {/* Step number */}
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-white border-2 border-cream-200 rounded-full flex items-center justify-center text-sm font-bold text-charcoal-600 z-10">
-                {index + 1}
+              {/* Number */}
+              <div className="text-7xl md:text-8xl font-serif text-charcoal-100 mb-4">
+                {step.number}
               </div>
 
               {/* Icon */}
-              <motion.div
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                className={`w-20 h-20 mx-auto rounded-2xl ${step.color} flex items-center justify-center mb-6`}
-              >
-                <step.icon className="w-10 h-10" />
-              </motion.div>
+              <div className="w-14 h-14 mx-auto border border-charcoal-200 flex items-center justify-center mb-6 -mt-8 bg-white relative z-10">
+                <step.icon className="w-6 h-6 text-charcoal-700" />
+              </div>
 
-              <h3 className="text-xl font-semibold text-charcoal-700 mb-3">
+              <h3 className="text-lg font-medium text-charcoal-900 mb-3 tracking-wide">
                 {step.title}
               </h3>
-              <p className="text-charcoal-500">
+              <p className="text-charcoal-500 text-sm leading-relaxed max-w-xs mx-auto">
                 {step.description}
               </p>
             </motion.div>

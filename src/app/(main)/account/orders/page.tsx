@@ -25,7 +25,7 @@ const statusConfig = {
   confirmed: { label: 'Confirmed', color: 'bg-blue-100 text-blue-700', icon: CheckCircle },
   processing: { label: 'Processing', color: 'bg-purple-100 text-purple-700', icon: Package },
   shipped: { label: 'Shipped', color: 'bg-indigo-100 text-indigo-700', icon: Truck },
-  delivered: { label: 'Delivered', color: 'bg-green-100 text-green-700', icon: CheckCircle },
+  delivered: { label: 'Delivered', color: 'bg-charcoal-100 text-charcoal-700', icon: CheckCircle },
   cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-700', icon: XCircle },
 }
 
@@ -106,7 +106,7 @@ export default function OrdersPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-10 h-10 border-4 border-forest-500/30 border-t-forest-500 rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-charcoal-500/30 border-t-charcoal-500 rounded-full animate-spin" />
       </div>
     )
   }
@@ -129,13 +129,13 @@ export default function OrdersPage() {
             placeholder="Search by order number..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-charcoal-200 rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500"
+            className="w-full pl-10 pr-4 py-2.5 border border-charcoal-200 rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500"
           />
         </div>
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="px-4 py-2.5 border border-charcoal-200 rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 bg-white"
+          className="px-4 py-2.5 border border-charcoal-200 rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 bg-white"
         >
           <option value="all">All Orders</option>
           <option value="pending">Pending</option>
@@ -166,7 +166,7 @@ export default function OrdersPage() {
           {orders.length === 0 && (
             <Link
               href="/shop"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-forest-600 text-white rounded-lg font-medium hover:bg-forest-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-charcoal-900 text-white rounded-lg font-medium hover:bg-charcoal-800 transition-colors"
             >
               Start Shopping
               <ChevronRight className="w-5 h-5" />
@@ -245,7 +245,7 @@ export default function OrdersPage() {
                     <div className="flex gap-3 w-full sm:w-auto">
                       <Link
                         href={`/account/orders/${order.id}`}
-                        className="flex-1 sm:flex-none px-4 py-2 bg-forest-600 text-white rounded-lg font-medium hover:bg-forest-700 transition-colors text-center"
+                        className="flex-1 sm:flex-none px-4 py-2 bg-charcoal-900 text-white rounded-lg font-medium hover:bg-charcoal-800 transition-colors text-center"
                       >
                         View Details
                       </Link>
@@ -258,7 +258,7 @@ export default function OrdersPage() {
                         </button>
                       )}
                       {order.status === 'delivered' && (
-                        <button className="flex-1 sm:flex-none px-4 py-2 border border-forest-600 text-forest-600 rounded-lg font-medium hover:bg-forest-50 transition-colors">
+                        <button className="flex-1 sm:flex-none px-4 py-2 border border-charcoal-900 text-charcoal-900 rounded-lg font-medium hover:bg-charcoal-50 transition-colors">
                           Write Review
                         </button>
                       )}

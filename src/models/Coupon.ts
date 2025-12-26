@@ -14,6 +14,8 @@ export interface ICoupon extends Document {
   validFrom: Date
   validUntil: Date
   isActive: boolean
+  showInBanner: boolean
+  bannerText?: string
   applicableProducts?: mongoose.Types.ObjectId[]
   applicableCategories?: mongoose.Types.ObjectId[]
   excludedProducts?: mongoose.Types.ObjectId[]
@@ -77,6 +79,14 @@ const CouponSchema = new Schema<ICoupon>(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    showInBanner: {
+      type: Boolean,
+      default: false,
+    },
+    bannerText: {
+      type: String,
+      maxlength: [100, 'Banner text cannot exceed 100 characters'],
     },
     applicableProducts: [{
       type: Schema.Types.ObjectId,

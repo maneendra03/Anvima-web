@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Eye, EyeOff, Lock, Bell, Shield, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -19,6 +19,7 @@ export default function SettingsPage() {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [notificationsLoading, setNotificationsLoading] = useState(true)
 
   const [notifications, setNotifications] = useState({
     orderUpdates: true,
@@ -26,6 +27,30 @@ export default function SettingsPage() {
     newsletter: true,
     sms: false,
   })
+
+  // Fetch notification preferences on mount
+  useEffect(() => {
+    const fetchNotificationPreferences = async () => {
+      try {
+        const response = await fetch('/api/user/notifications')
+        const data = await response.json()
+        if (data.success && data.data) {
+          setNotifications({
+            orderUpdates: data.data.orderUpdates ?? true,
+            promotions: data.data.promotions ?? false,
+            newsletter: data.data.newsletter ?? true,
+            sms: data.data.sms ?? false,
+          })
+        }
+      } catch (error) {
+        console.error('Failed to fetch notification preferences:', error)
+      } finally {
+        setNotificationsLoading(false)
+      }
+    }
+
+    fetchNotificationPreferences()
+  }, [])
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -91,11 +116,18 @@ export default function SettingsPage() {
     setNotifications((prev) => ({ ...prev, [key]: newValue }))
 
     try {
-      await fetch('/api/user/notifications', {
+      const response = await fetch('/api/user/notifications', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ [key]: newValue }),
       })
+
+      const data = await response.json()
+      if (!data.success) {
+        // Revert on error
+        setNotifications((prev) => ({ ...prev, [key]: !newValue }))
+        toast.error(data.message || 'Failed to update preferences')
+      }
     } catch {
       // Revert on error
       setNotifications((prev) => ({ ...prev, [key]: !newValue }))
@@ -143,8 +175,8 @@ export default function SettingsPage() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-forest-100 rounded-lg flex items-center justify-center">
-              <Lock className="w-5 h-5 text-forest-600" />
+            <div className="w-10 h-10 bg-charcoal-100 rounded-lg flex items-center justify-center">
+              <Lock className="w-5 h-5 text-charcoal-900" />
             </div>
             <div>
               <h3 className="font-semibold text-charcoal-800">Password</h3>
@@ -154,7 +186,7 @@ export default function SettingsPage() {
           {!isChangingPassword && (
             <button
               onClick={() => setIsChangingPassword(true)}
-              className="px-4 py-2 text-forest-600 hover:bg-forest-50 rounded-lg font-medium transition-colors"
+              className="px-4 py-2 text-charcoal-900 hover:bg-charcoal-50 rounded-lg font-medium transition-colors"
             >
               Change Password
             </button>
@@ -179,7 +211,7 @@ export default function SettingsPage() {
                   name="currentPassword"
                   value={passwordData.currentPassword}
                   onChange={handlePasswordChange}
-                  className={`w-full px-3 py-2.5 pr-10 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 ${
+                  className={`w-full px-3 py-2.5 pr-10 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 ${
                     errors.currentPassword ? 'border-red-500' : 'border-charcoal-200'
                   }`}
                 />
@@ -206,7 +238,7 @@ export default function SettingsPage() {
                   name="newPassword"
                   value={passwordData.newPassword}
                   onChange={handlePasswordChange}
-                  className={`w-full px-3 py-2.5 pr-10 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 ${
+                  className={`w-full px-3 py-2.5 pr-10 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 ${
                     errors.newPassword ? 'border-red-500' : 'border-charcoal-200'
                   }`}
                 />
@@ -233,7 +265,7 @@ export default function SettingsPage() {
                   name="confirmPassword"
                   value={passwordData.confirmPassword}
                   onChange={handlePasswordChange}
-                  className={`w-full px-3 py-2.5 pr-10 border rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500 ${
+                  className={`w-full px-3 py-2.5 pr-10 border rounded-lg focus:ring-2 focus:ring-charcoal-500 focus:border-charcoal-500 ${
                     errors.confirmPassword ? 'border-red-500' : 'border-charcoal-200'
                   }`}
                 />
@@ -254,7 +286,7 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="px-6 py-2.5 bg-forest-600 text-white rounded-lg font-medium hover:bg-forest-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-6 py-2.5 bg-charcoal-900 text-white rounded-lg font-medium hover:bg-charcoal-800 transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {isLoading && (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -296,7 +328,19 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-4">
-          {[
+          {notificationsLoading ? (
+            // Loading skeleton
+            [...Array(4)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between p-4 bg-cream-50 rounded-xl animate-pulse">
+                <div>
+                  <div className="h-5 w-32 bg-cream-200 rounded mb-2" />
+                  <div className="h-4 w-48 bg-cream-200 rounded" />
+                </div>
+                <div className="w-11 h-6 bg-cream-200 rounded-full" />
+              </div>
+            ))
+          ) : (
+          [
             { key: 'orderUpdates', label: 'Order Updates', description: 'Get notified about order status changes' },
             { key: 'promotions', label: 'Promotions & Offers', description: 'Receive exclusive deals and discounts' },
             { key: 'newsletter', label: 'Newsletter', description: 'Weekly updates about new products' },
@@ -320,7 +364,7 @@ export default function SettingsPage() {
                 <div
                   className={`w-11 h-6 rounded-full transition-colors ${
                     notifications[item.key as keyof typeof notifications]
-                      ? 'bg-forest-600'
+                      ? 'bg-charcoal-900'
                       : 'bg-charcoal-200'
                   }`}
                 >
@@ -334,7 +378,8 @@ export default function SettingsPage() {
                 </div>
               </div>
             </label>
-          ))}
+          ))
+          )}
         </div>
       </section>
 
@@ -358,7 +403,7 @@ export default function SettingsPage() {
               <p className="font-medium text-charcoal-800">Two-Factor Authentication</p>
               <p className="text-sm text-charcoal-500">Add an extra layer of security</p>
             </div>
-            <button className="px-4 py-2 border border-forest-600 text-forest-600 rounded-lg font-medium hover:bg-forest-50 transition-colors">
+            <button className="px-4 py-2 border border-charcoal-900 text-charcoal-900 rounded-lg font-medium hover:bg-charcoal-50 transition-colors">
               Enable
             </button>
           </div>

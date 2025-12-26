@@ -154,7 +154,7 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
                           onClick={() => setSelectedImage(index)}
                           className={`w-2 h-2 rounded-full transition-all ${
                             index === selectedImage
-                              ? 'bg-forest-600 w-4'
+                              ? 'bg-charcoal-900 w-4'
                               : 'bg-white/60 hover:bg-white'
                           }`}
                         />
@@ -194,7 +194,7 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
 
                 {/* Price */}
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-3xl font-bold text-forest-600">
+                  <span className="text-3xl font-bold text-charcoal-900">
                     ₹{calculatePrice().toLocaleString('en-IN')}
                   </span>
                   {product.originalPrice && product.originalPrice > product.price && (
@@ -222,7 +222,7 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
                           onClick={() => setSelectedSize(size.name)}
                           className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
                             selectedSize === size.name
-                              ? 'border-forest-600 bg-forest-50 text-forest-700'
+                              ? 'border-charcoal-900 bg-charcoal-50 text-charcoal-900'
                               : 'border-charcoal-200 hover:border-charcoal-300'
                           }`}
                         >
@@ -247,7 +247,7 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
                           onClick={() => setSelectedColor(color.name)}
                           className={`w-10 h-10 rounded-full border-2 transition-all ${
                             selectedColor === color.name
-                              ? 'border-forest-600 ring-2 ring-forest-200'
+                              ? 'border-charcoal-900 ring-2 ring-charcoal-200'
                               : 'border-transparent hover:border-charcoal-300'
                           }`}
                           style={{ backgroundColor: color.hex }}
@@ -299,7 +299,7 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
                 {/* View Full Details Link */}
                 <Link
                   href={`/product/${product.slug}`}
-                  className="mt-4 inline-flex items-center gap-1 text-forest-600 hover:text-forest-700 text-sm font-medium"
+                  className="mt-4 inline-flex items-center gap-1 text-charcoal-900 hover:text-charcoal-800 text-sm font-medium"
                   onClick={onClose}
                 >
                   View Full Details

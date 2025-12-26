@@ -18,6 +18,7 @@ import {
   Minus,
   Plus,
   Loader2,
+  Package,
 } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { useRecentlyViewedStore } from '@/store/recentlyViewed'
@@ -88,6 +89,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
+  const [failedImages, setFailedImages] = useState<Set<number>>(new Set())
+  
+  // Handle image load errors without causing infinite loops
+  const handleImageError = (imageIndex: number) => {
+    setFailedImages(prev => new Set(prev).add(imageIndex))
+  }
   
   // Animation states
   const [addedToCart, setAddedToCart] = useState(false)
@@ -183,9 +190,23 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   }
 
   // Get image URL helper
-  const getImageUrl = (image: ProductImage | string, index?: number): string => {
-    if (typeof image === 'string') return image
-    return image.url || '/placeholder.jpg'
+  const getImageUrl = (image: ProductImage | string | undefined | null): string => {
+    if (!image) return '/placeholder.jpg'
+    if (typeof image === 'string') return image || '/placeholder.jpg'
+    return image?.url || '/placeholder.jpg'
+  }
+
+  // Check if URL is external (needs unoptimized)
+  const isExternalUrl = (url: string): boolean => {
+    return url.startsWith('http://') || url.startsWith('https://')
+  }
+
+  // Safely get images array
+  const getProductImages = (): ProductImage[] => {
+    if (!product?.images || product.images.length === 0) {
+      return [{ url: '/placeholder.jpg', isPrimary: true }]
+    }
+    return product.images
   }
 
   // Calculate price with variant options
@@ -287,74 +308,93 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Image Gallery */}
           <div className="space-y-4">
-            <motion.div
-              key={selectedImage}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="relative aspect-square rounded-2xl overflow-hidden bg-white"
-            >
-              {product.images[selectedImage] ? (
-                <Image
-                  src={getImageUrl(product.images[selectedImage])}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                  <span className="text-gray-400">No image</span>
-                </div>
-              )}
-              
-              {/* Navigation arrows */}
-              {product.images.length > 1 && (
+            {(() => {
+              const images = getProductImages()
+              return (
                 <>
-                  <button
-                    onClick={() =>
-                      setSelectedImage(
-                        (prev) => (prev - 1 + product.images.length) % product.images.length
-                      )
-                    }
-                    className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors"
+                  <motion.div
+                    key={selectedImage}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="relative aspect-square rounded-2xl overflow-hidden bg-cream-100"
                   >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() =>
-                      setSelectedImage((prev) => (prev + 1) % product.images.length)
-                    }
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </>
-              )}
-            </motion.div>
+                    {images[selectedImage]?.url && !failedImages.has(selectedImage) ? (
+                      <Image
+                        src={getImageUrl(images[selectedImage])}
+                        alt={product.name}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        className="object-cover"
+                        priority
+                        unoptimized
+                        onError={() => handleImageError(selectedImage)}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cream-100 to-cream-200">
+                        <Package className="w-16 h-16 text-charcoal-300" />
+                      </div>
+                    )}
+                    
+                    {/* Navigation arrows */}
+                    {images.length > 1 && (
+                      <>
+                        <button
+                          onClick={() =>
+                            setSelectedImage(
+                              (prev) => (prev - 1 + images.length) % images.length
+                            )
+                          }
+                          className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() =>
+                            setSelectedImage((prev) => (prev + 1) % images.length)
+                          }
+                          className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
+                  </motion.div>
 
-            {/* Thumbnails */}
-            {product.images.length > 1 && (
-              <div className="flex gap-4 overflow-x-auto pb-2">
-                {product.images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${
-                      selectedImage === index
-                        ? 'border-forest-500'
-                        : 'border-transparent'
-                    }`}
-                  >
-                    <Image
-                      src={getImageUrl(image)}
-                      alt={`${product.name} ${index + 1}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
+                  {/* Thumbnails */}
+                  {images.length > 1 && (
+                    <div className="flex gap-4 overflow-x-auto pb-2">
+                      {images.map((image, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedImage(index)}
+                          className={`relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-colors bg-cream-100 ${
+                            selectedImage === index
+                              ? 'border-forest-500'
+                              : 'border-transparent'
+                          }`}
+                        >
+                          {!failedImages.has(index) ? (
+                            <Image
+                              src={getImageUrl(image)}
+                              alt={`${product.name} ${index + 1}`}
+                              fill
+                              sizes="80px"
+                              className="object-cover"
+                              unoptimized
+                              onError={() => handleImageError(index)}
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="w-6 h-6 text-charcoal-300" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )
+            })()}
           </div>
 
           {/* Product Info */}
@@ -667,13 +707,20 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   href={`/product/${relatedProduct.slug}`}
                   className="group"
                 >
-                  <div className="relative aspect-square rounded-xl overflow-hidden bg-cream-50 mb-3">
-                    <Image
-                      src={getImageUrl(relatedProduct.images[0])}
-                      alt={relatedProduct.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                  <div className="relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-cream-100 to-cream-200 mb-3">
+                    {relatedProduct.images?.[0] ? (
+                      <Image
+                        src={getImageUrl(relatedProduct.images[0])}
+                        alt={relatedProduct.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Package className="w-10 h-10 text-charcoal-300" />
+                      </div>
+                    )}
                   </div>
                   <h3 className="font-medium text-charcoal-700 group-hover:text-forest-500 transition-colors line-clamp-2">
                     {relatedProduct.name}
