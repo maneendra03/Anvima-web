@@ -105,31 +105,31 @@ export default function Header() {
     >
       {/* Top Bar - Dynamic Coupon Banner */}
       {bannerCoupon && (
-        <div className="bg-charcoal-900 text-white text-center py-2 px-4 text-xs md:text-sm tracking-wide">
+        <div className="bg-charcoal-900 text-white text-center py-2.5 px-4 text-[11px] sm:text-xs md:text-sm tracking-wide leading-tight">
           {bannerCoupon.text} • Code: <span className="font-semibold">{bannerCoupon.code}</span>
         </div>
       )}
 
       <nav className="border-b border-charcoal-100 relative" style={{ zIndex: 9999 }}>
-        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
             {/* Mobile menu button */}
             <button
-              className="md:hidden flex items-center justify-center w-12 h-12 -ml-2 text-charcoal-700 hover:text-charcoal-900 active:bg-gray-200 rounded-lg relative z-[9999]"
+              className="md:hidden flex items-center justify-center w-10 h-10 -ml-1 text-charcoal-700 hover:text-charcoal-900 active:bg-gray-100 rounded-lg"
               aria-label="Toggle menu"
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? (
-                <X className="w-7 h-7" />
+                <X className="w-6 h-6" />
               ) : (
-                <Menu className="w-7 h-7" />
+                <Menu className="w-6 h-6" />
               )}
             </button>
 
             {/* Logo - Center on mobile, left on desktop */}
             <Link href="/" className="flex items-center md:mr-12">
-              <span className="text-2xl md:text-3xl font-serif font-semibold tracking-tight text-charcoal-900">
+              <span className="text-xl sm:text-2xl md:text-3xl font-serif font-semibold tracking-tight text-charcoal-900">
                 ANVIMA
               </span>
             </Link>
@@ -148,7 +148,7 @@ export default function Header() {
             </div>
 
             {/* Actions - Right */}
-            <div className="flex items-center space-x-1 md:space-x-3">
+            <div className="flex items-center gap-0.5 sm:gap-1 md:gap-3">
               {/* Desktop Search Bar */}
               <div className="hidden lg:flex items-center">
                 <form onSubmit={handleSearch} className="relative">
@@ -166,15 +166,17 @@ export default function Header() {
               {/* Mobile Search Button */}
               <button 
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="lg:hidden p-2 text-charcoal-700 hover:text-charcoal-900 transition-colors"
+                className="lg:hidden flex items-center justify-center w-10 h-10 text-charcoal-700 hover:text-charcoal-900 active:bg-gray-100 rounded-lg transition-colors"
+                aria-label="Search"
               >
                 <Search className="w-5 h-5" />
               </button>
 
-              {/* Wishlist - Hidden on mobile */}
+              {/* Wishlist - Hidden on small mobile */}
               <Link 
                 href="/account/wishlist"
-                className="hidden sm:block p-2 text-charcoal-700 hover:text-charcoal-900 transition-colors"
+                className="hidden sm:flex items-center justify-center w-10 h-10 text-charcoal-700 hover:text-charcoal-900 active:bg-gray-100 rounded-lg transition-colors"
+                aria-label="Wishlist"
               >
                 <Heart className="w-5 h-5" />
               </Link>
@@ -184,7 +186,8 @@ export default function Header() {
                 <div className="relative hidden md:block">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="p-2 text-charcoal-700 hover:text-charcoal-900 transition-colors"
+                    className="flex items-center justify-center w-10 h-10 text-charcoal-700 hover:text-charcoal-900 active:bg-gray-100 rounded-lg transition-colors"
+                    aria-label="User menu"
                   >
                     <User className="w-5 h-5" />
                   </button>
@@ -244,23 +247,25 @@ export default function Header() {
               ) : hasHydrated ? (
                 <Link
                   href="/login"
-                  className="hidden md:block p-2 text-charcoal-700 hover:text-charcoal-900 transition-colors"
+                  className="hidden md:flex items-center justify-center w-10 h-10 text-charcoal-700 hover:text-charcoal-900 active:bg-gray-100 rounded-lg transition-colors"
+                  aria-label="Sign in"
                 >
                   <User className="w-5 h-5" />
                 </Link>
               ) : (
-                <div className="hidden md:block w-5 h-5" />
+                <div className="hidden md:block w-10 h-10" />
               )}
 
               {/* Cart */}
               <Link
                 href="/cart"
-                className="p-2 text-charcoal-700 hover:text-charcoal-900 transition-colors relative"
+                className="flex items-center justify-center w-10 h-10 text-charcoal-700 hover:text-charcoal-900 active:bg-gray-100 rounded-lg transition-colors relative"
+                aria-label="Cart"
               >
                 <ShoppingBag className="w-5 h-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-charcoal-900 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-medium">
-                    {cartCount}
+                  <span className="absolute top-0.5 right-0.5 bg-charcoal-900 text-white text-[9px] min-w-[16px] h-4 px-1 rounded-full flex items-center justify-center font-medium">
+                    {cartCount > 99 ? '99+' : cartCount}
                   </span>
                 )}
               </Link>
@@ -271,7 +276,7 @@ export default function Header() {
 
       {/* Mobile Menu - Simplified without AnimatePresence */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-[100]" style={{ top: bannerCoupon ? '104px' : '64px' }}>
+        <div className="md:hidden fixed inset-0 z-[1000]" style={{ top: bannerCoupon ? '94px' : '56px' }}>
           {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-black/40"
@@ -375,22 +380,23 @@ export default function Header() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-white z-50"
+            className="fixed inset-0 bg-white z-[1001]"
           >
             <div className="h-full flex flex-col">
-              <div className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-charcoal-100">
+              <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 h-14 sm:h-16 border-b border-charcoal-100">
                 <span className="text-sm text-charcoal-500 uppercase tracking-wide">Search</span>
                 <button
                   onClick={() => {
                     setIsSearchOpen(false)
                     setSearchQuery('')
                   }}
-                  className="p-2 text-charcoal-700 hover:text-charcoal-900"
+                  className="flex items-center justify-center w-10 h-10 text-charcoal-700 hover:text-charcoal-900 active:bg-gray-100 rounded-lg -mr-2"
+                  aria-label="Close search"
                 >
                   <X className="w-6 h-6" />
                 </button>
               </div>
-              <div className="flex-1 flex items-start justify-center pt-20 md:pt-32 px-4">
+              <div className="flex-1 flex items-start justify-center pt-16 sm:pt-20 md:pt-32 px-4 sm:px-6">
                 <form onSubmit={handleSearch} className="w-full max-w-2xl">
                   <div className="relative">
                     <input
@@ -398,12 +404,12 @@ export default function Header() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search for products..."
-                      className="w-full text-2xl md:text-4xl font-serif text-charcoal-900 placeholder:text-charcoal-300 border-0 border-b-2 border-charcoal-200 focus:border-charcoal-900 focus:ring-0 pb-4 bg-transparent"
+                      className="w-full text-xl sm:text-2xl md:text-4xl font-serif text-charcoal-900 placeholder:text-charcoal-300 border-0 border-b-2 border-charcoal-200 focus:border-charcoal-900 focus:ring-0 pb-3 sm:pb-4 bg-transparent"
                       autoFocus
                     />
                   </div>
-                  <p className="mt-4 text-sm text-charcoal-500">
-                    Press Enter to search or ESC to close
+                  <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-charcoal-500">
+                    Press Enter to search or tap X to close
                   </p>
                 </form>
               </div>
